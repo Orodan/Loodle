@@ -23,6 +23,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configuration ===============================================
+var database = require("./config/database");
+database.init(function (err) {
+	if (err) { return new Error(err); }
+});
+
+// Routes ======================================================
 app.use('/', routes);
 app.use('/users', users);
 
