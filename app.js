@@ -7,7 +7,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./app/routes/index');
-var users = require('./app/routes/users');
 
 var app = express();
 
@@ -31,7 +30,6 @@ database.init(function (err) {
 
 // Routes ======================================================
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
