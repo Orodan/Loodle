@@ -1,0 +1,18 @@
+extends layout
+
+block content
+	include partials/sign-nav
+
+	.container
+		.center
+			form(action="/new-doodle" method="POST")
+
+				.form-group()
+					label(for="name") Name
+					input(type="text" name="name" class="form-control" placeholder="Name" required)
+
+				.form-group()
+					label(for="description") Description
+					textarea(name="description" class="form-control" placeholder="Description")
+
+				button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send

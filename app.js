@@ -8,6 +8,10 @@ var bodyParser = require('body-parser');
 
 var routes = require('./app/routes/index');
 
+var passport = require('passport');
+var session = require('express-session');
+var flash = require('connect-flash');
+
 var app = express();
 
 // view engine setup
@@ -27,6 +31,19 @@ var database = require("./config/database");
 database.init(function (err) {
 	if (err) { return new Error(err); }
 });
+
+require('./config/passport')(passport);
+
+// required for passport
+app.use(session({
+                    secret : 'masupersessionsecrete',
+                    saveUninitialized : true,
+                    resave : true
+                }));
+app.use(passport.initialize());
+app.use(passport.session());        // persistent login sessions
+app.use(flash());                   // flash messages stored in session
+
 
 // Routes ======================================================
 app.use('/', routes);

@@ -1,6 +1,13 @@
 extends layout
 
 block content
+	include partials/nav
+
 	.container
-		.login
-			
+
+		if (message.error)
+			.alert.alert-danger.center
+				p= message.error
+		if (message.success)
+			.alert.alert-success.center
+				p= message.success

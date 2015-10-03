@@ -1,0 +1,26 @@
+extends layout
+
+block content
+	include partials/sign-nav
+	
+	.container
+		div(class="center")
+				form(action="/sign-up" method="POST")
+
+					.form-group()
+						label(for="email") Email
+						input(type="email" name="email" class="form-control" placeholder="Email" required)
+
+					.form-group()
+						label(for="first_name") First Name
+						input(type="text" name="first_name" class="form-control" placeholder="First Name" required)
+
+					.form-group()
+						label(for="first_name") Last Name
+						input(type="text" name="last_name" class="form-control" placeholder="Last Name" required)
+
+					.form-group()
+						label(for="password") Password
+						input(type="password" name="password" class="form-control" placeholder="Password" required)
+
+					button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send
