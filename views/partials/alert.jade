@@ -1,6 +1,4 @@
-if (message.error)
-	.alert.alert-danger
-		p= message.error
-if (message.success)
-	.alert.alert-success
-		p= message.success
+div(ng-controller="alertController as alertCtrl")
+
+	div(ng-show="alertCtrl.alert.message != undefined" class="alert alert-{{alertCtrl.alert.type}}")
+		p {{alertCtrl.alert.message}}

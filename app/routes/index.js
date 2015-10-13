@@ -1,58 +1,42 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('passport');
 
-/* GET home page. */
-router.get('/', isAuthenticated, function(req, res, next) {
-	res.render('index', {
-		message: req.flash()
-	});
+var Loodle = require('../controllers/loodle');
+
+var jwt = require('express-jwt');
+var secret = require('../../config/secret');
+
+router.use(jwt({ 
+    secret: secret
+  }).unless({ 
+    path : ['/sign-up', '/login', '/logout'] 
+  }));
+
+router.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+  	res.redirect('/login');
+  }
 });
 
-/** Login **/
+// Index page =========================================
+router.get('/', function(req, res) {
+	res.render('index');
+});
+
+// Login page =========================================
 router.get('/login', function (req, res) {
-	res.render('login', {
-		message: req.flash()
-	});
+	res.render('login');
 });
 
-/** Process login **/
-router.post('/login', passport.authenticate('local-login', {
-	successRedirect: '/',
-	failureRedirect: '/login',
-	failureFlash: true,
-	successFlash: true
-}));
-
-/** Sign up **/
+// Signup page ========================================
 router.get('/sign-up', function (req, res) {
 	res.render('sign-up');
 });
 
-router.post('/sign-up', passport.authenticate('local-signup', {
-	successRedirect: '/',
-	failureRedirect: '/sign-up',
-	failureFlash: true,
-    successFlash: true
-}));
-
-/** Logout **/
+// Logout page ========================================
 router.get('/logout', function (req, res) {
 	req.logout();
 	res.redirect('/login');
 });
-
-/** GET New doodle **/
-router.get('/new-doodle', isAuthenticated, function (req, res) {
-	res.render('new-doodle');
-});
-
-function isAuthenticated (req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-
-	res.redirect('/login');
-}
 
 module.exports = router;
