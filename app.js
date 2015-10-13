@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var routes = require('./app/routes/index');
 var api = require('./app/routes/api');
 
+var jwt = require('express-jwt');
 var secret = require('./config/secret');
 
 var app = express();
@@ -33,8 +34,8 @@ database.init(function (err) {
 });
 
 // Routes ======================================================
-app.use('/', routes);
 app.use('/api', api);
+app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
