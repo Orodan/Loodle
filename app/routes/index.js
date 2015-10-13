@@ -42,11 +42,10 @@ router.get('/logout', function (req, res) {
 	res.redirect('/login');
 });
 
-/** New doodle **/
+/** GET New doodle **/
 router.get('/new-doodle', isAuthenticated, function (req, res) {
 	res.render('new-doodle');
 });
-
 
 function isAuthenticated (req, res, next) {
 	if (req.isAuthenticated()) {

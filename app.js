@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./app/routes/index');
+var api = require('./app/routes/api');
 
 var passport = require('passport');
 var session = require('express-session');
@@ -47,6 +48,7 @@ app.use(flash());                   // flash messages stored in session
 
 // Routes ======================================================
 app.use('/', routes);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
