@@ -4,18 +4,19 @@ block content
 	include partials/sign-nav
 
 	.container
-		.center
+		.center(ng-controller="authController")
 
-			include partials/alert
+			alert
 
-			form(action="/login" method="POST")
+			div(ng-controller='authController as authCtrl')
+				form(ng-submit="authCtrl.login()")
 
-				.form-group()
-					label(for="email") Email
-					input(type="email" name="email" class="form-control" placeholder="Email" required)
+					.form-group()
+						label(for="email") Email
+						input(type="email" ng-model="authCtrl.email" name="email" class="form-control" placeholder="Email" required)
 
-				.form-group()
-					label(for="password") Password
-					input(type="password" name="password" class="form-control" placeholder="Password" required)
+					.form-group()
+						label(for="password") Password
+						input(type="password" ng-model="authCtrl.password" name="password" class="form-control" placeholder="Password" required)
 
-				button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send
+					button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send

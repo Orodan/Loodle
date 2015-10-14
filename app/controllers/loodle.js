@@ -19,15 +19,41 @@ module.exports = {
 			}
 		}, function (err, results) {
 
+<<<<<<< HEAD
+=======
+		var loodle = new Loodle(req.body.name, req.body.description);
+
+		async.series({
+
+			saveLoodle: function (done) {
+				loodle.save(done);
+			},
+
+			bindLoodleAndUser: function (done) {
+				Loodle.bindUser(loodle.id, req.user.id, done);
+			}
+
+		}, function (err, data) {
+
+>>>>>>> origin/dev
 			if (err)
 				return callback(err)
 			
 			return callback(null, results.save);
 
+<<<<<<< HEAD
+=======
+			return success(res, data.saveLoodle);
+
+>>>>>>> origin/dev
 		});
+
+		
 	},
 
 	get: function (req, res) {
+
+		console.log('id : ', req.params.id);
 
 		Loodle.get(req.params.id, function (err, data) {
 			if (err)
@@ -40,6 +66,7 @@ module.exports = {
 
 	getLoodlesOfUser: function (req, res) {
 
+<<<<<<< HEAD
 		console.log("req.user.id : ", req.user.id);
 
 		async.waterfall([
@@ -70,6 +97,44 @@ module.exports = {
 
 			return success(res, data);
 		});
+=======
+		console.log("User : ", req.user);
+
+		async.waterfall([
+
+			function (done) {
+				Loodle.getLoodleIdsOfUser(req.user.id, done);
+			},
+
+			function (loodle_ids, done) {
+
+				var results = [];
+
+				console.log("Loodle ids : ", loodle_ids);
+
+				async.each(loodle_ids, function (loodle_id, done) {
+
+					Loodle.get(loodle_id, function (err, data) {
+						results.push(data);
+						return done();
+					});
+
+				}, function (err) {
+					if (err)
+						return error(res, err);
+
+					return done(null, results);
+				});
+			}
+		], function (err, results) {
+
+			if (err)
+				return error(res, err);
+
+			return success(res, results);
+		});
+
+>>>>>>> origin/dev
 	}
 }
 
@@ -77,7 +142,7 @@ function error(res, err) {
 	res.status(500);
 	res.json({
 		type: false,
-		data: 'An error occured : ' + err
+		data: err
 	});
 };
 

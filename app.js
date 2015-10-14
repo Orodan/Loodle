@@ -9,9 +9,8 @@ var bodyParser = require('body-parser');
 var routes = require('./app/routes/index');
 var api = require('./app/routes/api');
 
-var passport = require('passport');
-var session = require('express-session');
-var flash = require('connect-flash');
+var jwt = require('express-jwt');
+var secret = require('./config/secret');
 
 var app = express();
 
@@ -30,26 +29,14 @@ app.use(express.static(path.join(__dirname, 'views')));
 
 // Configuration ===============================================
 var database = require("./config/database");
+// Initialisation of the database
 database.init(function (err) {
 	if (err) { return new Error(err); }
 });
 
-require('./config/passport')(passport);
-
-// required for passport
-app.use(session({
-                    secret : 'masupersessionsecrete',
-                    saveUninitialized : true,
-                    resave : true
-                }));
-app.use(passport.initialize());
-app.use(passport.session());        // persistent login sessions
-app.use(flash());                   // flash messages stored in session
-
-
 // Routes ======================================================
-app.use('/', routes);
 app.use('/api', api);
+app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

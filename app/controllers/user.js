@@ -5,6 +5,11 @@ var UserModel = require('../models/user.model');
 
 var jwt = require('jsonwebtoken');
 
+<<<<<<< HEAD
+=======
+var secret = require('../../config/secret');
+
+>>>>>>> origin/dev
 function User (email, first_name, last_name, password) {
 
 	this.id = cassandra.types.Uuid.random();
@@ -98,13 +103,61 @@ User.generateHash = function (text) {
 
 };
 
+<<<<<<< HEAD
+=======
+User.authenticate = function (req, res) {
+
+    if (!req.body.email)
+        return error(res, 'No email specified');
+
+    if(!req.body.password)
+        return error(res, 'No password specified');
+
+    User.getByEmail(req.body.email, function (err, user) {
+
+        // If an error happened, stop everything and send it back
+        if (err)
+            return error(res, err); 
+
+        // No user found
+        if (!user)
+            return error(res, 'Authentication failed. User not found.'); 
+
+        // If the user is found but the password is wrong
+        if (!User.validPassword(req.body.password, user.password))
+            return error(res, 'Authentication failed. Wrong password.');
+
+        // Create a token
+        var token = jwt.sign(user, secret, {
+          expiresIn: 86440 // expires in 24 hours
+        });
+
+        return success(res, token);
+    });
+}
+
+>>>>>>> origin/dev
 function error(res, err) {
     res.status(500);
     res.json({
         type: false,
+<<<<<<< HEAD
         data: 'An error occured : ' + err
     });
 };
+=======
+        data: err
+    });
+};
+
+function success(res, data) {
+    res.json({
+        type: true,
+        data: data
+    });
+};
+
+>>>>>>> origin/dev
 
 function success(res, data) {
     res.json({

@@ -3,14 +3,22 @@ extends layout
 block content
 	include partials/nav
 
-	.container
-
-		include partials/alert
+	.container(ng-controller="mainController")
 
 		.row
 			.col-md-8
+<<<<<<< HEAD
 				include partials/loodles
 				
+=======
+				.panel.panel-primary
+					.panel-heading
+						h3.panel-title Loodles
+					.panel-body
+						list-loodles
+
+
+>>>>>>> origin/dev
 			.col-md-4
 				include partials/participation-requests
 				
