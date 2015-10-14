@@ -24,7 +24,16 @@ router.use(function (err, req, res, next) {
 
 router.get('/loodle/:id', Loodle.get);
 
+router.get('/loodle/resume/:id', Loodle.getResume);
+
 router.get('/loodle/', Loodle.getLoodlesOfUser);
+
+router.get('/loodle/getUsers/:id', Loodle.getUsers);
+
+router.get('/loodle/getSchedules/:id', Loodle.getSchedules);
+
+router.get('/loodle/getVotes/:id', Loodle.getVotes);
+
 
 // POST ============================================
 

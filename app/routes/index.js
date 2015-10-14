@@ -41,8 +41,11 @@ router.get('/loodle/:id', isAuthenticated, function (req, res) {
 	res.render('loodle');
 });
 
-// Loodles list
-router.get('/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
+// Get loodle data
+router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
+
+// Loodles list data
+router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
 
 // POST ====================================================
 

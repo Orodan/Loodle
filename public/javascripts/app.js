@@ -4,7 +4,7 @@
 
 	app.controller('loodlesController', ['$http', '$scope', '$location', function ($http, $scope, $location) {
 
-		$http.get('/loodle/')
+		$http.get('/data/loodle/')
 			.success(function (result) {
 				$scope.loodles = result.data;
 			})
@@ -17,8 +17,17 @@
 	app.controller('loodleController', ['$http', '$scope', '$location', function ($http, $scope, $location) {
 
 		$scope.message = 'Welcome';
+		$scope.loodle_id = window.location.pathname.split("/")[2];
 
-		console.log($location.url());
+		$http.get('/data/loodle/' + $scope.loodle_id)
+			.success(function (result) {
+
+				$scope.loodle = result.data;
+				console.log(result);
+			})
+			.error(function (result) {
+				console.log("Error : ", result);
+			})
 
 	}]);
 

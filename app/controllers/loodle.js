@@ -27,7 +27,9 @@ module.exports = {
 		});
 	},
 
-	get: function (req, res) {
+	getResume: function (req, res) {
+
+		console.log("Call to get resume");
 
 		Loodle.get(req.params.id, function (err, data) {
 			if (err)
@@ -36,6 +38,68 @@ module.exports = {
 			return success(res, data);
 		});
 
+	},
+
+	getUsers: function (req, res) {
+		Loodle.getUsers(req.params.id, function (err, data) {
+			if (err)
+				return error(res, error);
+
+			return success(res, data);
+		});
+	},
+
+	getVotes: function (req, res) {
+		Loodle.getVotes(req.params.id, function (err, data) {
+			if (err)
+				return error(res, error);
+
+			return success(res, data);
+		});
+	},
+
+	getSchedules: function (req, res) {
+
+		Loodle.getSchedules(req.params.id, function (err, data) {
+
+			if (err)
+				return error(res, error);
+
+			return success(res, data);
+		});
+
+	},
+
+	get: function (req, res) {
+
+		async.parallel({
+
+			// Get loodle data
+			loodle: function (done) {
+				Loodle.get(req.params.id, done);
+			},
+			// Get users of the loodle
+			users: function (done) {
+				Loodle.getUsers(req.params.id, done);
+			},
+			// Get schedules of the loodle
+			schedules: function (done) {
+				Loodle.getSchedules(req.params.id, done);
+			},
+			// Get votes of the loodle
+			votes: function (done) {
+				Loodle.getVotes(req.params.id, done);
+			}
+
+		}, function (err, results) {
+
+			console.log("Error : ", err);
+
+			if (err)
+				return error(res, err);
+
+			return success(res, results);
+		});
 	},
 
 	getLoodlesOfUser: function (req, res) {
