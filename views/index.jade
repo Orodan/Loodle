@@ -3,9 +3,7 @@ extends layout
 block content
 	include partials/nav
 
-	.container
-
-		include partials/alert
+	.container(ng-controller="mainController")
 
 		.row
 			.col-md-8

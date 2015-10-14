@@ -4,9 +4,9 @@ block content
 	include partials/sign-nav
 
 	.container
-		.center
+		.center(ng-controller="authController")
 
-			include partials/alert
+			alert
 
 			div(ng-controller='authController as authCtrl')
 				form(ng-submit="authCtrl.login()")

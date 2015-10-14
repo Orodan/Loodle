@@ -1,6 +1,10 @@
 (function () {
 
-	var app = angular.module('loodle', []);
+	var app = angular.module('loodle', ['alert-directives']);
+
+	app.controller('mainController', function () {
+
+	});
 
 	app.factory('alert', function () {
 
@@ -10,13 +14,7 @@
 		};
 	});
 
-	app.controller('alertController', ['alert', function (alert) {
-
-		this.alert = alert;
-
-	}]);
-
-	app.controller('authController', ['$http', 'alert', function ($http, alert) {
+	app.controller('authController', ['$http', '$location', 'alert', function ($http, $location, alert) {
 
 		this.email = '';
 		this.password = '';
@@ -30,10 +28,18 @@
 			})
 			.success(function (result){
 
+				// Empty the values
 				this.email = '';
 				this.password = '';
 
-				console.log("Data : ", result);
+				// Set the service values
+				// alert.type = 'success';
+				// alert.message = result.data;
+
+				// Change page
+				console.log(document.location);
+				$location.path('/home');
+				// document.location = '/home';
 			})
 			.error(function (result) {
 
@@ -42,11 +48,26 @@
 				
 				alert.type = 'danger';
 				alert.message = result.data;
-
-				console.log("Data : ", result);
 			});
 		}		
 
 	}]);
+
+	/**
+	app.directive('testDirective', function () {
+
+		return {
+			restrict: 'E',
+			templateUrl: '/partials/alert.html',
+			controller: ['alert', function (alert) {
+
+				this.alert = alert;
+
+			}],
+			controllerAs: 'alertCtrl'
+		}
+
+	});
+	**/
 
 })();
