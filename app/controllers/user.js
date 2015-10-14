@@ -7,18 +7,18 @@ var jwt = require('jsonwebtoken');
 
 function User (email, first_name, last_name, password) {
 
-	this.id = cassandra.types.Uuid.random();
-	this.email = email;
-	this.first_name = first_name;
-	this.last_name = last_name;
-	this.password = User.generateHash(password);
-	this.status = 'registered';
+    this.id = cassandra.types.Uuid.random();
+    this.email = email;
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.password = User.generateHash(password);
+    this.status = 'registered';
 }
 
 
 User.prototype.save = function (callback) {
 
-	var that = this;
+    var that = this;
 
     async.parallel([
             function (end) {
@@ -40,13 +40,13 @@ User.prototype.save = function (callback) {
 
 User.get = function (user_id, callback) {
 
-	UserModel.get(user_id, callback);
+    UserModel.get(user_id, callback);
 
 };
 
 User.getByEmail = function (user_email, callback) {
 
-	async.waterfall([
+    async.waterfall([
         function (end) {
             UserModel.getUserIdByEmail(user_email, function (err, user_id) {
                 if (err) { return end(err); }
@@ -88,13 +88,13 @@ User.authenticate = function (req, res) {
 
 User.validPassword = function (password, user_password) {
 
-	return bcrypt.compareSync(password, user_password);
+    return bcrypt.compareSync(password, user_password);
 
 };
 
 User.generateHash = function (text) {
 
-	return bcrypt.hashSync(text, bcrypt.genSaltSync(8), null);
+    return bcrypt.hashSync(text, bcrypt.genSaltSync(8), null);
 
 };
 

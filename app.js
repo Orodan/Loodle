@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'views')));
 // Configuration ===============================================
 var database = require("./config/database");
 database.init(function (err) {
-	if (err) { return new Error(err); }
+  if (err) { return new Error(err); }
 });
 
 require('./config/passport')(passport);

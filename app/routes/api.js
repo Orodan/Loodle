@@ -11,13 +11,13 @@ var Loodle = require('../controllers/loodle');
 router.use(jwt({ secret: 'secret'}).unless({path: ['/api/authenticate']}));
 router.use(function (err, req, res, next) {
 
-	if (err.name === 'UnauthorizedError') {
-		res.status(401);
-		res.json({
-			type: false,
-			data: 'Unauthorized'
-		});
-	}
+  if (err.name === 'UnauthorizedError') {
+    res.status(401);
+    res.json({
+      type: false,
+      data: 'Unauthorized'
+    });
+  }
 });
 
 // GET =============================================
