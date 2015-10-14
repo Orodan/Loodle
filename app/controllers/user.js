@@ -3,6 +3,8 @@ var bcrypt = require('bcrypt-nodejs');
 var cassandra = require('cassandra-driver');
 var UserModel = require('../models/user.model');
 
+var jwt = require('jsonwebtoken');
+
 function User (email, first_name, last_name, password) {
 
 	this.id = cassandra.types.Uuid.random();
@@ -59,6 +61,31 @@ User.getByEmail = function (user_email, callback) {
 
 };
 
+User.authenticate = function (req, res) {
+
+    User.getByEmail(req.body.email, function (err, user) {
+
+        // If an error happened, stop everything and send it back
+        if (err) 
+            return error(res, err);
+
+        if (!user)
+            return error(res, 'No user found');
+
+        if (!User.validPassword(req.body.password, user.password))
+            return error(res, 'Wrong password');
+
+        var token = jwt.sign(user, 'secret', {
+          expiresIn: 86400 // expires in 24 hours
+        });
+
+        return success(res, token);
+
+        // return callback(null, user, { message: 'Welcome !' });
+    });
+
+};
+
 User.validPassword = function (password, user_password) {
 
 	return bcrypt.compareSync(password, user_password);
@@ -71,6 +98,19 @@ User.generateHash = function (text) {
 
 };
 
+function error(res, err) {
+    res.status(500);
+    res.json({
+        type: false,
+        data: 'An error occured : ' + err
+    });
+};
 
+function success(res, data) {
+    res.json({
+        type: true,
+        data: data
+    });
+};
 
 module.exports = User;

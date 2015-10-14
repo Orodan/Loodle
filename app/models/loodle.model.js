@@ -27,6 +27,27 @@ Loodle.prototype.save = function (callback) {
 
 }
 
+Loodle.bindUser = function (user_id, loodle_id, callback) {
+
+	var queries = [
+		{
+			query: 'INSERT INTO doodle_by_user (user_id, doodle_id) values (?, ?)',
+			params: [ user_id, loodle_id ]
+		},
+		{
+			query: 'INSERT INTO user_by_doodle (doodle_id, user_id) values (?, ?)',
+			params: [ loodle_id, user_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, function (err) {
+			return callback(err);
+		});
+
+};
+
 Loodle.get = function (id, callback) {
 
 	var query = 'SELECT * FROM doodles WHERE id = ?';
@@ -37,10 +58,31 @@ Loodle.get = function (id, callback) {
 			if (err)
 				return callback(err);
 
-			return callback(null, data.rows);
+			return callback(null, data.rows[0]);
 		}
 	);
 
 }
+
+Loodle.getLoodleIdsOfUser = function (user_id, callback) {
+
+	var query = 'SELECT doodle_id FROM doodle_by_user WHERE user_id = ?';
+	db.execute(query
+		, [ user_id ]
+		, { prepare : true }
+		, function (err, data) {
+
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.doodle_id);
+			});
+
+			return callback(null, results);
+		});
+};
 
 module.exports = Loodle;

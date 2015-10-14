@@ -1,0 +1,13 @@
+.panel.panel-primary(ng-controller="loodlesController as loodlesCtrl")
+	.panel-heading
+		h3.panel-title Loodles
+	ul.list-group
+		| <li class="list-group-item" ng-repeat="loodle in loodles">
+		|	id: {{loodle.id}} <br/>
+		|	category: {{loodle.category}} <br/>
+		|	created: {{loodle.created}} <br/>
+		|	description: {{loodle.description}} <br/>
+		|	name: {{loodle.name}} <br/><br/>
+		form(method="GET" action="{{'/loodle/' + loodle.id }}")
+			button(class="btn btn-primary") Access
+		| </li>
