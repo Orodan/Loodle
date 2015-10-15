@@ -29,8 +29,6 @@ module.exports = {
 
 	getResume: function (req, res) {
 
-		console.log("Call to get resume");
-
 		Loodle.get(req.params.id, function (err, data) {
 			if (err)
 				return error(res, err);
@@ -93,18 +91,19 @@ module.exports = {
 
 		}, function (err, results) {
 
-			console.log("Error : ", err);
+			// Format
+			results.loodle.schedules = results.schedules;
+			results.loodle.votes = results.votes;
+			results.loodle.users = results.users;
 
 			if (err)
 				return error(res, err);
 
-			return success(res, results);
+			return success(res, results.loodle);
 		});
 	},
 
 	getLoodlesOfUser: function (req, res) {
-
-		console.log("req.user.id : ", req.user.id);
 
 		async.waterfall([
 			// Get the loodles id 

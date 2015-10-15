@@ -22,6 +22,8 @@
 		$http.get('/data/loodle/' + $scope.loodle_id)
 			.success(function (result) {
 
+				console.log("Result : ", result);
+
 				$scope.loodle = result.data;
 				console.log(result);
 			})

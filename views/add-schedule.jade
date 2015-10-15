@@ -1,0 +1,19 @@
+extends layout
+
+block content
+	div(ng-controller='loodleController as loodleCtrl')
+		include partials/loodle-nav
+
+		.container
+
+			form(action="/add-schedule" method="POST")
+
+				.form-group()
+					label(for="email") Email
+					input(type="email" name="email" class="form-control" placeholder="Email" required)
+
+				.form-group()
+					label(for="password") Password
+					input(type="password" name="password" class="form-control" placeholder="Password" required)
+
+				button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send
