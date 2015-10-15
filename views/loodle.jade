@@ -5,7 +5,11 @@ block content
 		include partials/loodle-nav
 
 		.container
-			.jumbotron.center
-				h1 {{loodle.name}}
+			.center
 
-				p {{loodle.description}}
+				include partials/alert
+				
+				.jumbotron
+					h1 {{loodle.name}}
+
+					p {{loodle.description}}

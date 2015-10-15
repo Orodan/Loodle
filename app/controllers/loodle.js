@@ -1,6 +1,5 @@
 var async = require('async');
 var bcrypt = require('bcrypt-nodejs');
-var cassandra = require('cassandra-driver');
 var Loodle = require('../models/loodle.model');
 
 module.exports = {
@@ -90,6 +89,8 @@ module.exports = {
 			}
 
 		}, function (err, results) {
+
+			console.log("Results : ", results);
 
 			// Format
 			results.loodle.schedules = results.schedules;

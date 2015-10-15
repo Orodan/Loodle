@@ -140,7 +140,7 @@ Loodle.getSchedules = function (id, callback) {
 
 				var query = 'SELECT * FROM schedules WHERE id = ?';
 				db.execute(query
-					, [ element.user_id ]
+					, [ element.schedule_id ]
 					, { prepare : true }
 					, function (err, data) {
 						if (err)
@@ -196,8 +196,6 @@ Loodle.getVotes = function (id, callback) {
 
 			async.each(results, function (element, end) {
 
-				console.log("Element : ", element);
-
 				var query = 'SELECT vote FROM votes WHERE id = ?';
 				db.execute(query
 					, [ element.vote_id ]
@@ -211,11 +209,8 @@ Loodle.getVotes = function (id, callback) {
 					});
 			}, done);
 		}
-	], function (err) {
-		if (err)
-			return callback(err);
-
-		return callback(null, results);
+	], function (err, results) {
+		return callback(err, results);
 	});
 
 };

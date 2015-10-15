@@ -5,6 +5,7 @@ var jwt = require('express-jwt');
 
 var User = require('../controllers/user');
 var Loodle = require('../controllers/loodle');
+var Schedule = require('../controllers/schedule');
 
 // All the api routes need an acces token, except the route
 // to get the token
@@ -39,12 +40,43 @@ router.get('/loodle/getVotes/:id', Loodle.getVotes);
 
 router.post('/authenticate', User.authenticate);
 
-router.post('/loodle', Loodle.createLoodle);
+router.post('/loodle', function (req, res) {
+
+	Loodle.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
+		if (err)
+			return error(res, err);
+		return success(res, data);
+	});
+
+});
+
+router.post('/loodle/:id/schedule', function (req, res) {
+
+	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
+		if (err)
+			return error(res, err);
+		return success(res, data);
+	});
+
+});
 
 // PUT =============================================
 
 // DELETE ==========================================
 
+function error(res, err) {
+	res.status(500);
+	res.json({
+		type: false,
+		data: 'An error occured : ' + err
+	});
+};
 
+function success(res, data) {
+	res.json({
+		type: true,
+		data: data
+	});
+};
 
 module.exports = router;

@@ -5,15 +5,29 @@ block content
 		include partials/loodle-nav
 
 		.container
+			.center
 
-			form(action="/add-schedule" method="POST")
+				form(action="" method="POST")
 
-				.form-group()
-					label(for="email") Email
-					input(type="email" name="email" class="form-control" placeholder="Email" required)
+					.form-group
+						div(class="input-group date" id="datetimepicker1")
+							label(for="begin_time") Begin date
+							input(name="begin_time" type="text" class="form-control" placeholder="begin date")
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
 
-				.form-group()
-					label(for="password") Password
-					input(type="password" name="password" class="form-control" placeholder="Password" required)
+					.form-group
+						div(class="input-group date" id="datetimepicker2")
+							label(for="end_time") End date
+							input(name="end_time" type="text" class="form-control" placeholder="end date")
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
 
-				button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send
+					button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid") Send
+
+	script(type="text/javascript" src="/javascripts/jquery.js")
+	script(type="text/javascript" src="/javascripts/moment.js")
+	script(type="text/javascript" src="/javascripts/bootstrap/transition.js")
+	script(type="text/javascript" src="/javascripts/bootstrap/collapse.js")
+	script(type="text/javascript" src="/javascripts/bootstrap-datetimepicker.js")
+	script(type="text/javascript" src="/javascripts/add-schedule.js")
