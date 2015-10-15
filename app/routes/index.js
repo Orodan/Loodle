@@ -100,7 +100,7 @@ router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
 		if (err)
 			throw err;
 		
-		req.flash = 'Schedule added';
+		req.flash('success', 'Schedule added');
 		res.redirect('/loodle/' + req.params.id);
 
 	});
