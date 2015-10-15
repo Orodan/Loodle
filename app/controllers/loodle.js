@@ -115,7 +115,7 @@ module.exports = {
 			function (loodle_ids, done) {
 				var results = [];
 
-				async.each(loodle_ids, function (loodle_id, end) {
+				async.eachSeries(loodle_ids, function (loodle_id, end) {
 
 					Loodle.get(loodle_id, function (err, data) {
 						if (err)
@@ -131,6 +131,9 @@ module.exports = {
 		], function (err, data) {
 			if (err)
 				return error(res, err);
+
+			// organize data
+			console.log("Data : ", data);
 
 			return success(res, data);
 		});
