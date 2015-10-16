@@ -155,6 +155,11 @@ Loodle.getSchedules = function (id, callback) {
 
 		}
 	], function (err) {
+
+		results.sort(function (a, b) {
+			return new Date(a.begin_time) - new Date(b.begin_time);
+		});
+
 		return callback(err, results);
 	});
 

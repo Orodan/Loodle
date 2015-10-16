@@ -90,8 +90,6 @@ module.exports = {
 
 		}, function (err, results) {
 
-			console.log("Results : ", results);
-
 			// Format
 			results.loodle.schedules = results.schedules;
 			results.loodle.votes = results.votes;
