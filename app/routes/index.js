@@ -3,19 +3,20 @@ var router = express.Router();
 var passport = require('passport');
 
 var User = require('../controllers/user');
+var Vote = require('../controllers/vote');
 var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
 
-/* GET home page. */
+// GET =====================================================
+
+// PAGES ===================
+
+// Home 
 router.get('/', isAuthenticated, function(req, res, next) {
 	res.render('index', {
 		message: req.flash()
 	});
 });
-
-// GET =====================================================
-
-// PAGES ===================
 
 // Login
 router.get('/login', function (req, res) {
@@ -35,6 +36,7 @@ router.get('/logout', function (req, res) {
 	res.redirect('/login');
 });
 
+// New loodle
 router.get('/new-doodle', isAuthenticated, function (req, res) {
 	res.render('new-doodle');
 });
@@ -57,6 +59,19 @@ router.get('/loodle/:id/user', isAuthenticated, function (req, res) {
 });
 
 // DATA ======================
+
+// Get user data
+router.get('/data/user', isAuthenticated, function (req, res) {
+	User.get(req.user.id, function (err, user) {
+		if (err)
+			throw new Error(err);
+
+		res.json({
+			type: true,
+			data: user
+		});
+	})
+});
 
 // Get loodle data
 router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
@@ -109,6 +124,22 @@ router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
 
 	});
 	
+});
+
+router.put('/vote', function (req, res) {
+
+	Vote.updateVotes(req.body.votes, function (err) {
+
+		console.log("Error : ", err);
+
+		if (err)
+			throw new Error;
+
+		res.json({
+			type: true,
+			data: "success"
+		});
+	});
 
 });
 

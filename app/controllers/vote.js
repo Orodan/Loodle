@@ -34,4 +34,16 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 
 };
 
+VoteController.updateVotes = function (votes, callback) {
+
+	async.each(votes, function(vote, done) {
+
+		console.log("Vote : ", vote);
+
+		Vote.update(vote.id, vote.vote, done);
+
+	}, callback);
+
+};
+
 module.exports = VoteController;

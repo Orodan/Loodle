@@ -23,5 +23,12 @@ block content
 						tbody
 							tr(ng-repeat="user in loodle.users")
 								td {{user.first_name}} {{user.last_name}}
-								td(ng-repeat="vote in user.votes" ng-class="vote.vote == 0 ? 'not-available' : 'available'") 
+
+								td(ng-hide="edit" ng-repeat="vote in user.votes")
 									{{vote.vote}}
+									//span(ng-class="vote.vote == 1 ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'")
+								td(ng-show="edit" ng-repeat="vote in user.votes")
+									input(type="checkbox" ng-checked="vote.vote == 1" class="input-vote" data-id="{{vote.vote_id}}") 
+
+					button(ng-hide="edit" class="btn btn-primary" ng-click="edit=true") Edit votes
+					button(ng-show="edit" class="btn btn-primary" ng-click="saveVotes()") Save votes

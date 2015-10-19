@@ -84,4 +84,14 @@ Vote.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 };
 
+Vote.update = function (id, vote, callback) {
+
+	var query = 'UPDATE votes SET vote = ? WHERE id = ?';
+	db.execute(query
+		, [ vote, id ]
+		, { prepare : true }
+		, callback);
+
+}
+
 module.exports = Vote;
