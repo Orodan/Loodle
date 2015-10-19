@@ -73,7 +73,13 @@ Loodle.getUsersIds = function (id, callback) {
 			if (err)
 				return callback(err);
 
-			return callback(null, data.rows);
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.user_id);
+			});
+
+			return callback(null, results);
 		}
 	);
 }
@@ -90,11 +96,11 @@ Loodle.getUsers = function (id, callback) {
 		// Get users data
 		function (user_ids, done) {
 
-			async.each(user_ids, function (element, end) {
+			async.each(user_ids, function (user_id, end) {
 
 				var query = 'SELECT id, email, first_name, last_name FROM users WHERE id = ?';
 				db.execute(query
-					, [ element.user_id ]
+					, [ user_id ]
 					, { prepare : true }
 					, function (err, data) {
 						if (err)
@@ -177,13 +183,16 @@ Loodle.getVotes = function (id, callback) {
 		// Get votes ids
 		function (user_ids, done) {
 
-			async.each(user_ids, function (element, end) {
+			console.log("User ids : ", user_ids);
+
+			async.each(user_ids, function (user_id, end) {
 
 				var query = 'SELECT user_id, schedule_id, vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
 				db.execute(query
-					, [ id, element.user_id ]
+					, [ id, user_id ]
 					, { prepare : true }
 					, function (err, data) {
+
 						if (err)
 							return end(err);
 
@@ -210,11 +219,12 @@ Loodle.getVotes = function (id, callback) {
 							return end(err);
 
 						element.vote = data.rows[0].vote;
+						console.log("elemet : ", element);
 						return end();
 					});
 			}, done);
 		}
-	], function (err, results) {
+	], function (err) {
 		return callback(err, results);
 	});
 

@@ -1,4 +1,8 @@
 $(function () {
-	$('#datetimepicker1').datetimepicker();
-	$('#datetimepicker2').datetimepicker();
+	$('#datetimepicker1').datetimepicker({
+		useCurrent: true
+	});
+	$('#datetimepicker2').datetimepicker({
+		useCurrent: true
+	});
 });

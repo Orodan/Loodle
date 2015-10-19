@@ -2,6 +2,8 @@ var async = require('async');
 var bcrypt = require('bcrypt-nodejs');
 var Schedule = require('../models/schedule.model');
 
+var Vote = require('../controllers/vote');
+
 var ScheduleController = {};
 
 // Create the schedule and bind it to the loodle
@@ -17,6 +19,10 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, c
 		// Bind the schedule to the loodle
 		bind: function (done) {
 			Schedule.bindLoodle(loodle_id, schedule.id, done);
+		},
+		// Create the default vote for this schedule
+		defaultVotes: function (done) {
+			Vote.createVotesForSchedule(loodle_id, schedule.id, done);
 		}
 	}, function (err, results) {
 		if (err)
@@ -24,7 +30,6 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, c
 		
 		return callback(null, results.save);
 	});
-
 }
 
 module.exports = ScheduleController;

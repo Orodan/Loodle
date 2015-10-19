@@ -96,14 +96,19 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 // Process add schedule
 router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
 
+	// Create the schedule
+	// Bind it to the loodle
+	// Create the default votes according to the schedule
+	
 	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
 		if (err)
-			throw err;
+			throw new Error(err);
 		
 		req.flash('success', 'Schedule added');
 		res.redirect('/loodle/' + req.params.id);
 
 	});
+	
 
 });
 
