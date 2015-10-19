@@ -7,10 +7,21 @@
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  width: 600px; }
+  min-width: 600px; }
   .center form {
     padding: 20px;
     background-color: #eee;
     border-radius: 3px; }
+
+table tr th {
+  text-align: center; }
+
+.not-available {
+  text-align: center;
+  background-color: #FB6E73; }
+
+.available {
+  text-align: center;
+  background-color: #5ACE5F; }
 
 /*# sourceMappingURL=style.css.map */

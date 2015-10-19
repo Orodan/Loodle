@@ -13,3 +13,15 @@ block content
 					h1 {{loodle.name}}
 
 					p {{loodle.description}}
+
+					table.table.table-striped.table-hover
+						thead
+							tr
+								th #
+								th(ng-repeat="schedule in loodle.schedules")
+									{{schedule.begin_time}} - {{schedule.end_time}}
+						tbody
+							tr(ng-repeat="user in loodle.users")
+								td {{user.first_name}} {{user.last_name}}
+								td(ng-repeat="vote in user.votes" ng-class="vote.vote == 0 ? 'not-available' : 'available'") 
+									{{vote.vote}}

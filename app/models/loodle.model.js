@@ -183,8 +183,6 @@ Loodle.getVotes = function (id, callback) {
 		// Get votes ids
 		function (user_ids, done) {
 
-			console.log("User ids : ", user_ids);
-
 			async.each(user_ids, function (user_id, end) {
 
 				var query = 'SELECT user_id, schedule_id, vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
@@ -219,7 +217,6 @@ Loodle.getVotes = function (id, callback) {
 							return end(err);
 
 						element.vote = data.rows[0].vote;
-						console.log("elemet : ", element);
 						return end();
 					});
 			}, done);
