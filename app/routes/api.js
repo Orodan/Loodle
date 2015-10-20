@@ -102,6 +102,18 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 // DELETE ==========================================
 
+// Delete a schedule
+router.delete('/loodle/:id/schedule', function (req, res) {
+
+	Schedule.remove(req.params.id, req.body.schedule_id, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Schedule deleted');
+	});
+
+});
+
 function error(res, err) {
 	res.status(500);
 	res.json({
