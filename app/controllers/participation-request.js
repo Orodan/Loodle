@@ -114,6 +114,66 @@ ParticipationRequestController.createParticipationRequest = function (loodle_id,
 
 };
 
+ParticipationRequestController.accept = function (participation_request_id, user_id, callback) {
+
+	// Get the loodle id from the participation request data
+	ParticipationRequest.get(participation_request_id, function (err, data) {
+
+		if (err)
+			return callback(err);
+
+		var loodle_id = data.doodle_id;
+
+		async.parallel({
+			// Give access to the concerned loodle
+			loodleAccess: function (done) {
+				ParticipationRequest.giveAcess(user_id, loodle_id, done);
+			},
+			// Create default votes for each schedule of the loodle
+			defaultVotes: function (done) {
+
+				async.waterfall([
+					// Get schedule ids of the loodle
+					function (end) {
+						ParticipationRequest.getScheduleIds(loodle_id, end);
+					},
+					// Create a default vote for each of them
+					function (schedule_ids, end) {
+
+						async.each(schedule_ids, function (schedule_id, finish) {
+
+							ParticipationRequest.createDefaultVote(loodle_id, user_id, schedule_id, finish);
+
+						}, end);
+
+					}
+				], done);
+			},
+			// Delete the participation request
+			deleteParticipationRequest: function (done) {
+				ParticipationRequest.remove(participation_request_id, loodle_id, user_id, done);
+			}
+		}, callback);
+
+	});
+
+};
+
+ParticipationRequestController.decline = function (participation_request_id, user_id, callback) {
+
+	ParticipationRequest.get(participation_request_id, function (err, data) {
+
+		if (err)
+			return callback(err);
+
+		var loodle_id = data.doodle_id;
+
+		ParticipationRequest.remove(participation_request_id, loodle_id, user_id, callback);
+
+	});
+
+};
+
 module.exports = ParticipationRequestController;
 
 function error(res, err) {

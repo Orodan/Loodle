@@ -38,6 +38,28 @@ router.get('/loodle/getSchedules/:id', Loodle.getSchedules);
 
 router.get('/loodle/getVotes/:id', Loodle.getVotes);
 
+router.get('/participation-request/:id/accept', function (req, res) {
+
+	ParticipationRequest.accept(req.params.id, req.user.id, function (err, data) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Participation request accepted');
+	});
+
+});
+
+router.get('/participation-request/:id/decline', function (req, res) {
+
+	ParticipationRequest.decline(req.params.id, req.user.id, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Participation request declined');
+	});
+
+});
+
 
 // POST ============================================
 

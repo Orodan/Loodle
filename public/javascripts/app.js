@@ -60,7 +60,8 @@
 
 				if (months.length === 0) {
 					months.push({
-						time: moment_begin_time.format('MMMM YYYY'),
+						// time: moment_begin_time.format('MMMM YYYY'),
+						time: moment_begin_time,
 						nbSchedules: 2
 					});
 				}
@@ -69,10 +70,7 @@
 					var monthAlreadyPresent = false;
 
 					months.forEach(function (month) {
-						console.log("Month : ", month);
-						console.log("Month 2 : ", moment_begin_time.format('MMMM YYYY'));
-						console.log(month.time === moment_begin_time.format('MMMM YYYY'));
-						if (month.time === moment_begin_time.format('MMMM YYYY')) {
+						if (month.time.format('MMMM YYYY') === moment_begin_time.format('MMMM YYYY')) {
 							monthAlreadyPresent = true;
 							month.nbSchedules+=2;
 						}
@@ -80,19 +78,19 @@
 
 					if (!monthAlreadyPresent) {
 						months.push({
-							time: moment_begin_time.format('MMMM YYYY'),
+							// time: moment_begin_time.format('MMMM YYYY'),
+							time: moment_begin_time,
 							nbSchedules: 2
 						});
 					}
 				}
 
-				console.log("Months : ", months);
-
 				// Get the days =======================
 
 				if (days.length === 0) {
 					days.push({
-						time: moment_begin_time.format('dddd D'),
+						// time: moment_begin_time.format('dddd D'),
+						time: moment_begin_time,
 						nbSchedules: 2
 					});
 				}
@@ -101,7 +99,7 @@
 					var dayAlreadyPresent = false;
 
 					days.forEach(function (day) {
-						if (day.time === moment_begin_time.format('dddd D')) {
+						if (day.time.format('dddd D') === moment_begin_time.format('dddd D')) {
 							dayAlreadyPresent = true;
 							day.nbSchedules+=2;
 						}
@@ -109,15 +107,18 @@
 
 					if (!dayAlreadyPresent) {
 						days.push({
-							time: moment_begin_time.format('dddd D'),
+							//time: moment_begin_time.format('dddd D'),
+							time: moment_begin_time,
 							nbSchedules: 2
 						});
 					}
 				}
 
 				// Get the hours
-				hours.push(moment_begin_time.format('hh A'));
-				hours.push(moment_end_time.format('hh A'));
+				hours.push(moment_begin_time);
+				hours.push(moment_end_time);
+				//hours.push(moment_begin_time.format('hh A'));
+				//hours.push(moment_end_time.format('hh A'));
 			});
 			
 			// Make it available in our scope
