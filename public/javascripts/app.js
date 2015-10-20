@@ -2,11 +2,27 @@
 
 	var app = angular.module('loodle', []);
 
-	app.controller('loodlesController', ['$http', '$scope', '$location', function ($http, $scope, $location) {
+	app.controller('loodlesController', ['$http', '$scope', function ($http, $scope) {
 
 		$http.get('/data/loodle/')
 			.success(function (result) {
 				$scope.loodles = result.data;
+			})
+			.error(function (result) {
+				console.log("Error : ", result);
+			})
+
+	}]);
+
+	app.controller('participationRequestsController', ['$http', '$scope', function ($http, $scope) {
+
+		$http.get('/data/participation-request/')
+			.success(function (result) {
+
+				console.log("get participation requests");
+				console.log("Result : ", result);
+
+				$scope.participationRequests = result.data;
 			})
 			.error(function (result) {
 				console.log("Error : ", result);
@@ -172,5 +188,7 @@
 
 		}
 	}]);
+
+	
 
 })();

@@ -1,5 +1,5 @@
-.panel.panel-warning
+.panel.panel-warning(ng-controller="participationRequestsController as prCtrl")
 	.panel-heading
 		h3.panel-title Participation requests
-	.panel-body
-		p Panel content
+	.panel-body(ng-show="participationRequests.length == 0")
+		p You currently have no participation requests

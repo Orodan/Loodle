@@ -6,6 +6,7 @@ var User = require('../controllers/user');
 var Vote = require('../controllers/vote');
 var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
+var ParticipationRequest = require('../controllers/participation-request');
 
 // GET =====================================================
 
@@ -27,7 +28,9 @@ router.get('/login', function (req, res) {
 
 // Sign up 
 router.get('/sign-up', function (req, res) {
-	res.render('sign-up');
+	res.render('sign-up', {
+		message: req.flash()
+	});
 });
 
 // Logout
@@ -78,6 +81,8 @@ router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
 
 // Loodles list data
 router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
+
+router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
 
 // POST ====================================================
 

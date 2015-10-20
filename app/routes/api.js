@@ -6,6 +6,7 @@ var jwt = require('express-jwt');
 var User = require('../controllers/user');
 var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
+var ParticipationRequest = require('../controllers/participation-request');
 
 // All the api routes need an acces token, except the route
 // to get the token
@@ -22,6 +23,8 @@ router.use(function (err, req, res, next) {
 });
 
 // GET =============================================
+
+router.get('/user/participation-requests', ParticipationRequest.getParticipationRequestsOfUser);
 
 router.get('/loodle/:id', Loodle.get);
 

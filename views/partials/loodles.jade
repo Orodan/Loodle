@@ -1,6 +1,8 @@
 .panel.panel-primary(ng-controller="loodlesController as loodlesCtrl")
 	.panel-heading
 		h3.panel-title Loodles
+	.panel-body(ng-show="loodles.length == 0")
+		p You currently have no loodle available
 	ul.list-group
 		| <li class="list-group-item" ng-repeat="loodle in loodles">
 		|	id: {{loodle.id}} <br/>
