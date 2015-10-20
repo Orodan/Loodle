@@ -18,7 +18,6 @@
 
 		$http.get('/data/participation-request/')
 			.success(function (result) {
-				console.log("Data : ", result.data);
 				$scope.participationRequests = result.data;
 			})
 			.error(function (result) {
@@ -119,6 +118,9 @@
 				hours.push(moment_end_time);
 				//hours.push(moment_begin_time.format('hh A'));
 				//hours.push(moment_end_time.format('hh A'));
+
+				schedule.begin_time = moment(schedule.begin_time);
+				schedule.end_time = moment(schedule.end_time);
 			});
 			
 			// Make it available in our scope
@@ -175,13 +177,11 @@
 
 			$http.put('/vote', {votes: data})
 				.success(function (result) {
-					console.log("success");
-
 					// Reload of the data
 					loadLoodleData();
 				})
 				.error(function (result) {
-					console.log("error");
+					console.log("Error : ", result);
 				})
 
 		}

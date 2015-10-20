@@ -8,6 +8,6 @@
 		|	id: {{pr.id}} <br/>
 		|	from: {{pr.from.first_name}} {{pr.from.last_name}} <br/>
 		|	loodle: {{pr.loodle.name}} <br/><br/>
-		form(method="GET" action="{{'/loodle/' + pr.loodle.id }}")
+		form(method="GET" action="{{'/participation-request/' + pr.id + '/accept'}}")
 			button(class="btn btn-primary") Access
 		| </li>

@@ -52,13 +52,35 @@ router.get('/loodle/:id', isAuthenticated, function (req, res) {
 });
 
 // Add schedule page
-router.get('/loodle/:id/schedule', isAuthenticated, function (req, res) {
+router.get('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
 	res.render('add-schedule');
 });
 
 // Add user page
-router.get('/loodle/:id/user', isAuthenticated, function (req, res) {
+router.get('/loodle/:id/user/add', isAuthenticated, function (req, res) {
 	res.render('add-user');
+});
+
+// Delete schedule page
+router.get('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) {
+	res.render('delete-schedule');
+});
+
+// Delete user page
+router.get('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
+	res.render('delete-user');
+});
+
+// Accept participation request
+router.get('/participation-request/:id/accept', isAuthenticated, function (req, res) {
+
+	ParticipationRequest.accept(req.params.id, req.user.id, function (err, data) {
+		if (err)
+			throw new Error(err);
+
+		res.redirect('/');
+	});
+
 });
 
 // DATA ======================
@@ -115,7 +137,7 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 });
 
 // Process add schedule
-router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
+router.post('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
 
 	// Create the schedule
 	// Bind it to the loodle
@@ -133,7 +155,7 @@ router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
 });
 
 // Process add user
-router.post('/loodle/:id/user', isAuthenticated, function (req, res) {
+router.post('/loodle/:id/user/add', isAuthenticated, function (req, res) {
 
 	// Create the participation request
 	// Bind it to the loodle and the concerned user
@@ -148,11 +170,24 @@ router.post('/loodle/:id/user', isAuthenticated, function (req, res) {
 
 });
 
+// Process delete schedule
+router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) {
+
+	Schedule.remove(req.params.id, req.body.schedule_id, function (err) {
+		if (err)
+			throw new Error(err);
+
+		req.flash('success', 'Schedule deleted');
+		res.redirect('/loodle/' + req.params.id);
+	});
+
+});
+
+// PUT =====================================================
+
 router.put('/vote', function (req, res) {
 
 	Vote.updateVotes(req.body.votes, function (err) {
-
-		console.log("Error : ", err);
 
 		if (err)
 			throw new Error;
@@ -164,9 +199,6 @@ router.put('/vote', function (req, res) {
 	});
 
 });
-
-
-// PUT =====================================================
 
 
 // DEL =====================================================

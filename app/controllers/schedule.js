@@ -32,4 +32,19 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, c
 	});
 }
 
+ScheduleController.remove = function (loodle_id, schedule_id, callback) {
+
+	async.parallel({
+		// Delete the schedule and its association with the loodle
+		deleteSchedule: function (done) {
+			Schedule.remove(loodle_id, schedule_id, done);
+		},
+		// Delete the votes associated for each user of the loodle
+		deleteVotes: function (done) {
+			Vote.deleteVotesFromSchedule(loodle_id, schedule_id, done);
+		}
+	}, callback);
+
+};
+
 module.exports = ScheduleController;

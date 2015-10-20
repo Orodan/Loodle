@@ -44,4 +44,51 @@ VoteController.updateVotes = function (votes, callback) {
 
 };
 
+VoteController.deleteVotesFromSchedule = function (loodle_id, schedule_id, callback) {
+
+	// Get vote ids of the schedule
+	// Delete the votes
+	// Delete the association doodle-schedule-vote
+	// Get user ids of the loodle
+	// For each of them, delete the association doodle-user-vote
+
+	async.series([
+		function (done) {
+
+			async.waterfall([
+				// Get vote ids of the schedule
+				function (end) {
+					Vote.getVoteIdsFromSchedule(loodle_id, schedule_id, end);
+				},
+				// Delete the votes
+				function (vote_ids, end) {
+					async.each(vote_ids, function (vote_id, finish) {
+						Vote.remove(vote_id, finish);
+					}, end);
+				}
+			], done);
+
+		},
+		function (done) {
+			Vote.deleteAssociationScheduleVoteBySchedule(loodle_id, schedule_id, done);
+		},
+		function (done) {
+
+			async.waterfall([
+				// Get user ids of the loodle
+				function (end) {
+					Vote.getUserIdsOfLoodle(loodle_id, end);
+				},
+				// For each of them, delete the association doodle-user-vote
+				function (user_ids, end) {
+					async.each(user_ids, function (user_id, finish) {
+						Vote.deleteAssociationUserVoteBySchedule(loodle_id, user_id, schedule_id, finish);
+					}, end);
+				}
+			], done);
+
+		}
+	], callback);
+};
+
 module.exports = VoteController;

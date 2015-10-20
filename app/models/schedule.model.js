@@ -49,9 +49,32 @@ Schedule.bindLoodle = function (loodle_id, schedule_id, callback) {
 	db.execute(query
 		, [ loodle_id, schedule_id ]
 		, { prepare : true }
-		, function (err) {
-			return callback(err);
-		});
+		, callback);
+};
+
+Schedule.remove = function (loodle_id, schedule_id, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM schedules WHERE id = ?',
+			params: [ schedule_id ]
+		},
+		{
+			query: 'DELETE FROM schedule_by_doodle WHERE doodle_id = ? AND schedule_id = ?',
+			params: [ loodle_id, schedule_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, callback);
+
+};
+
+Schedule.removeAssociation = function (loodle_id, schedule_id, callback) {
+
+	var query = 'DELETE FROM schedule_by'
+
 };
 
 module.exports = Schedule;

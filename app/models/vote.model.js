@@ -94,4 +94,54 @@ Vote.update = function (id, vote, callback) {
 
 }
 
+Vote.getVoteIdsFromSchedule = function (loodle_id, schedule_id, callback) {
+
+	var query = 'SELECT vote_id FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
+	db.execute(query
+		, [ loodle_id, schedule_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+			data.rows.forEach(function (element) {
+				results.push(element.vote_id);
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Vote.remove = function (vote_id, callback) {
+
+	var query = 'DELETE FROM votes WHERE id = ?';
+	db.execute(query
+		, [ vote_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Vote.deleteAssociationScheduleVoteBySchedule = function (loodle_id, schedule_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
+	db.execute(query
+		, [ loodle_id, schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Vote.deleteAssociationUserVoteBySchedule = function (loodle_id, user_id, schedule_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
+	db.execute(query
+		, [  loodle_id, user_id, schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
 module.exports = Vote;

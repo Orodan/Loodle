@@ -5,9 +5,13 @@ nav.navbar.navbar-inverse
 		.collapse.navbar-collapse
 			ul.nav.navbar-nav
 				li
-					a(href="/loodle/{{loodle.id}}/schedule") Add schedule
+					a(href="/loodle/{{loodle.id}}/schedule/add") Add schedule
 				li
-					a(href="/loodle/{{loodle.id}}/user") Add user
+					a(href="/loodle/{{loodle.id}}/user/add") Add user
+				li
+					a(href="/loodle/{{loodle.id}}/schedule/delete") Delete schedule
+				li
+					a(href="/loodle/{{loodle.id}}/user/delete") Delete user
 			ul.nav.navbar-nav.navbar-right
 				li
 					a(href="/logout") Logout

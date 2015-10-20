@@ -27,7 +27,7 @@ block content
 							tr
 								th #
 								th(ng-repeat="hour in hours")
-									{{hour.format('hh A')}}
+									{{hour.format('LT')}}
 						tbody
 							tr(ng-repeat="user in loodle.users")
 								td {{user.first_name}} {{user.last_name}}
