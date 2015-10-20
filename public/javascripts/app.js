@@ -18,22 +18,110 @@
 
 		$scope.loodle_id = window.location.pathname.split("/")[2];
 
+		// Load the current user data
 		$http.get('/data/user')
 			.success(function (result) {
-
 				$scope.currentUser = result.data;
-
-				console.log("Current user : ", result.data);
 			})
 			.error(function (result) {
 				console.log("Error : ", result);
 			})
 
+		// Format schedules date =============================
+		var formatSchedule = function () {
+			
+			// Get the months
+			// Get the days
+			// Get the hours
+
+			var months = []
+				, days = []
+				, hours = [];
+
+			$scope.loodle.schedules.forEach(function (schedule) {
+
+				var moment_begin_time = moment(schedule.begin_time);
+				var moment_end_time = moment(schedule.end_time);
+
+				// Get the months ====================
+
+				if (months.length === 0) {
+					months.push({
+						time: moment_begin_time.format('MMMM YYYY'),
+						nbSchedules: 2
+					});
+				}
+				else {
+
+					var monthAlreadyPresent = false;
+
+					months.forEach(function (month) {
+						console.log("Month : ", month);
+						console.log("Month 2 : ", moment_begin_time.format('MMMM YYYY'));
+						console.log(month.time === moment_begin_time.format('MMMM YYYY'));
+						if (month.time === moment_begin_time.format('MMMM YYYY')) {
+							monthAlreadyPresent = true;
+							month.nbSchedules+=2;
+						}
+					})
+
+					if (!monthAlreadyPresent) {
+						months.push({
+							time: moment_begin_time.format('MMMM YYYY'),
+							nbSchedules: 2
+						});
+					}
+				}
+
+				console.log("Months : ", months);
+
+				// Get the days =======================
+
+				if (days.length === 0) {
+					days.push({
+						time: moment_begin_time.format('dddd D'),
+						nbSchedules: 2
+					});
+				}
+				else {
+
+					var dayAlreadyPresent = false;
+
+					days.forEach(function (day) {
+						if (day.time === moment_begin_time.format('dddd D')) {
+							dayAlreadyPresent = true;
+							day.nbSchedules+=2;
+						}
+					});
+
+					if (!dayAlreadyPresent) {
+						days.push({
+							time: moment_begin_time.format('dddd D'),
+							nbSchedules: 2
+						});
+					}
+				}
+
+				// Get the hours
+				hours.push(moment_begin_time.format('hh A'));
+				hours.push(moment_end_time.format('hh A'));
+			});
+			
+			// Make it available in our scope
+			$scope.months = months;
+			$scope.days = days;
+			$scope.hours = hours;
+		};
+
+		// Load the loodle data
 		var loadLoodleData = function () {
+
 			$http.get('/data/loodle/' + $scope.loodle_id)
 				.success(function (result) {
 
 					$scope.loodle = result.data;
+
+					formatSchedule();
 
 					// Format to easily display
 					$scope.loodle.users.forEach(function (user) {
@@ -48,10 +136,6 @@
 						});
 
 					});
-
-					console.log("Loodle Data : ", $scope.loodle);
-
-					console.log(result);
 				})
 				.error(function (result) {
 					console.log("Error : ", result);

@@ -18,16 +18,24 @@ block content
 						thead
 							tr
 								th #
-								th(ng-repeat="schedule in loodle.schedules")
-									{{schedule.begin_time}} - {{schedule.end_time}}
+								th(ng-repeat="month in months" colspan="{{month.nbSchedules}}")
+									{{month.time}}
+							tr
+								th #
+								th(ng-repeat="day in days" colspan="{{day.nbSchedules}}")
+									{{day.time}}
+							tr
+								th #
+								th(ng-repeat="hour in hours")
+									{{hour}}
 						tbody
 							tr(ng-repeat="user in loodle.users")
 								td {{user.first_name}} {{user.last_name}}
 
-								td(ng-hide="edit" ng-repeat="vote in user.votes")
+								td(ng-hide="edit" ng-repeat="vote in user.votes" colspan="2")
 									{{vote.vote}}
 									//span(ng-class="vote.vote == 1 ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'")
-								td(ng-show="edit" ng-repeat="vote in user.votes")
+								td(ng-show="edit" ng-repeat="vote in user.votes" colspan="2")
 									input(type="checkbox" ng-checked="vote.vote == 1" class="input-vote" data-id="{{vote.vote_id}}") 
 
 					button(ng-hide="edit" class="btn btn-primary" ng-click="edit=true") Edit votes
