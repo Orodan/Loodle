@@ -140,9 +140,6 @@ LoodleController.getLoodlesOfUser = function (req, res) {
 		if (err)
 			return error(res, err);
 
-		// organize data
-		console.log("Data : ", data);
-
 		return success(res, data);
 	});
 

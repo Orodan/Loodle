@@ -48,6 +48,7 @@ router.post('/loodle', function (req, res) {
 	Loodle.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
 		if (err)
 			return error(res, err);
+
 		return success(res, data);
 	});
 
@@ -58,6 +59,18 @@ router.post('/loodle/:id/schedule', function (req, res) {
 	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
 		if (err)
 			return error(res, err);
+
+		return success(res, data);
+	});
+
+});
+
+router.post('/loodle/:id/participation-request', function (req, res) {
+
+	ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
+		if (err)
+			return error(res, err);
+
 		return success(res, data);
 	});
 

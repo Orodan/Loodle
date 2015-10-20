@@ -5,7 +5,12 @@ block content
 		include partials/loodle-nav
 
 		.container
-			.jumbotron.center
-				h1 {{loodle.name}}
+			.center
+				
+				form(action="" method="POST")
 
-				p {{loodle.description}}
+					.form-group
+						label(for="email") Email
+						input(type="text" name="email" class="form-control" placeholder="Email")
+
+					button(type="submit" class="btn btn-primary") Send

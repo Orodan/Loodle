@@ -18,10 +18,7 @@
 
 		$http.get('/data/participation-request/')
 			.success(function (result) {
-
-				console.log("get participation requests");
-				console.log("Result : ", result);
-
+				console.log("Data : ", result.data);
 				$scope.participationRequests = result.data;
 			})
 			.error(function (result) {
@@ -187,6 +184,7 @@
 				})
 
 		}
+
 	}]);
 
 	

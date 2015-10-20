@@ -6,8 +6,6 @@ var ParticipationRequestController = {};
 
 ParticipationRequestController.getParticipationRequestsOfUser = function (req, res) {
 
-	var results = [];
-
 	async.waterfall([
 		// Get participation requests ids of the user
 		function (done) {
@@ -15,6 +13,8 @@ ParticipationRequestController.getParticipationRequestsOfUser = function (req, r
 		},
 		// Get participation requests data
 		function (participation_request_ids, done) {
+
+			var results = [];
 
 			async.each(participation_request_ids, function (pr_id, end) {
 				ParticipationRequest.get(pr_id, function (err, data) {
@@ -24,13 +24,92 @@ ParticipationRequestController.getParticipationRequestsOfUser = function (req, r
 					results.push(data);
 					return end();
 				})
-			}, done);
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+		},
+		// Get data of the loodle and users concerned
+		function (participation_requests, done) {
+
+			var results = [];
+
+			async.each(participation_requests, function (participation_request, end) {
+
+				async.parallel({
+					fromData: function (finish) {
+						ParticipationRequest.getUserData(participation_request.from_id, finish);
+					},
+					toData: function (finish) {
+						ParticipationRequest.getUserData(participation_request.to_id, finish);
+					},
+					loodleData: function (finish) {
+						ParticipationRequest.getLoodleData(participation_request.doodle_id, finish);
+					}
+				}, function (err, data) {
+					if (err) 
+						return end(err);
+
+					results.push({
+						id: participation_request.id,
+						from: data.fromData,
+						to: data.toData,
+						loodle: data.loodleData
+					});
+
+					return end();
+				});
+
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+
 		}
-	], function (err) {
+	], function (err, results) {
 		if (err)
 			return error(res, err);
 
 		return success(res, results);
+	});
+
+};
+
+ParticipationRequestController.createParticipationRequest = function (loodle_id, from_id, to_email, callback) {
+
+	// Get the id of the user to send the participation requests
+	ParticipationRequest.getUserIdFromEmail(to_email, function (err, to_id) {
+
+		if (err)
+			return callback(err);
+
+		// Create the participation request
+		var pr = new ParticipationRequest(loodle_id, from_id, to_id);
+
+		async.parallel({
+			// Save the participation request
+			save: function (done) {
+				pr.save(done);
+			},
+			// Bind it to the loodle
+			bindToLoodle: function (done) {
+				ParticipationRequest.bindToLoodle(pr.id, loodle_id, done);
+			},
+			// Bind it to the user
+			bindToUser: function (done) {
+				ParticipationRequest.bindToUser(pr.id, to_id, done);	
+			}
+		}, function (err, result) {
+			if (err)
+				return callback(err);
+
+			return callback(null, result.save);
+		});
+
 	});
 
 };

@@ -82,6 +82,7 @@ router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
 // Loodles list data
 router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
 
+// Participation requests data
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
 
 // POST ====================================================
@@ -129,6 +130,22 @@ router.post('/loodle/:id/schedule', isAuthenticated, function (req, res) {
 
 	});
 	
+});
+
+// Process add user
+router.post('/loodle/:id/user', isAuthenticated, function (req, res) {
+
+	// Create the participation request
+	// Bind it to the loodle and the concerned user
+
+	ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
+		if (err)
+			throw new Error(err);
+
+		req.flash('success', 'Participation request send');
+		res.redirect('/loodle/' + req.params.id);
+	});
+
 });
 
 router.put('/vote', function (req, res) {
