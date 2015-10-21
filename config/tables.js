@@ -14,6 +14,12 @@ module.exports = [
 		'doodle_id uuid, ' +
 		'primary key (user_id, doodle_id)' +
 	')',
+	// User by doodle
+	'CREATE TABLE IF NOT EXISTS user_by_doodle (' +
+		'doodle_id uuid, ' +
+		'user_id uuid, ' +
+		'primary key(doodle_id, user_id)' + 
+	')',
 	// Users
 	'CREATE TABLE IF NOT EXISTS users (' +
 		'id uuid, ' +
@@ -31,12 +37,6 @@ module.exports = [
 		'user_id uuid, ' +
 		'primary key (email, user_id)' +
 	')',
-	// User by doodle
-	'CREATE TABLE IF NOT EXISTS user_by_doodle (' +
-		'doodle_id uuid, ' +
-		'user_id uuid, ' +
-		'primary key(doodle_id, user_id)' + 
-	')',
 	// Participation requests
 	'CREATE TABLE IF NOT EXISTS participation_requests (' +
 		'id uuid, ' +
@@ -46,8 +46,14 @@ module.exports = [
 		'primary key (id)' +
 	')',
 	// Participation requests by user
-	'CREATE TABLE IF NOT EXISTS participation_requests_by_user (' +
+	'CREATE TABLE IF NOT EXISTS participation_request_by_user (' +
 		'user_id uuid, ' +
+		'participation_request_id uuid, ' +
+		'primary key (user_id, participation_request_id)' +
+	')',
+	// Participation requests by doodle
+	'CREATE TABLE IF NOT EXISTS participation_request_by_doodle (' +
+		'doodle_id uuid, ' +
 		'participation_request_id uuid, ' +
 		'primary key (user_id, participation_request_id)' +
 	')',
@@ -59,7 +65,7 @@ module.exports = [
 		'primary key(id)' +
 	')',
 	// Schedules by doodle
-	'CREATE TABLE IF NOT EXISTS schedules_by_doodle (' +
+	'CREATE TABLE IF NOT EXISTS schedule_by_doodle (' +
 		'doodle_id uuid, ' +
 		'schedule_id uuid, ' +
 		'primary key (doodle_id, schedule_id)' +
