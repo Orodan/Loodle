@@ -9,7 +9,7 @@ module.exports = [
 		'primary key (id)' +
 	')',
 	// Doodles by user
-	'CREATE TABLE IF NOT EXISTS doodles_by_user(' +
+	'CREATE TABLE IF NOT EXISTS doodle_by_user(' +
 		'user_id uuid, ' +
 		'doodle_id uuid, ' +
 		'primary key (user_id, doodle_id)' +
