@@ -55,7 +55,7 @@ module.exports = [
 	'CREATE TABLE IF NOT EXISTS participation_request_by_doodle (' +
 		'doodle_id uuid, ' +
 		'participation_request_id uuid, ' +
-		'primary key (user_id, participation_request_id)' +
+		'primary key (doodle_id, participation_request_id)' +
 	')',
 	// Schedules
 	'CREATE TABLE IF NOT EXISTS schedules (' +
@@ -91,5 +91,24 @@ module.exports = [
 		'schedule_id uuid, ' +
 		'vote_id uuid, ' +
 		'primary key (doodle_id, user_id, schedule_id)' +
+	')',
+	// Notifications
+	'CREATE TABLE IF NOT EXISTS notifications (' +
+		'id uuid, ' +
+		'from_id uuid, ' +
+		'doodle_id uuid, ' +
+		'primary key (id)' +
+	')',
+	// Notification by user
+	'CREATE TABLE IF NOT EXISTS notification_by_user (' +
+		'user_id uuid, ' +
+		'notification_id uuid, ' +
+		'primary key (user_id, notification_id)' +
+	')',
+	// Notification by doodle
+	'CREATE TABLE IF NOT EXISTS notification_by_doodle (' +
+		'doodle_id uuid, ' +
+		'notification_id uuid, ' +
+		'primary key (doodle_id, notification_id)' +
 	')'
 ];

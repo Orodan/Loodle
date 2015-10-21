@@ -44,22 +44,16 @@ client.init = function (callback) {
 		// Create the doodle tables used by the application
 		function _createDoodleTables (done) {
 			client.connect(function (err) { 
-				if (err) { return done(err); }
+				if (err)  
+					return done(err);
 
 				// Creation of each table
-				async.each(tables, function (table_creation_request, end) {
-
-					client.execute(table_creation_request, function (err) {
-						return end(table_creation_request + "\n" + err);
-					});
-				}, function (err) {		
-					if (err) { return done(err); }
-				});
+				async.eachSeries(tables, function (table_creation_request, end) {
+					client.execute(table_creation_request, end);
+				}, done);
 			});
 		}
-	], function (err) {
-		return callback(err);
-	});
+	], callback);
 };
 
 module.exports = client;
