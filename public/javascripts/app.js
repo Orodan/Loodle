@@ -212,11 +212,12 @@
 
 		$scope.setCookie = function (name, value) {
 
-			console.log("name : ", name);
-			console.log("value : ", value);
-
+			// Set the cookie
 			$cookies.put(name, value);
-			console.log("Cookie : ", $cookies.get('mylanguage'));
+
+			// Reload the current page
+			document.location.reload();
+
 		};
 
 	}]);
