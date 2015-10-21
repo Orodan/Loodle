@@ -248,4 +248,214 @@ Loodle.getLoodleIdsOfUser = function (user_id, callback) {
 		});
 };
 
+Loodle.remove = function (loodle_id, callback) {
+
+	var query = 'DELETE FROM doodles WHERE id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getScheduleIds = function (loodle_id, callback) {
+
+	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.schedule_id);
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Loodle.removeSchedule = function (schedule_id, callback) {
+
+	var query = 'DELETE FROM schedules WHERE id = ?';
+	db.execute(query
+		, [ schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.removeAssociationLoodleSchedules = function (loodle_id, callback) {
+
+	var query = 'DELETE FROM schedule_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getUserIds = function (loodle_id, callback) {
+
+	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.user_id)
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Loodle.removeAssociationLoodleUser = function (loodle_id, user_id, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM doodle_by_user WHERE user_id = ? AND doodle_id = ?',
+			params: [ user_id, loodle_id ]
+		},
+		{
+			query: 'DELETE FROM user_by_doodle WHERE doodle_id = ?',
+			params: [ loodle_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getVoteIds = function (loodle_id, callback) {
+
+	var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.vote_id)
+			});
+
+			return callback(null, results);
+
+		});
+
+};
+
+Loodle.removeVote = function (vote_id, callback) {
+
+	var query = 'DELETE FROM votes WHERE id = ?';
+	db.execute(query
+		, [ vote_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.removeAssociationLoodleVote = function (loodle_id, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ?',
+			params: [ loodle_id ]
+		},
+		{
+			query: 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ?',
+			params: [ loodle_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getParticipationRequestIds = function (loodle_id, callback) {
+
+	var query = 'SELECT participation_request_id FROM participation_request_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.participation_request_id);
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Loodle.removeParticipationRequest = function (participation_request_id, callback) {
+
+	var query = 'DELETE FROM participation_requests WHERE id = ?';
+	db.execute(query
+		, [ participation_request_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getUserIdWithParticipationRequest = function (participation_request_id, callback) {
+
+	var query = 'SELECT to_id FROM participation_requests WHERE id = ?';
+	db.execute(query
+		, [ participation_request_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			return callback(null, data.rows[0].to_id);
+		});
+
+};
+
+Loodle.removeAssocationUserParticipationRequest = function (user_id, callback) {
+
+	var query = 'DELETE FROM participation_request_by_user WHERE user_id = ?';
+	db.execute(query
+		, [ user_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callback) {
+
+	var query = 'DELETE FROM participation_request_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+
 module.exports = Loodle;

@@ -12,6 +12,24 @@
 				console.log("Error : ", result);
 			})
 
+		// Access the specified loodle
+		$scope.access = function (loodle_id) {
+			window.location = '/loodle/' + loodle_id;
+		};
+
+		// Delete the specified loodle
+		$scope.delete = function( loodle_id) {
+
+			$http.delete('/loodle/' + loodle_id)
+				.success(function () {
+					window.location.reload();
+				})
+				.error(function (result) {
+					console.log("Error : ", result);
+				})
+
+		}
+
 	}]);
 
 	app.controller('participationRequestsController', ['$http', '$scope', function ($http, $scope) {
@@ -203,12 +221,6 @@
 	}]);
 
 	app.controller('langController', ['$scope', '$cookies', function ($scope, $cookies) {
-
-		console.log("Cookie : ", $cookies.get('mylanguage'));
-
-		$scope.test = function () {
-			console.log("TEST");
-		};
 
 		$scope.setCookie = function (name, value) {
 

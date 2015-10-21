@@ -10,6 +10,7 @@
 		|	created: {{loodle.created}} <br/>
 		|	description: {{loodle.description}} <br/>
 		|	name: {{loodle.name}} <br/><br/>
-		form(method="GET" action="{{'/loodle/' + loodle.id }}")
-			button(class="btn btn-primary") Access
+		button(class="btn btn-primary" ng-click="access(loodle.id)")= __('Access')
+		span &nbsp &nbsp
+		button(class="btn btn-primary" ng-click="delete(loodle.id)")= __('Delete')
 		| </li>

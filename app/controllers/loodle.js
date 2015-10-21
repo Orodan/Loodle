@@ -145,6 +145,195 @@ LoodleController.getLoodlesOfUser = function (req, res) {
 
 };
 
+LoodleController.remove = function (loodle_id, callback) {
+
+	// Delete the loodle
+
+	// Get the schedule ids associated with the loodle
+	// Delete the schedules
+	// Delete the association loodle - schedule
+
+	// Get the user ids associated with the loodle
+	// Delete the association loodle - user
+
+	// Get the vote ids associated with the loodle
+	// Delete the votes
+	// Delete the association loodle - vote
+
+	// Get the participation request ids associated with the loodle
+	// Delete the participation requests
+	// Get the user ids who have a participation requests
+	// Delete the association user - participation request
+	// Delete the association loodle - participation request
+
+	async.series({
+
+		// Delete the loodle
+		deleteLoodle: function (done) {
+			Loodle.remove(loodle_id, done);
+		},
+
+		// Delete schedules
+		deleteSchedules: function (done) {
+
+			async.waterfall([
+
+				// Get the schedule ids associated with the loodle
+				function (end) {
+					Loodle.getScheduleIds(loodle_id, end);
+				},
+
+				// Delete the schedules
+				function (schedule_ids, end) {
+
+					async.each(schedule_ids, function (schedule_id, finish) {
+						Loodle.removeSchedule(schedule_id, finish);
+					}, end);
+
+				},
+
+				// Delete the association loodle - schedule
+				function (end) {
+					Loodle.removeAssociationLoodleSchedules(loodle_id, end);
+				}
+			], done);
+
+		},
+
+		// Delete user association 
+		deleteUserAssociation: function (done) {
+
+			async.waterfall([
+
+				// Get the user ids associated with the loodle
+				function (end) {
+					Loodle.getUserIds(loodle_id, end);
+				},
+
+				// Delete the association loodle - user
+				function (user_ids, end) {
+
+					async.each(user_ids, function (user_id, finish) {
+						Loodle.removeAssociationLoodleUser(loodle_id, user_id, finish);
+					}, end);
+
+				}
+
+			], done);
+
+		},
+
+		// Delete votes
+		deleteVotes: function (done) {
+
+			async.waterfall([
+
+				// Get the vote ids associated with the loodle
+				function (end) {
+					Loodle.getVoteIds(loodle_id, end);
+				},
+
+				// Delete the votes
+				function (vote_ids, end) {
+
+					async.each(vote_ids, function (vote_id, finish) {
+						Loodle.removeVote(vote_id, finish);
+					}, end);
+
+				},
+
+				// Delete the association loodle - vote
+				function (end) {
+					Loodle.removeAssociationLoodleVote(loodle_id, end);
+				},
+
+
+
+			], done);
+
+		},
+
+		// Delete participation requests
+		deleteParticipationRequests: function (done) {
+
+			var participation_request_ids = [];
+			var user_ids = [];
+
+			async.series([
+
+				// Get the participation request ids associated with the loodle
+				function (end) {
+					Loodle.getParticipationRequestIds(loodle_id, function (err, data) {
+						if (err)
+							return end(err);
+
+						participation_request_ids = data;
+						return end();
+					});
+				},
+
+				// Get the user ids who have a participation requests
+				function (end) {
+
+					async.each(participation_request_ids, function (pr_id, finish) {
+
+						Loodle.getUserIdWithParticipationRequest(pr_id, function (err, user_id) {
+							if (err)
+								return finish(err);
+
+							user_ids.push(user_id);
+							return finish();
+						});
+
+					}, function (err) {
+						if (err)
+							return end(err);
+
+						return end(null, user_ids);
+					});
+
+				},
+
+				// Delete the association user - participation request
+				function (end) {
+
+					async.each(user_ids, function (user_id, finish) {
+
+						Loodle.removeAssocationUserParticipationRequest(user_id, finish);
+
+					}, end);
+
+				},
+
+				// Delete the association loodle - participation request
+				function (end) {
+					Loodle.removeAssociationLoodleParticipationRequest(loodle_id, end);
+				},
+
+
+				// Delete the participation requests
+				function (end) {
+					
+					async.each(participation_request_ids, function (pr_id, finish) {
+
+						Loodle.removeParticipationRequest(pr_id, finish);
+
+					}, function (err) {
+						if (err)
+							return end(err);
+
+						return end(null, participation_request_ids);
+					});
+
+				},
+
+			], done);
+
+		}
+	}, callback);
+
+};
+
 
 module.exports = LoodleController;
 

@@ -116,6 +116,7 @@ router.delete('/loodle/:id/schedule', function (req, res) {
 
 });
 
+// Remove an user from a loodle
 router.delete('/loodle/:id/user', function (req, res) {
 
 	User.remove(req.params.id, req.body.user_id, function (err) {
@@ -126,6 +127,17 @@ router.delete('/loodle/:id/user', function (req, res) {
 		return success(res, 'User deleted');
 
 	});
+
+});
+
+router.delete('/loodle/:id', function (req, res) {
+
+	Loodle.remove(req.params.id, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Loodle deleted');
+	})
 
 });
 

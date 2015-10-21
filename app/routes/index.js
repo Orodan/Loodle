@@ -221,6 +221,19 @@ router.put('/vote', function (req, res) {
 
 // DEL =====================================================
 
+router.delete('/loodle/:id', function (req, res) {
+
+	Loodle.remove(req.params.id, function (err) {
+		if (err)
+			throw new Error(err);
+
+		res.json({
+			type: true,
+			data: 'Loodle deleted'
+		});
+	})
+
+});
 
 function isAuthenticated (req, res, next) {
 	if (req.isAuthenticated()) {
