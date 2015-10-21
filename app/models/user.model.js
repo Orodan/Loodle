@@ -63,6 +63,25 @@ exports.saveLinkWithEmail = function (id, email, callback) {
     db.execute(query, [ email, id ], { prepare: true }, callback);
 };
 
+exports.remove = function (loodle_id, user_id, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM doodle_by_user WHERE user_id = ? AND doodle_id = ?',
+			params: [ user_id, loodle_id ]
+		},
+		{
+			query: 'DELETE FROM user_by_doodle WHERE doodle_id = ? AND user_id = ?',
+			params: [ loodle_id, user_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, callback);
+
+};
+
 
 
 

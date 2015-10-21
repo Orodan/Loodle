@@ -3,6 +3,8 @@ var bcrypt = require('bcrypt-nodejs');
 var cassandra = require('cassandra-driver');
 var UserModel = require('../models/user.model');
 
+var Vote = require('../controllers/vote');
+
 var jwt = require('jsonwebtoken');
 
 function User (email, first_name, last_name, password) {
@@ -80,9 +82,22 @@ User.authenticate = function (req, res) {
         });
 
         return success(res, token);
-
-        // return callback(null, user, { message: 'Welcome !' });
     });
+
+};
+
+User.remove = function (loodle_id, user_id, callback) {
+
+    async.parallel({
+        // Delete the association user - loodle
+        removeUserFromLoodle: function (done) {
+            UserModel.remove(loodle_id, user_id, done);
+        },
+        // Delete the votes of the user for each schedules of the loodle
+        deleteVotes: function (done) {
+            Vote.deleteVotesFromUser(loodle_id, user_id, done);
+        }
+    }, callback);
 
 };
 

@@ -84,6 +84,28 @@ Vote.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 };
 
+Vote.getScheduleIdsOfLoodle = function (loodle_id, callback) {
+
+	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.schedule_id);
+			});
+
+			return callback(null, results);
+		}
+	);
+
+};
+
 Vote.update = function (id, vote, callback) {
 
 	var query = 'UPDATE votes SET vote = ? WHERE id = ?';
@@ -99,6 +121,26 @@ Vote.getVoteIdsFromSchedule = function (loodle_id, schedule_id, callback) {
 	var query = 'SELECT vote_id FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
 	db.execute(query
 		, [ loodle_id, schedule_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+			data.rows.forEach(function (element) {
+				results.push(element.vote_id);
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Vote.getVoteIdsFromUser = function (loodle_id, user_id, callback) {
+
+	var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
+	db.execute(query
+		, [ loodle_id, user_id ]
 		, { prepare : true }
 		, function (err, data) {
 			if (err)
@@ -134,11 +176,31 @@ Vote.deleteAssociationScheduleVoteBySchedule = function (loodle_id, schedule_id,
 
 };
 
+Vote.deleteAssociationUserVoteByUser = function (loodle_id, user_id, callback) {
+	
+	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
+	db.execute(query
+		, [ loodle_id, user_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
 Vote.deleteAssociationUserVoteBySchedule = function (loodle_id, user_id, schedule_id, callback) {
 
 	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
 	db.execute(query
 		, [  loodle_id, user_id, schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Vote.deleteAssociationScheduleVoteByUser = function (loodle_id, schedule_id, user_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ? AND user_id = ?';
+	db.execute(query
+		, [ loodle_id, schedule_id, user_id ]
 		, { prepare : true }
 		, callback);
 
