@@ -183,6 +183,21 @@ router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) 
 
 });
 
+// Process delete user
+router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
+
+	User.remove(req.params.id, req.body.user_id, function (err) {
+
+		if (err)
+			throw new Error(err);
+
+		req.flash('success', 'User deleted');
+		res.redirect('/loodle/' + req.params.id);
+
+	});
+
+});
+
 // PUT =====================================================
 
 router.put('/vote', function (req, res) {

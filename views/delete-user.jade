@@ -6,3 +6,13 @@ block content
 
 		.container
 			.center
+
+				form(action="" method="POST")
+
+					.form-group
+						label(for="user_id") Choose a user to delete
+						select(name="user_id" class="form-control")
+							option(ng-repeat="user in loodle.users" value="{{user.id}}") {{user.first_name}} {{user.last_name}}
+
+					button(type="submit" class="btn btn-primary") Send
+
