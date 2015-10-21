@@ -12,6 +12,7 @@ var api = require('./app/routes/api');
 var passport = require('passport');
 var session = require('express-session');
 var flash = require('connect-flash');
+var i18n = require('i18n');
 
 var app = express();
 
@@ -46,6 +47,20 @@ app.use(passport.initialize());
 app.use(passport.session());        // persistent login sessions
 app.use(flash());                   // flash messages stored in session
 
+// Internationalization
+i18n.configure({
+  locales: ['en', 'fr'],
+  directory: __dirname + '/locales',
+  cookie: 'mylanguage'
+});
+
+app.use(i18n.init);
+app.use(function (req, res, next) {
+  if (!req.cookies.mylanguage) {
+    res.cookie('mylanguage', 'fr', { maxAge: 900000, httpOnly: false });
+  }
+  next();
+});
 
 // Routes ======================================================
 app.use('/', routes);

@@ -18,6 +18,7 @@
     "express": "~4.13.1",
     "express-jwt": "^3.1.0",
     "express-session": "^1.11.3",
+    "i18n": "^0.5.0",
     "jade": "~1.11.0",
     "jsonwebtoken": "^5.4.0",
     "morgan": "~1.6.1",

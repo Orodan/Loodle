@@ -1,6 +1,6 @@
 (function () {
 
-	var app = angular.module('loodle', []);
+	var app = angular.module('loodle', ['ngCookies']);
 
 	app.controller('loodlesController', ['$http', '$scope', function ($http, $scope) {
 
@@ -202,6 +202,23 @@
 
 	}]);
 
-	
+	app.controller('langController', ['$scope', '$cookies', function ($scope, $cookies) {
+
+		console.log("Cookie : ", $cookies.get('mylanguage'));
+
+		$scope.test = function () {
+			console.log("TEST");
+		};
+
+		$scope.setCookie = function (name, value) {
+
+			console.log("name : ", name);
+			console.log("value : ", value);
+
+			$cookies.put(name, value);
+			console.log("Cookie : ", $cookies.get('mylanguage'));
+		};
+
+	}]);
 
 })();
