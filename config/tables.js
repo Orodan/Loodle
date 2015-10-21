@@ -110,5 +110,13 @@ module.exports = [
 		'doodle_id uuid, ' +
 		'notification_id uuid, ' +
 		'primary key (doodle_id, notification_id)' +
+	')',
+	// Configuration by user and doodle
+	'CREATE TABLE IF NOT EXISTS configuration_by_user_and_doodle (' +
+		'user_id uuid, ' +
+		'doodle_id uuid, ' +
+		'notification boolean, ' +
+		'notification_by_email boolean, ' +
+		'primary key (user_id, doodle_id) ' +
 	')'
 ];
