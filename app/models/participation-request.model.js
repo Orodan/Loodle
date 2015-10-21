@@ -86,6 +86,27 @@ ParticipationRequest.getIdsFromUser = function (user_id, callback) {
 
 };
 
+ParticipationRequest.getIdsFromLoodle = function (loodle_id, callback) {
+
+	var query = 'SELECT participation_request_id FROM participation_request_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+
+			data.rows.forEach(function (element) {
+				results.push(element.participation_request_id);
+			})
+
+			return callback(null, results);
+		});
+
+};
+
 ParticipationRequest.getUserIdFromEmail = function (email, callback) {
 
 	var query = 'SELECT user_id FROM user_by_email WHERE email = ?';

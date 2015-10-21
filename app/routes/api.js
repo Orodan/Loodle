@@ -38,6 +38,8 @@ router.get('/loodle/getSchedules/:id', Loodle.getSchedules);
 
 router.get('/loodle/getVotes/:id', Loodle.getVotes);
 
+router.get('/loodle/:id/participation-request', ParticipationRequest.getParticipationRequestsOfLoodle);
+
 router.get('/participation-request/:id/accept', function (req, res) {
 
 	ParticipationRequest.accept(req.params.id, req.user.id, function (err, data) {

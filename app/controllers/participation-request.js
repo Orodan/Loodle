@@ -79,6 +79,84 @@ ParticipationRequestController.getParticipationRequestsOfUser = function (req, r
 
 };
 
+ParticipationRequestController.getParticipationRequestsOfLoodle = function (req, res) {
+
+	// Get participation requests ids from loodle id
+	// Get participation requests data
+	// Get data of the loodle and users concerned
+
+	async.waterfall([
+		// Get participation requests ids from loodle id
+		function (done) {
+			ParticipationRequest.getIdsFromLoodle(req.params.id, done);
+		},
+		// Get participation requests data
+		function (participation_request_ids, done) {
+			var results = [];
+
+			async.each(participation_request_ids, function (pr_id, end) {
+				ParticipationRequest.get(pr_id, function (err, data) {
+					if (err)
+						return end(err);
+
+					results.push(data);
+					return end();
+				})
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+		},
+		// Get data of the loodle and users concerned
+		function (participation_requests, done) {
+
+			var results = [];
+
+			async.each(participation_requests, function (participation_request, end) {
+
+				async.parallel({
+					fromData: function (finish) {
+						ParticipationRequest.getUserData(participation_request.from_id, finish);
+					},
+					toData: function (finish) {
+						ParticipationRequest.getUserData(participation_request.to_id, finish);
+					},
+					loodleData: function (finish) {
+						ParticipationRequest.getLoodleData(participation_request.doodle_id, finish);
+					}
+				}, function (err, data) {
+					if (err) 
+						return end(err);
+
+					results.push({
+						id: participation_request.id,
+						from: data.fromData,
+						to: data.toData,
+						loodle: data.loodleData
+					});
+
+					return end();
+				});
+
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+
+		}
+	], function (err, results) {
+		if (err)
+			return error(res, err);
+
+		return success(res, results);
+	});
+
+};
+
 ParticipationRequestController.createParticipationRequest = function (loodle_id, from_id, to_email, callback) {
 
 	// Get the id of the user to send the participation requests

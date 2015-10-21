@@ -104,7 +104,10 @@ router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
 // Loodles list data
 router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
 
-// Participation requests data
+// Participation requests data of loodle
+router.get('/data/loodle/:id/participation-request', isAuthenticated, ParticipationRequest.getParticipationRequestsOfLoodle);
+
+// Participation requests data of user
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
 
 // POST ====================================================

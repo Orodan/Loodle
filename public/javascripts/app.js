@@ -137,6 +137,7 @@
 
 					$scope.loodle = result.data;
 
+					loadParticipationRequests($scope.loodle.id);
 					formatSchedule();
 
 					// Format to easily display
@@ -156,9 +157,22 @@
 				.error(function (result) {
 					console.log("Error : ", result);
 				})
-		}
+		};
 
 		loadLoodleData();
+
+		var loadParticipationRequests = function (loodle_id) {
+
+			$http.get('/data/loodle/' + loodle_id + '/participation-request')
+				.success(function (result) {
+					$scope.participationRequests = result.data;
+					console.log("Success : ", result.data);
+				})
+				.error(function (result) {
+					console.log("Error : ", result);
+				})
+
+		};
 
 		$scope.saveVotes = function () {
 
