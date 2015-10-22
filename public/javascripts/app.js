@@ -44,7 +44,7 @@
 
 	}]);
 
-	app.controller('loodleController', ['$http', '$scope', '$location', function ($http, $scope, $location) {
+	app.controller('loodleController', ['$http', '$scope', function ($http, $scope) {
 
 		$scope.loodle_id = window.location.pathname.split("/")[2];
 
@@ -206,7 +206,7 @@
 				});
 			});
 
-			$http.put('/vote', {votes: data})
+			$http.put('/loodle/' + $scope.loodle_id + '/votes', {votes: data})
 				.success(function (result) {
 					// Reload of the data
 					loadLoodleData();

@@ -2,6 +2,8 @@ var async = require('async');
 var bcrypt = require('bcrypt-nodejs');
 var Vote = require('../models/vote.model');
 
+var NotificationController = require('./notification');
+
 var VoteController = {};
 
 var defaultValue = 0;
@@ -34,12 +36,17 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 
 };
 
-VoteController.updateVotes = function (votes, callback) {
+VoteController.updateVotes = function (loodle_id, user_id, votes, callback) {
 
-	async.each(votes, function(vote, done) {
-
-		Vote.update(vote.id, vote.vote, done);
-
+	async.parallel({
+		updateVotes: function (done) {
+			async.each(votes, function(vote, end) {
+				Vote.update(vote.id, vote.vote, end);
+			}, done);
+		},
+		notify: function (done) {
+			NotificationController.notify(loodle_id, user_id, done);
+		}
 	}, callback);
 
 };

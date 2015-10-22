@@ -212,16 +212,16 @@ router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
 
 // PUT =====================================================
 
-router.put('/vote', function (req, res) {
+router.put('/loodle/:id/votes', function (req, res) {
 
-	Vote.updateVotes(req.body.votes, function (err) {
+	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
 
 		if (err)
 			throw new Error;
 
 		res.json({
 			type: true,
-			data: "success"
+			data: "votes updated"
 		});
 	});
 

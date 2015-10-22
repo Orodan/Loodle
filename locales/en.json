@@ -135,5 +135,7 @@
 	"Access": "Access",
 	"Remove": "Remove",
 	"Choose your language": "Choose your language",
-	"Delete": "Delete"
+	"Delete": "Delete",
+	"Notification": "Notification",
+	"Notification by email": "Notification by email"
 }

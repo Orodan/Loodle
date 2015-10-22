@@ -2,6 +2,8 @@ var async = require('async');
 var bcrypt = require('bcrypt-nodejs');
 var ParticipationRequest = require('../models/participation-request.model');
 
+var Configuration = require('./configuration');
+
 var ParticipationRequestController = {};
 
 ParticipationRequestController.getParticipationRequestsOfUser = function (req, res) {
@@ -203,10 +205,12 @@ ParticipationRequestController.accept = function (participation_request_id, user
 		var loodle_id = data.doodle_id;
 
 		async.parallel({
+
 			// Give access to the concerned loodle
 			loodleAccess: function (done) {
 				ParticipationRequest.giveAcess(user_id, loodle_id, done);
 			},
+
 			// Create default votes for each schedule of the loodle
 			defaultVotes: function (done) {
 
@@ -227,6 +231,14 @@ ParticipationRequestController.accept = function (participation_request_id, user
 					}
 				], done);
 			},
+
+			// Create default configuration for the user
+			createDefaultConfiguration: function (done) {
+
+				Configuration.createDefaultConfiguration(user_id, loodle_id, done);
+				
+			},
+
 			// Delete the participation request
 			deleteParticipationRequest: function (done) {
 				ParticipationRequest.remove(participation_request_id, loodle_id, user_id, done);

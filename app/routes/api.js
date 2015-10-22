@@ -105,6 +105,18 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 // PUT =============================================
 
+router.put('/loodle/:id/votes', function (req, res) {
+
+	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
+
+		if (err)
+			return error(res, err);
+
+		return error(res, 'votes updated');
+	});
+
+});
+
 router.put('/loodle/:id/configuration', Configuration.update);
 
 // DELETE ==========================================

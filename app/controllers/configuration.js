@@ -4,6 +4,13 @@ var Configuration = require('../models/configuration.model');
 
 var ConfigurationController = {};
 
+ConfigurationController.createDefaultConfiguration = function (user_id, loodle_id, callback) {
+
+	var config = new Configuration(user_id, loodle_id);
+	config.save(callback);
+
+};
+
 // Get configuration data
 ConfigurationController.get = function (req, res) {
 
@@ -25,6 +32,12 @@ ConfigurationController.update = function (req, res) {
 		return success(res, data);
 	});
 
+};
+
+ConfigurationController.getFromUser = function (user_id, loodle_id, callback) {
+
+	Configuration.getFromUser(user_id, loodle_id, callback);
+	
 };
 
 module.exports = ConfigurationController;
