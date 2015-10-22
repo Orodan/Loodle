@@ -1,0 +1,20 @@
+extends layout
+
+block content
+	div(ng-controller='loodleController as loodleCtrl')
+		include partials/loodle-nav
+
+		.container(ng-controller='configurationController as configCtrl')
+			.center
+				
+
+				.form-group
+					.checkbox
+						label #[input(name="notification" type="checkbox" ng-checked="configuration.notification" ng-model="configuration.notification")] #{__('Notification')}
+
+				.form-group
+					.checkbox
+						label #[input(name="notification_by_email" type="checkbox" ng-checked="configuration.notification_by_email" ng-model="configuration.notification_by_email")] #{__('Notification by email')}
+							
+			
+				button(type="submit" class="btn btn-primary" ng-click="editConfiguration()") Send

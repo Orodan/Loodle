@@ -15,6 +15,10 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 		// Associate the loodle and the user
 		bind: function (done) {
 			Loodle.bindUser(user_id, loodle.id, done)
+		},
+		// Create default configuration for the user
+		config: function (done) {
+			Loodle.createDefaultConfig(user_id, loodle.id, done);
 		}
 	}, function (err, results) {
 

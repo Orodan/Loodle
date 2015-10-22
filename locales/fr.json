@@ -115,5 +115,7 @@
 	" French ": " French ",
 	" English /": " English /",
 	" English": " English",
-	"Delete": "Delete"
+	"Delete": "Delete",
+	"Notification": "Notification",
+	"Notification by email": "Notification by email"
 }

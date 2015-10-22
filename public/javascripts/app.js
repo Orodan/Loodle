@@ -184,7 +184,6 @@
 			$http.get('/data/loodle/' + loodle_id + '/participation-request')
 				.success(function (result) {
 					$scope.participationRequests = result.data;
-					console.log("Success : ", result.data);
 				})
 				.error(function (result) {
 					console.log("Error : ", result);
@@ -229,6 +228,42 @@
 
 			// Reload the current page
 			document.location.reload();
+
+		};
+
+	}]);
+
+	app.controller('configurationController', ['$http', '$scope', function ($http, $scope) {
+
+		var loadConfig = function () {
+
+			$scope.loodle_id = window.location.pathname.split("/")[2];
+			
+			$http.get('/data/loodle/' + $scope.loodle_id + '/configuration')
+				.success(function (result) {
+					$scope.configuration = result.data;
+				})
+				.error(function (result) {
+					console.log("error : ", result);
+				})
+
+		};
+
+		loadConfig();
+
+		$scope.editConfiguration = function () {
+
+			$http.put('/data/loodle/' + $scope.loodle_id + '/configuration'
+				, { 
+					'notification' : $scope.configuration.notification,
+					'notification_by_email' : $scope.configuration.notification_by_email
+				})
+				.success(function (result) {
+					window.location = '/loodle/' + $scope.loodle_id;
+				})
+				.error(function (result) {
+					console.log("error : ", result);
+				})
 
 		};
 

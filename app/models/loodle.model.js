@@ -2,6 +2,8 @@ var db = require('../../config/database');
 var cassandra = require('cassandra-driver');
 var async = require('async');
 
+var Configuration = require('./configuration.model');
+
 function Loodle (name, description) {
 	this.id = cassandra.types.Uuid.random();
 	this.name = name;
@@ -454,6 +456,13 @@ Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callba
 		, [ loodle_id ]
 		, { prepare : true }
 		, callback);
+
+};
+
+Loodle.createDefaultConfig = function (user_id, loodle_id, callback) {
+
+	var config = new Configuration (user_id, loodle_id);
+	config.save(callback);
 
 };
 

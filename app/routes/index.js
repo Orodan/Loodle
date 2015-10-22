@@ -7,6 +7,7 @@ var Vote = require('../controllers/vote');
 var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
+var Configuration = require('../controllers/configuration');
 
 // GET =====================================================
 
@@ -71,6 +72,11 @@ router.get('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
 	res.render('delete-user');
 });
 
+// Configuration page
+router.get('/loodle/:id/configure', isAuthenticated, function (req, res) {
+	res.render('configure');
+});
+
 // Accept participation request
 router.get('/participation-request/:id/accept', isAuthenticated, function (req, res) {
 
@@ -109,6 +115,9 @@ router.get('/data/loodle/:id/participation-request', isAuthenticated, Participat
 
 // Participation requests data of user
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
+
+// Configuration of the user for the specified loodle
+router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
 
 // POST ====================================================
 
@@ -217,6 +226,8 @@ router.put('/vote', function (req, res) {
 	});
 
 });
+
+router.put('/data/loodle/:id/configuration', Configuration.update);
 
 
 // DEL =====================================================
