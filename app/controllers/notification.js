@@ -124,12 +124,8 @@ NotificationController.notify = function (loodle_id, current_user_id, callback) 
 					// Send notification by email if needed
 					sendNotificationByEmail: function (finish) {
 
-						if (user.configuration.notification_by_email) {
-							
-							var notif = new NotificationByEmail(current_user_id, loodle_id);
-							notif.save(user_id, finish);
-
-						}
+						if (user.configuration.notification_by_email)
+							NotificationByEmail.send(current_user_id, user.id, loodle_id, finish);
 						else
 							return finish();
 

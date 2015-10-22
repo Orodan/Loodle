@@ -220,8 +220,10 @@ router.put('/loodle/:id/votes', function (req, res) {
 
 	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
 
-		if (err)
+		if (err) {
+			console.log("Error : ", err);
 			throw new Error;
+		}
 
 		res.json({
 			type: true,

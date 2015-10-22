@@ -22,6 +22,8 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^5.4.0",
     "morgan": "~1.6.1",
+    "nodemailer": "^1.8.0",
+    "nodemailer-smtp-transport": "^1.0.3",
     "passport": "^0.3.0",
     "passport-http": "^0.3.0",
     "passport-local": "^1.0.0",
