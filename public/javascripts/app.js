@@ -269,4 +269,56 @@
 
 	}]);
 
+	app.controller('notificationsController', ['$http', '$scope', function ($http, $scope) {
+
+		var loodle_id = window.location.pathname.split("/")[2];
+		$scope.unreadNotif = 0;
+		$scope.show = false;
+
+		// Load the notifications of the user
+		var loadNotifications = function () {
+
+			$http.get('/data/loodle/' + loodle_id + '/notifications')
+				.success(function (result) {
+					$scope.notifications = result.data;
+
+					$scope.notifications.forEach(function (element) {
+						if (!element.is_read)
+							$scope.unreadNotif++;
+					});
+
+
+
+				})
+				.error(function (result) {
+					console.log("Error : ", result);
+				})
+
+		};
+
+		loadNotifications();
+
+		$scope.markAsRead = function (notification_id) {
+
+			$http.put('/data/notification/' + notification_id)
+				.success(function (result) {
+					$scope.unreadNotif--;
+					$scope.notifications.forEach(function (element) {
+						if (element.id === notification_id)
+							element.is_read = true;
+					});
+
+				})
+				.error(function (result) {
+					console.log("Error : ", result);
+				});
+
+		};
+
+		$scope.toggleShow = function () {
+			($scope.show) ? $scope.show = false : $scope.show = true
+		};
+
+	}]);
+
 })();

@@ -8,6 +8,7 @@ var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
 var Configuration = require('../controllers/configuration');
+var Notification = require('../controllers/notification');
 
 // All the api routes need an acces token, except the route
 // to get the token
@@ -65,6 +66,8 @@ router.get('/participation-request/:id/decline', function (req, res) {
 
 router.get('/loodle/:id/configuration', Configuration.get);
 
+router.get('/loodle/:id/notifications', Notification.getFromUser);
+
 
 // POST ============================================
 
@@ -118,6 +121,8 @@ router.put('/loodle/:id/votes', function (req, res) {
 });
 
 router.put('/loodle/:id/configuration', Configuration.update);
+
+router.put('/notification/:id', Notification.markAsRead);
 
 // DELETE ==========================================
 

@@ -8,6 +8,7 @@ var Loodle = require('../controllers/loodle');
 var Schedule = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
 var Configuration = require('../controllers/configuration');
+var Notification = require('../controllers/notification');
 
 // GET =====================================================
 
@@ -119,6 +120,9 @@ router.get('/data/participation-request/', isAuthenticated, ParticipationRequest
 // Configuration of the user for the specified loodle
 router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
 
+// Notifications
+router.get('/data/loodle/:id/notifications', isAuthenticated, Notification.getFromUser);
+
 // POST ====================================================
 
 // Process login 
@@ -226,6 +230,8 @@ router.put('/loodle/:id/votes', function (req, res) {
 	});
 
 });
+
+router.put('/data/notification/:id', Notification.markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);
 

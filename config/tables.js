@@ -97,6 +97,7 @@ module.exports = [
 		'id uuid, ' +
 		'from_id uuid, ' +
 		'doodle_id uuid, ' +
+		'is_read boolean,' +
 		'primary key (id)' +
 	')',
 	// Notification by user

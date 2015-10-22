@@ -1,0 +1,10 @@
+div(ng-controller="notificationsController as notifsCtrl")
+	button(class="btn btn-primary" ng-click="toggleShow()") #{__('Notifications')} &nbsp #[span.badge {{unreadNotif}}]
+
+	ul.list-group(ng-show="show")
+		li.list-group-item(ng-repeat="notification in notifications")
+			|	id: {{notification.id}} <br/>
+			|	from: {{notification.user.first_name}} {{notification.user.last_name}} <br/>
+			|	loodle: {{notification.doodle.name}} <br/>
+			|	<a href="" ng-click="markAsRead(notification.id)" ng-hide="notification.is_read">Mark as read</a>
+br
