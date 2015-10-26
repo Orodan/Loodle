@@ -2,6 +2,9 @@ var async = require('async');
 var bcrypt = require('bcrypt-nodejs');
 var Loodle = require('../models/loodle.model');
 
+var User = require('./user');
+var ParticipationRequest = require('./participation-request');
+
 var LoodleController = {};
 
 LoodleController.createLoodle = function (user_id, name, description, callback) {
@@ -338,6 +341,157 @@ LoodleController.remove = function (loodle_id, callback) {
 
 };
 
+LoodleController.openToPublic = function (req, res) {
+
+	Loodle.openToPublic(req.params.id, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'loodle open to public');
+	})
+
+};
+
+LoodleController.check = function (req, res, next) {
+
+	// Get the loodle data
+	// If the loodle is set to public, no need to be authenticated
+	// Otherwise, check authorization to access
+
+	Loodle.get(req.params.id, function (err, loodle) {
+		if (err)
+			throw new Error(err);
+
+		// Loodle public, no authentification required ======
+		if (loodle.category === 'public')
+			return next();
+
+		// Loodle private, authentification required ========
+
+		// No user authenticated
+		if (!req.user) {
+			req.flash('error', 'You need to be authenticated to access this loodle');
+			return res.redirect('/login');
+		}
+
+		//  User authenticated
+
+		// Get user of the loodle to see if the user has access
+		// to the loodle
+		Loodle.getUserIds(req.params.id, function (err, user_ids) {
+			if (err)
+				throw new Error(err);
+
+			var authorized = false;
+
+			user_ids.forEach(function (user_id) {
+				if (user_id.equals(req.user.id))
+					authorized = true;
+			});
+
+			// Authenticated and authorized
+			if (authorized)
+				return next();
+
+			req.flash('error', "You don't have the permission to access this loodle");
+			res.redirect('/login');
+		});
+
+	});
+
+};
+
+LoodleController.inviteUser = function (req, res) {
+
+	// Check if the email is matching a user
+	// Check if the user is not already in the loodle
+	// Check if the user is not already invated to participate
+	// Create the participation request and
+	// bind it to the loodle and the invated user
+
+	var invated_user_id = undefined;
+
+	async.series({
+
+		// Check if the email is matching a user
+		emailMatching: function (done) {
+			User.getByEmail(req.body.email, function (err, data) {
+				if (err)
+					return done(err);
+
+				// No user found
+				if (!data)
+					return done('No user found with that email');
+
+				invated_user_id = data.id;
+				return done();
+			});
+		},
+
+		// Check if the user is not already in the loodle
+		checkUsers: function (done) {
+
+			Loodle.getUserIds(req.params.id, function (err, user_ids) {
+				if (err)
+					return done(err);
+
+				var alreadyParticipating = false;
+
+				user_ids.forEach(function (user_id) {
+					if (user_id.equals(invated_user_id))
+						alreadyParticipating = true;
+				});
+
+				if (alreadyParticipating)
+					return done('This user is already participating to the loodle');
+
+				return done();
+			});
+
+		},
+
+		// Check if the user is not already invated to participate
+		checkInvatedUsers: function (done) {
+
+			Loodle.getParticipationRequestsOfUser(invated_user_id, function (err, participation_requests) {
+				if (err)
+					return done(err);
+
+				var alreadyInvated = false;
+
+				participation_requests.forEach(function (pr) {
+					if (pr.doodle_id == req.params.id)
+						alreadyInvated = true;
+				});
+
+				if (alreadyInvated)
+					return done('This user is already invated to participate to the loodle');
+
+				return done();
+			});
+
+		},
+
+		// Create the participation request and bind it to the
+		// loodle and the invated user
+		createPR: function (done) {
+			ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
+				if (err)
+					return done(err);
+
+				return done();
+			});
+		}
+	}, function (err) {
+		if (err)
+			req.flash('error', err);
+		else
+			req.flash('success', 'Participation request send');
+
+		res.redirect('/loodle/' + req.params.id);
+	});
+
+};
 
 module.exports = LoodleController;
 

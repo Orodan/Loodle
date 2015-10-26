@@ -1,6 +1,9 @@
 extends layout
 
 block content
+
+	include partials/public-user-modal
+
 	div(ng-controller='loodleController as loodleCtrl')
 		include partials/loodle-nav
 
@@ -13,6 +16,8 @@ block content
 					h1 {{loodle.name}}
 
 					p {{loodle.description}}
+
+					button(ng-hide="loodle.category === 'public'" class="btn btn-primary" ng-click="openLoodleToPublic()") Open loodle to public
 
 					table.table.table-striped.table-hover
 						thead
@@ -38,7 +43,13 @@ block content
 								td(ng-show="edit && currentUser.id == user.id" ng-repeat="vote in user.votes" colspan="2")
 									input(type="checkbox" ng-checked="vote.vote == 1" class="input-vote" data-id="{{vote.vote_id}}")
 
-					button(ng-hide="edit" class="btn btn-primary" ng-click="edit=true") Edit votes
+					button(ng-hide="edit || !currentUser" class="btn btn-primary" ng-click="edit=true") Edit votes
 					button(ng-show="edit" class="btn btn-primary" ng-click="saveVotes()") Save votes
+					br
+					br
+					button(type="button" ng-show="loodle.category === 'public' && !currentUser" class="btn btn-primary" data-toggle="modal" data-target="#myModal") Add public user
 
 				include partials/invated-users
+
+	script(src="https://code.jquery.com/jquery-2.1.4.js")
+	script(src="/javascripts/bootstrap.js")

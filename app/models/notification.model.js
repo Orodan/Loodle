@@ -86,8 +86,10 @@ Notification.getUserIdsOfLoodle = function (loodle_id, callback) {
 		, [ loodle_id ]
 		, { prepare : true }
 		, function (err, data) {
-			if (err) 
+			if (err) {
+				console.log('Error : ', err);
 				return callback(err);
+			}
 
 			var results = [];
 			data.rows.forEach(function (element) {
@@ -98,6 +100,48 @@ Notification.getUserIdsOfLoodle = function (loodle_id, callback) {
 		});
 
 };
+
+Notification.getUserIdsOfLoodleMinusPublic = function (loodle_id, callback) {
+
+	// Get user ids
+	// Filter : remove the ones not registred
+
+	async.waterfall([
+		// Get user ids
+		function (done) {
+			Notification.getUserIdsOfLoodle(loodle_id, done)
+		},
+		// Filter : remove the ones not registred
+		function (user_ids, done) {
+
+			var results = [];
+
+			async.each(user_ids, function (user_id, end) {
+
+				var query = 'SELECT status FROM users WHERE id = ?';
+				db.execute(query
+					, [ user_id ]
+					, { prepare : true }
+					, function (err, result) {
+						if (err)
+							return end(err);
+
+						if (result.rows[0].status === 'registred')
+							results.push(user_id);
+
+						return end();
+					});
+
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+		}
+	], callback);
+
+}
 
 Notification.getIdsFromUser = function (user_id, callback) {
 

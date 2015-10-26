@@ -466,5 +466,80 @@ Loodle.createDefaultConfig = function (user_id, loodle_id, callback) {
 
 };
 
+Loodle.openToPublic = function (loodle_id, callback) {
+
+	var query = 'UPDATE doodles SET category = ? WHERE id = ?';
+	db.execute(query
+		, [ 'public', loodle_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Loodle.getParticipationRequestsOfUser = function (user_id, callback) {
+
+	// Get participation request ids
+	// For each of them, get participation request data
+
+	async.waterfall([
+
+		// Get participation request ids
+		function (done) {
+
+			var query = 'SELECT participation_request_id FROM participation_request_by_user WHERE user_id = ?';
+			db.execute(query
+				, [ user_id ]
+				, { prepare : true }
+				, function (err, data) {
+					if (err)
+						return done(err);
+
+					var results = [];
+					data.rows.forEach(function (element) {
+						results.push(element.participation_request_id);
+					});
+
+					return done(null, results);
+				});
+
+		},
+
+		// For each of them, get participation request data
+		function (pr_ids, done) {
+
+			var results = [];
+
+			async.each(pr_ids, function (pr_id, end) {
+
+				var query = 'SELECT * FROM participation_requests WHERE id = ?';
+				db.execute(query
+					, [ pr_id ]
+					, { prepare : true }
+					, function (err, data) {
+						if (err)
+							return end(err);
+
+						results.push(data.rows[0]);
+						return end();
+					});
+
+			}, function (err) {
+				if (err)
+					return done(err);
+
+				return done(null, results);
+			});
+
+		}
+
+	], function (err, result) {
+		if (err)
+			return callback(err);
+
+		return callback(null, result);
+	});
+
+};
+
 
 module.exports = Loodle;

@@ -13,19 +13,6 @@ var transporter = nodemailer.createTransport({
 	}
 });
 
-
-/**
-var transporter = nodemailer.createTransport(smtpTransport({
-	host: 'mail.univ-lr.fr',
-	port: 25,
-	debug: true,
-	auth: {
-	        user: 'jkasprza',
-	        pass: 'Univlr17'
-	    }
-}));
-**/
-
 var NotificationByEmail = {};
 
 NotificationByEmail.send = function (from_id, to_id, loodle_id, callback) {

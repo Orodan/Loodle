@@ -36,7 +36,7 @@ router.get('/sign-up', function (req, res) {
 });
 
 // Logout
-router.get('/logout', function (req, res) {
+router.get('/logout', isAuthenticated, function (req, res) {
 	req.logout();
 	res.redirect('/login');
 });
@@ -47,11 +47,15 @@ router.get('/new-doodle', isAuthenticated, function (req, res) {
 });
 
 // Loodle page
-router.get('/loodle/:id', isAuthenticated, function (req, res) {
-	res.render('loodle', {
-		message: req.flash()
-	});
-});
+router.get('/loodle/:id'
+	// Authentication
+	, Loodle.check
+	, function (req, res) {
+		res.render('loodle', {
+			message: req.flash()
+		});
+	}
+);
 
 // Add schedule page
 router.get('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
@@ -106,13 +110,14 @@ router.get('/data/user', isAuthenticated, function (req, res) {
 });
 
 // Get loodle data
-router.get('/data/loodle/:id', isAuthenticated, Loodle.get);
+router.get('/data/loodle/:id'
+	, Loodle.get);
 
 // Loodles list data
 router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
 
 // Participation requests data of loodle
-router.get('/data/loodle/:id/participation-request', isAuthenticated, ParticipationRequest.getParticipationRequestsOfLoodle);
+router.get('/data/loodle/:id/participation-request', ParticipationRequest.getParticipationRequestsOfLoodle);
 
 // Participation requests data of user
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
@@ -171,20 +176,7 @@ router.post('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
 });
 
 // Process add user
-router.post('/loodle/:id/user/add', isAuthenticated, function (req, res) {
-
-	// Create the participation request
-	// Bind it to the loodle and the concerned user
-
-	ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
-		if (err)
-			throw new Error(err);
-
-		req.flash('success', 'Participation request send');
-		res.redirect('/loodle/' + req.params.id);
-	});
-
-});
+router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)
 
 // Process delete schedule
 router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) {
@@ -214,28 +206,17 @@ router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
 
 });
 
+router.post('/data/loodle/:id/user/public', User.createPublicUser);
+
 // PUT =====================================================
 
-router.put('/loodle/:id/votes', function (req, res) {
-
-	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
-
-		if (err) {
-			console.log("Error : ", err);
-			throw new Error;
-		}
-
-		res.json({
-			type: true,
-			data: "votes updated"
-		});
-	});
-
-});
+router.put('/loodle/:id/votes', Vote.updateVotes);
 
 router.put('/data/notification/:id', Notification.markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);
+
+router.put('/data/loodle/:id/public', Loodle.openToPublic);
 
 
 // DEL =====================================================

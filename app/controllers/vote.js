@@ -36,6 +36,7 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 
 };
 
+/**
 VoteController.updateVotes = function (loodle_id, user_id, votes, callback) {
 
 	async.parallel({
@@ -48,6 +49,39 @@ VoteController.updateVotes = function (loodle_id, user_id, votes, callback) {
 			NotificationController.notify(loodle_id, user_id, done);
 		}
 	}, callback);
+
+};
+**/
+VoteController.updateVotes = function (req, res) {
+
+	var user_id;
+
+	// Authenticated mode
+	if (req.user) 
+		user_id = req.user.id;
+	// Non authenticated mode
+	else
+		user_id = req.body.user_id;
+
+	// Update the votes
+	// Send the notifications
+	
+	async.parallel({
+		updateVotes: function (done) {
+			async.each(req.body.votes, function(vote, end) {
+				Vote.update(vote.id, vote.vote, end);
+			}, done);
+		},
+		notify: function (done) {
+			NotificationController.notify(req.params.id, user_id, done);
+		}
+	}, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Vote(s) updated');
+	});
+
 
 };
 
@@ -153,4 +187,61 @@ VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
 
 };
 
+VoteController.createDefaultVotesForLoodle = function (loodle_id, user_id, callback) {
+
+	// Get schedule ids of the loodle
+	// For each of them
+	// Create a default vote
+
+	async.waterfall([
+
+		// Get schedule ids of the loodle
+		function (done) {
+			Vote.getScheduleIdsOfLoodle(loodle_id, done);
+		},
+
+		// For each of them create a default vote
+		function (schedule_ids, done) {
+
+			console.log("Schedule_ids : ", schedule_ids);
+
+			async.each(schedule_ids, function (schedule_id, end) {
+
+				console.log("Schedule id : ", schedule_id);
+
+				// Create a new default vote
+				var vote = new Vote(defaultValue);
+				async.parallel({
+					// Save the vote
+					save: function (finish) {
+						vote.save(finish);
+					},
+					// Bind the vote to a loodle, schedule and user
+					bind: function (finish) {
+						vote.bind(loodle_id, user_id, schedule_id, finish)
+					}
+				}, end);
+
+			}, done);
+
+		}
+	], callback);
+
+};
+
 module.exports = VoteController;
+
+function error(res, err) {
+    res.status(500);
+    res.json({
+        type: false,
+        data: 'An error occured : ' + err
+    });
+};
+
+function success(res, data) {
+    res.json({
+        type: true,
+        data: data
+    });
+};
