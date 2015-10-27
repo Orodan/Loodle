@@ -5,30 +5,47 @@ block content
 		include partials/loodle-nav
 
 		.container(ng-controller='configurationController as configCtrl')
-			.center
 
-				div(ng-hide="showUsersForm")
+			.content
 
-					button(type="button" class="btn btn-primary" ng-click="toggleForm()" ng-show="configuration.role == 'manager'") Users management
+				.col-md-4
 
-					.form-group
-						.checkbox
-							label #[input(name="notification" type="checkbox" ng-checked="configuration.notification" ng-model="configuration.notification")] #{__('Notification')}
+					ul.list-group
+						li.list-group-item(ng-class="(notificationsForm) ? 'active' : ''" ng-click="showNotifications()")= __('Notifications')
+						li.list-group-item(ng-class="(usersManagementForm) ? 'active' : ''" ng-show="configuration.role == 'manager'" ng-click="showUsersManagement()")= __('Users management')
 
-					.form-group
-						.checkbox
-							label #[input(name="notification_by_email" type="checkbox" ng-checked="configuration.notification_by_email" ng-model="configuration.notification_by_email")] #{__('Notification by email')}
+				.col-md-8
 
-					button(type="submit" class="btn btn-primary" ng-click="editConfiguration()") Send
+					div.panel.panel-primary(ng-show="notificationsForm")
 
-				div(ng-show="showUsersForm")
+						.panel-heading
+							h3.panel-title= __('Notifications')
 
-					.form-group(ng-repeat="user in users")
-						{{user.first_name}} {{user.last_name}}
-						.radio
-							label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="radio-input")] Manager
-						.radio
-							label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="radio-input")] User
+						.panel-body
+							.form-group
+								.checkbox
+									label #[input(name="notification" type="checkbox" ng-checked="configuration.notification" ng-model="configuration.notification")] #{__('Notification')}
 
-					button(type="button" class="btn btn-primary" ng-click="updateUserRoles()")= __('Send')
-						
+							.form-group
+								.checkbox
+									label #[input(name="notification_by_email" type="checkbox" ng-checked="configuration.notification_by_email" ng-model="configuration.notification_by_email")] #{__('Notification by email')}
+
+							button(type="submit" class="btn btn-primary" ng-click="editConfiguration()") Send
+
+					div.panel.panel-primary(ng-show="usersManagementForm")
+
+						.panel-heading
+							h3.panel-title= __('Users management')
+
+						.panel-body
+
+							.row
+								.form-group.col-md-3(ng-repeat="user in users")
+									strong {{user.first_name}} {{user.last_name}}
+									.radio
+										label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="radio-input")] Manager
+									.radio
+										label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="radio-input")] User
+
+							button(type="button" class="btn btn-primary" ng-click="updateUserRoles()")= __('Send')
+							

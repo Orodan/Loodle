@@ -234,6 +234,9 @@
 
 		var loodle_id = window.location.pathname.split("/")[2];
 
+		$scope.notificationsForm = true;
+		$scope.usersManagementForm = false;
+
 		configurationService.loadConfig(loodle_id)
 			.success(function () {
 				$scope.configuration = configurationService.getConfig();
@@ -244,6 +247,20 @@
 				$scope.users = configurationService.getUsers();
 				console.log('$scope.users : ', $scope.users);
 			});
+
+		$scope.showNotifications = function () {
+
+			$scope.notificationsForm = true;
+			$scope.usersManagementForm = false;
+
+		};			
+
+		$scope.showUsersManagement = function () {
+
+			$scope.notificationsForm = false;
+			$scope.usersManagementForm = true;
+
+		};
 
 		$scope.editConfiguration = function () {
 
@@ -268,13 +285,6 @@
 				.error(function (result) {
 					console.log("error : ", result);
 				})
-
-		};
-
-		$scope.toggleForm = function () {
-
-			if ($scope.configuration.role == 'manager')
-				$scope.showUsersForm = true;
 
 		};
 
