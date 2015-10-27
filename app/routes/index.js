@@ -132,6 +132,9 @@ router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get)
 // Notifications
 router.get('/data/loodle/:id/notifications', isAuthenticated, Notification.getFromUser);
 
+// Users with
+router.get('/data/loodle/:id/users/configuration', isAuthenticated, Configuration.getUsersWithRole);
+
 // POST ====================================================
 
 // Process login 
@@ -208,6 +211,8 @@ router.put('/data/notification/:id', Notification.markAsRead);
 router.put('/data/loodle/:id/configuration', Configuration.update);
 
 router.put('/data/loodle/:id/public', Loodle.openToPublic);
+
+router.put('/data/loodle/:id/users/roles', Configuration.updateUserRoles);
 
 
 // DEL =====================================================

@@ -5,6 +5,7 @@ var Loodle = require('../models/loodle.model');
 var User = require('./user');
 var ParticipationRequest = require('./participation-request');
 var Schedule = require('./schedule');
+var Configuration = require('./configuration');
 
 var LoodleController = {};
 
@@ -22,7 +23,11 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 		},
 		// Create default configuration for the user
 		config: function (done) {
-			Loodle.createDefaultConfig(user_id, loodle.id, done);
+			Configuration.createDefaultConfiguration(user_id, loodle.id, done);
+		},
+		// Set the user role as manager
+		setUserRole: function (done) {
+			Configuration.setUserRole(user_id, loodle.id, 'manager', done);
 		}
 	}, function (err, results) {
 

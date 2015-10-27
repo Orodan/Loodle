@@ -459,13 +459,6 @@ Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callba
 
 };
 
-Loodle.createDefaultConfig = function (user_id, loodle_id, callback) {
-
-	var config = new Configuration (user_id, loodle_id);
-	config.save(callback);
-
-};
-
 Loodle.openToPublic = function (loodle_id, callback) {
 
 	var query = 'UPDATE doodles SET category = ? WHERE id = ?';

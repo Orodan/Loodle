@@ -239,6 +239,12 @@
 				$scope.configuration = configurationService.getConfig();
 			});
 
+		configurationService.loadUsersOfLoodle(loodle_id)
+			.success(function () {
+				$scope.users = configurationService.getUsers();
+				console.log('$scope.users : ', $scope.users);
+			});
+
 		$scope.editConfiguration = function () {
 
 			var config = { 
@@ -263,6 +269,38 @@
 					console.log("error : ", result);
 				})
 
+		};
+
+		$scope.toggleForm = function () {
+
+			if ($scope.configuration.role == 'manager')
+				$scope.showUsersForm = true;
+
+		};
+
+		$scope.updateUserRoles = function () {
+
+			// Get the radio inputs
+			var inputs = document.getElementsByClassName('radio-input');
+
+			var data = [];
+			// Organize the data for the server call
+			// Get the user id and the role defined
+			Array.prototype.forEach.call(inputs, function (input) {
+				if (input.checked) {
+					data.push({
+						id: input.getAttribute('name'),
+						role: input.getAttribute('data')
+					});
+				}
+			});
+
+			// Server call to update the user roles and
+			// redirection to the loodle page
+			configurationService.updateUserRoles(loodle_id, data)
+				.success(function () {
+					window.location = '/loodle/' + loodle_id;
+				})
 		};
 
 	}]);
@@ -624,6 +662,7 @@
 		// Data =============================================
 
 		var configuration = {};
+		var users = [];
 
 		// Functions ========================================
 
@@ -639,7 +678,7 @@
 				})
 				.error(function (res) {
 					console.log("configurationService.loadConfig error : ", res);
-				})
+				});
 
 		};
 
@@ -648,7 +687,34 @@
 			return $http.put('/data/loodle/' + loodle_id + '/configuration', config)
 				.error(function (res) {
 					console.log("configurationService.editConfig error : ", res);
+				});
+
+		};
+
+		configurationService.loadUsersOfLoodle = function (loodle_id) {
+
+			return $http.get('/data/loodle/' + loodle_id + '/users/configuration')
+				.success(function (res) {
+					users = res.data;
 				})
+				.error(function (res) {
+					console.log('configurationService.loadUsersOfLoodle error : ', res);
+				});
+		};
+
+		configurationService.getUsers = function () {
+			return users;
+		};
+
+		configurationService.updateUserRoles = function (loodle_id, users) {
+
+			return $http.put('/data/loodle/' + loodle_id + '/users/roles'
+				, {
+					users: users
+				})
+				.error(function (res) {
+					console.log('configurationService.updateUserRoles error : ', res);
+				});
 
 		};
 

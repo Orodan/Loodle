@@ -234,9 +234,7 @@ ParticipationRequestController.accept = function (participation_request_id, user
 
 			// Create default configuration for the user
 			createDefaultConfiguration: function (done) {
-
 				Configuration.createDefaultConfiguration(user_id, loodle_id, done);
-				
 			},
 
 			// Delete the participation request

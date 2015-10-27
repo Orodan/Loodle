@@ -118,6 +118,7 @@ module.exports = [
 		'doodle_id uuid, ' +
 		'notification boolean, ' +
 		'notification_by_email boolean, ' +
+		'role text, ' +
 		'primary key (user_id, doodle_id) ' +
 	')'
 ];
