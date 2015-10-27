@@ -1,8 +1,10 @@
 $(function () {
 	$('#datetimepicker1').datetimepicker({
-		useCurrent: true
+		minDate: new Date(),
+		stepping: 15
 	});
 	$('#datetimepicker2').datetimepicker({
-		useCurrent: true
+		minDate: new Date(),
+		stepping: 15
 	});
 });

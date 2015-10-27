@@ -4,6 +4,7 @@ var Loodle = require('../models/loodle.model');
 
 var User = require('./user');
 var ParticipationRequest = require('./participation-request');
+var Schedule = require('./schedule');
 
 var LoodleController = {};
 
@@ -487,6 +488,37 @@ LoodleController.inviteUser = function (req, res) {
 			req.flash('error', err);
 		else
 			req.flash('success', 'Participation request send');
+
+		res.redirect('/loodle/' + req.params.id);
+	});
+
+};
+
+LoodleController.addSchedule = function (req, res) {
+
+	console.log('LoodleController.addSchedule');
+
+	// Check if the two dates of the schedule are on the same day
+	// Create the new schedule
+	// Bind it to the loodle
+	// Create the default votes according to the schedule
+
+	async.series({
+
+		// Check if the two dates of the schedule are on the same day
+		checkSchedule: function (done) {
+			Schedule.checkSchedule(req.body.begin_time, req.body.end_time, done);
+		},
+
+		// Create the new schedule 
+		createSchedule: function (done) {
+			Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, done);
+		}
+	}, function (err) {
+		if (err)
+			req.flash('error', err);
+		else
+			req.flash('success', 'Schedule added');
 
 		res.redirect('/loodle/' + req.params.id);
 	});

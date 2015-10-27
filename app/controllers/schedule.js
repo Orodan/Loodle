@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 var Schedule = require('../models/schedule.model');
 
 var Vote = require('../controllers/vote');
+var moment = require('moment');
 
 var ScheduleController = {};
 
@@ -44,6 +45,21 @@ ScheduleController.remove = function (loodle_id, schedule_id, callback) {
 			Vote.deleteVotesFromSchedule(loodle_id, schedule_id, done);
 		}
 	}, callback);
+
+};
+
+// Check if the begin time and the end time are on the same day
+ScheduleController.checkSchedule = function (begin_time, end_time, callback) {
+
+	var moment_begin_time = moment(begin_time);
+	var moment_end_time = moment(end_time);
+
+	if (moment_begin_time.dayOfYear() != moment_end_time.dayOfYear())
+		return callback('You must provide a schedule on the same day');
+
+	return callback();
+
+	
 
 };
 

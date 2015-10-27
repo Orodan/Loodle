@@ -158,6 +158,9 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 });
 
 // Process add schedule
+router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle.addSchedule);
+
+/**
 router.post('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
 
 	// Create the schedule
@@ -174,6 +177,7 @@ router.post('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
 	});
 	
 });
+**/
 
 // Process add user
 router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)
