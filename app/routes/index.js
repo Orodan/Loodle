@@ -41,6 +41,10 @@ router.get('/logout', isAuthenticated, function (req, res) {
 	res.redirect('/login');
 });
 
+router.get('/public-loodle', function (req, res) {
+	res.render('create-public-loodle');
+});
+
 // New loodle
 router.get('/new-doodle', isAuthenticated, function (req, res) {
 	res.render('new-doodle');
@@ -160,25 +164,6 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 // Process add schedule
 router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle.addSchedule);
 
-/**
-router.post('/loodle/:id/schedule/add', isAuthenticated, function (req, res) {
-
-	// Create the schedule
-	// Bind it to the loodle
-	// Create the default votes according to the schedule
-	
-	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
-		if (err)
-			throw new Error(err);
-		
-		req.flash('success', 'Schedule added');
-		res.redirect('/loodle/' + req.params.id);
-
-	});
-	
-});
-**/
-
 // Process add user
 router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)
 
@@ -211,6 +196,8 @@ router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
 });
 
 router.post('/data/loodle/:id/user/public', User.createPublicUser);
+
+router.post('/data/public/loodle', Loodle.createPublicLoodle);
 
 // PUT =====================================================
 

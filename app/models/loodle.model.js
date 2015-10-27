@@ -4,12 +4,12 @@ var async = require('async');
 
 var Configuration = require('./configuration.model');
 
-function Loodle (name, description) {
+function Loodle (name, description, category) {
 	this.id = cassandra.types.Uuid.random();
 	this.name = name;
 	this.description = description;
 	this.created = Date.now();
-	this.category = 'private';
+	this.category = (category) ? category : 'private';
 }
 
 Loodle.prototype.save = function (callback) {

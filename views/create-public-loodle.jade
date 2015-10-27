@@ -1,0 +1,49 @@
+extends layout
+
+block content
+	include partials/sign-nav
+
+	.container(ng-controller="publicLoodleController as publicLoodleCtrl")
+		.center
+			div(ng-hide="showScheduleForm")
+
+				.form-group()
+					label(for="name")= __('Name')
+					input(type="text" name="name" class="form-control" placeholder="Name" ng-model="name" required)
+
+				.form-group()
+					label(for="description")= __('Description')
+					textarea(name="description" class="form-control" placeholder="Description" ng-model="description")
+
+				button(type="button" ng-click="showScheduleForm = true" class="btn btn-primary")= __('Next')
+
+			div(ng-show="showScheduleForm")
+
+				.form-group
+						div(class="input-group date" id="datetimepicker1")
+							label(for="begin_time")= __('Begin date')
+							input(name="begin_time" type="text" class="form-control" placeholder="begin date" id="begin_time")
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
+
+				.form-group
+						div(class="input-group date" id="datetimepicker2")
+							label(for="end_time")= __('End date')
+							input(name="end_time" type="text" class="form-control" placeholder="end date" id="end_time")
+							span.input-group-addon
+								span.glyphicon.glyphicon-calendar
+
+				button(type="button" ng-click="saveSchedule()" class="btn btn-primary")= __('Add schedule')
+
+				&nbsp;
+				&nbsp;
+
+				button(type="button" ng-click="createLoodle()" class="btn btn-primary right")= __('Finish')
+
+
+	script(type="text/javascript" src="/javascripts/jquery.js")
+	script(type="text/javascript" src="/javascripts/moment.js")
+	script(type="text/javascript" src="/javascripts/bootstrap/transition.js")
+	script(type="text/javascript" src="/javascripts/bootstrap/collapse.js")
+	script(type="text/javascript" src="/javascripts/bootstrap-datetimepicker.js")
+	script(type="text/javascript" src="/javascripts/add-schedule.js")

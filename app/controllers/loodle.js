@@ -496,8 +496,6 @@ LoodleController.inviteUser = function (req, res) {
 
 LoodleController.addSchedule = function (req, res) {
 
-	console.log('LoodleController.addSchedule');
-
 	// Check if the two dates of the schedule are on the same day
 	// Create the new schedule
 	// Bind it to the loodle
@@ -523,6 +521,44 @@ LoodleController.addSchedule = function (req, res) {
 		res.redirect('/loodle/' + req.params.id);
 	});
 
+};
+
+LoodleController.createPublicLoodle = function (req, res) {
+
+	var loodle = new Loodle(req.body.name, req.body.description, 'public');
+	async.parallel({
+		// Save the loodle
+		save: function (done) {
+			loodle.save(done);
+		},
+		// Create and add the schedule to it
+		addSchedule: function (done) {
+
+			async.each(req.body.schedules, function (schedule, end) {
+
+				async.series({
+
+					// Check if the two dates of the schedule are on the same day
+					checkSchedule: function (finish) {
+						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, finish);
+					},
+
+					// Create the new schedule 
+					createSchedule: function (finish) {
+						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, finish);
+					}
+				}, end);
+
+			}, done);
+		}	
+	}, function (err, results) {
+
+		if (err)
+			return error(res, err);
+		
+		return success(res, results.save);
+
+	});	
 };
 
 module.exports = LoodleController;

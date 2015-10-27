@@ -339,6 +339,60 @@
 
 	}]);
 
+	app.controller('publicLoodleController', ['$http', '$scope', 'loodleService', function ($http, $scope, loodleService) {
+
+		var schedules = [];
+
+		// Firs step : user fill the name and description
+		// Second step : user choose his/her schedules
+		// Third step : send everything to the server for
+		// verification and saving in bd 
+
+		$scope.showScheduleForm = false;
+
+		// Save the current vote (not in db but only on our controller) and show the form vote again
+		$scope.saveSchedule = function () {
+
+			// We are force to use this way
+			// Strangly if we affect a model to the concernet inputs
+			// they are never populated
+
+			// Get the current schedule data
+			schedules.push({
+				begin_time: document.getElementById('begin_time').value,
+				end_time: document.getElementById('end_time').value
+			});
+
+			// Empty the field so that the user can add another schedule
+			document.getElementById('begin_time').value = '';
+			document.getElementById('end_time').value = '';
+		};
+
+		// Collect the data give by the user and call the server
+		// to create the public loodle
+		$scope.createLoodle = function () {
+
+			var begin_time = document.getElementById('begin_time').value;
+			var end_time = document.getElementById('end_time').value
+
+			// We add the schedule if the fields are not empty
+			if (begin_time != '' && end_time != '') {
+				// Get the current schedule data
+				schedules.push({
+					begin_time: begin_time,
+					end_time: end_time
+				});
+			}
+
+			loodleService.createPublicLoodle($scope.name, $scope.description, schedules)
+				.success(function (res) {
+					window.location = '/loodle/' + res.data.id
+				});
+
+		};
+
+	}]);
+
 
 	// Services =============================================================================
 
@@ -414,6 +468,19 @@
 			return $http.get('/data/loodle/')
 				.error(function (res) {
 					console.log("loodleService.getLoodles error : ", res);
+				});
+
+		};
+
+		loodleService.createPublicLoodle = function (name, description, schedules) {
+
+			return $http.post('/data/public/loodle', { 
+					name: name,
+					description: description,
+					schedules: schedules
+				})
+				.error(function (res) {
+					console.log('loodleService.createPublicLoodle error : ', res);
 				});
 
 		};
