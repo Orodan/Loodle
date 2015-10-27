@@ -1,10 +1,8 @@
 $(function () {
 	$('#datetimepicker1').datetimepicker({
-		minDate: new Date(),
-		stepping: 15
+		minDate: new Date()
 	});
 	$('#datetimepicker2').datetimepicker({
-		minDate: new Date(),
-		stepping: 15
+		minDate: new Date()
 	});
 });
