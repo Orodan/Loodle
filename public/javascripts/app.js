@@ -245,7 +245,6 @@
 		configurationService.loadUsersOfLoodle(loodle_id)
 			.success(function () {
 				$scope.users = configurationService.getUsers();
-				console.log('$scope.users : ', $scope.users);
 			});
 
 		$scope.showNotifications = function () {
@@ -325,7 +324,6 @@
 		notificationService.loadNotifications()
 			.success(function (res) {
 				$scope.notifications = notificationService.getNotifications();
-				console.log('$scope.notifications : ', $scope.notifications);
 
 				$scope.notifications.forEach(function (element) {
 					if (!element.is_read)

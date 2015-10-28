@@ -131,13 +131,17 @@ LoodleController.get = function (req, res) {
 
 };
 
+// Get a resume of the data ov every loodle on the user
+// with his/her configuration for every loodle
 LoodleController.getLoodlesOfUser = function (req, res) {
 
 	async.waterfall([
+
 		// Get the loodles id 
 		function (done) {
 			Loodle.getLoodleIdsOfUser(req.user.id, done);
 		},
+
 		// Get the loodles data 
 		function (loodle_ids, done) {
 			var results = [];
@@ -154,7 +158,27 @@ LoodleController.getLoodlesOfUser = function (req, res) {
 			}, function (err) {
 				return done(err, results);
 			});
+		},
+
+		// Get user configuration for the loodles
+		function (loodles, done) {
+
+			async.each(loodles, function (loodle, end) {
+
+				Configuration.getUserConfiguration(req.user.id, loodle.id, function (err, data) {
+					if (err)
+						return end(err);
+					
+					loodle.user_config = data;
+					return end();
+				});
+
+			}, function (err) {
+				return done(err, loodles);
+			});
+
 		}
+
 	], function (err, data) {
 		if (err)
 			return error(res, err);

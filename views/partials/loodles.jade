@@ -8,4 +8,4 @@
 		li.list-group-item(ng-repeat="loodle in loodles") #{__('name')} : {{loodle.name}} #[br] #{__('description')} : {{loodle.description}} #[br] #[br]
 			button(class="btn btn-primary" ng-click="access(loodle.id)")= __('Access')
 			span &nbsp &nbsp
-			button(class="btn btn-primary" ng-click="delete(loodle.id)")= __('Delete')
+			button(class="btn btn-primary" ng-show="loodle.user_config.role == 'manager'" ng-click="delete(loodle.id)")= __('Delete')

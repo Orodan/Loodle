@@ -23,6 +23,10 @@ ConfigurationController.get = function (req, res) {
 
 };
 
+ConfigurationController.getUserConfiguration = function (user_id, loodle_id, callback) {
+	Configuration.get(user_id, loodle_id, callback);
+};
+
 ConfigurationController.update = function (req, res) {
 
 	Configuration.update(req.user.id, req.params.id, req.body.notification, req.body.notification_by_email, function (err, data) {
