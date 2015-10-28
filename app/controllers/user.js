@@ -16,7 +16,7 @@ function User (email, first_name, last_name, password) {
     this.first_name = first_name;
     this.last_name = last_name;
     this.password = User.generateHash(password);
-    this.status = 'registered';
+    this.status = 'registred';
 }
 
 

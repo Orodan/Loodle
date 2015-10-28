@@ -11,19 +11,19 @@ block content
 
 					.form-group
 						div(class="input-group date" id="datetimepicker1")
-							label(for="begin_time") Begin date
+							label(for="begin_time")= __('Begin date')
 							input(name="begin_time" type="text" class="form-control" placeholder="begin date")
 							span.input-group-addon
 								span.glyphicon.glyphicon-calendar
 
 					.form-group
 						div(class="input-group date" id="datetimepicker2")
-							label(for="end_time") End date
+							label(for="end_time")= __('End date')
 							input(name="end_time" type="text" class="form-control" placeholder="end date")
 							span.input-group-addon
 								span.glyphicon.glyphicon-calendar
 
-					button(type="submit" class="btn btn-primary") Send
+					button(type="submit" class="btn btn-primary")= __('Send')
 
 	script(type="text/javascript" src="/javascripts/jquery.js")
 	script(type="text/javascript" src="/javascripts/moment.js")

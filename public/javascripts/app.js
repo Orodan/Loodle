@@ -317,14 +317,15 @@
 
 	app.controller('notificationsController', ['$http', '$scope', 'notificationService',function ($http, $scope, notificationService) {
 
-		var loodle_id = window.location.pathname.split("/")[2];
+
 		$scope.unreadNotif = 0;
 		$scope.show = false;
 
 		// Load the notifications of the user
-		notificationService.loadNotifications(loodle_id)
-			.success(function () {
+		notificationService.loadNotifications()
+			.success(function (res) {
 				$scope.notifications = notificationService.getNotifications();
+				console.log('$scope.notifications : ', $scope.notifications);
 
 				$scope.notifications.forEach(function (element) {
 					if (!element.is_read)
@@ -674,12 +675,12 @@
 		// Functions ========================================
 
 		notificationService.getNotifications = function () {
-			return notificationService.notifications;
+			return notifications;
 		};
 
-		notificationService.loadNotifications = function (loodle_id) {
+		notificationService.loadNotifications = function () {
 
-			return $http.get('/data/loodle/' + loodle_id + '/notifications')
+			return $http.get('/data/user/notifications')
 				.success(function (res) {
 					notifications = res.data;
 				})

@@ -127,5 +127,11 @@
 	"Finish": "Finish",
 	"Users management": "Users management",
 	"Loodle": "Loodle",
-	"Delete user": "Delete user"
+	"Delete user": "Delete user",
+	"Loodles": "Loodles",
+	"You currently have no loodles": "You currently have no loodles",
+	"name": "name",
+	"New doodle": "New doodle",
+	"updated his/her vote(s) on ": "updated his/her vote(s) on ",
+	"Mark as read": "Mark as read"
 }

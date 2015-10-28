@@ -10,9 +10,9 @@ block content
 				form(action="" method="POST")
 
 					.form-group
-						label(for="schedule_id") Choose a schedule to delete
+						label(for="schedule_id")= __('Choose a schedule to delete')
 						select(name="schedule_id" class="form-control")
 							option(ng-repeat="schedule in loodle.schedules" value="{{schedule.id}}") {{schedule.begin_time.format('llll')}} - {{schedule.end_time.format('llll')}}
 
-					button(type="submit" class="btn btn-primary") Send
+					button(type="submit" class="btn btn-primary")= __('Send')
 

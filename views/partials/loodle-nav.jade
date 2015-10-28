@@ -22,6 +22,11 @@ nav.navbar.navbar-inverse(ng-controller="navbarController")
 
 		div(ng-show="currentUser && role == 'user'")
 			.collapse.navbar-collapse
+
+				ul.nav.navbar-nav
+					li
+						a(href="/loodle/{{loodle.id}}/configure")= __('Configuration')
+
 				ul.nav.navbar-nav.navbar-right
 					li
 						a(href="/logout")= __('Logout')

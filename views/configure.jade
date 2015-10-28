@@ -30,7 +30,7 @@ block content
 								.checkbox
 									label #[input(name="notification_by_email" type="checkbox" ng-checked="configuration.notification_by_email" ng-model="configuration.notification_by_email")] #{__('Notification by email')}
 
-							button(type="submit" class="btn btn-primary" ng-click="editConfiguration()") Send
+							button(type="submit" class="btn btn-primary" ng-click="editConfiguration()")= __('Send')
 
 					div.panel.panel-primary(ng-show="usersManagementForm")
 
@@ -43,9 +43,9 @@ block content
 								.form-group.col-md-3(ng-repeat="user in users")
 									strong {{user.first_name}} {{user.last_name}}
 									.radio
-										label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="radio-input")] Manager
+										label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="radio-input")] #{__('Manager')}
 									.radio
-										label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="radio-input")] User
+										label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="radio-input")] #{__('User')}
 
 							button(type="button" class="btn btn-primary" ng-click="updateUserRoles()")= __('Send')
 							

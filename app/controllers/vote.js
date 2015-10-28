@@ -36,22 +36,6 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 
 };
 
-/**
-VoteController.updateVotes = function (loodle_id, user_id, votes, callback) {
-
-	async.parallel({
-		updateVotes: function (done) {
-			async.each(votes, function(vote, end) {
-				Vote.update(vote.id, vote.vote, end);
-			}, done);
-		},
-		notify: function (done) {
-			NotificationController.notify(loodle_id, user_id, done);
-		}
-	}, callback);
-
-};
-**/
 VoteController.updateVotes = function (req, res) {
 
 	var user_id;

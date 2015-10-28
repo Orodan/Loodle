@@ -73,7 +73,7 @@ ConfigurationController.getUsersWithRole = function (req, res) {
 						return end(err);
 
 					// Only get the users registred
-					if (user.status == 'registered')
+					if (user.status == 'registred')
 						users.push(user);
 					
 					return end();

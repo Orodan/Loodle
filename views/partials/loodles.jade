@@ -1,17 +1,11 @@
 .panel.panel-primary(ng-controller="loodlesController as loodlesCtrl")
 	.panel-heading
-		h3.panel-title Loodles
+		h3.panel-title= __('Loodles')
 	.panel-body(ng-show="loodles.length == 0")
-		p You currently have no loodles
+		p= __('You currently have no loodles')
 
 	ul.list-group
-		| <li class="list-group-item" ng-repeat="loodle in loodles">
-		|	id: {{loodle.id}} <br/>
-		|	category: {{loodle.category}} <br/>
-		|	created: {{loodle.created}} <br/>
-		|	description: {{loodle.description}} <br/>
-		|	name: {{loodle.name}} <br/><br/>
-		button(class="btn btn-primary" ng-click="access(loodle.id)")= __('Access')
-		span &nbsp &nbsp
-		button(class="btn btn-primary" ng-click="delete(loodle.id)")= __('Delete')
-		| </li>
+		li.list-group-item(ng-repeat="loodle in loodles") #{__('name')} : {{loodle.name}} #[br] #{__('description')} : {{loodle.description}} #[br] #[br]
+			button(class="btn btn-primary" ng-click="access(loodle.id)")= __('Access')
+			span &nbsp &nbsp
+			button(class="btn btn-primary" ng-click="delete(loodle.id)")= __('Delete')

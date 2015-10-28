@@ -71,7 +71,9 @@ NotificationController.notify = function (loodle_id, current_user_id, callback) 
 		// Get the user ids of the loodle minus the current user
 		// and the public users
 		getUserIdsOfLoodle: function (done) {
+
 			Notification.getUserIdsOfLoodleMinusPublic(loodle_id, function (err, data) {
+
 				if (err)
 					return done(err);
 
@@ -176,12 +178,12 @@ NotificationController.getFromUser = function (req, res) {
 			async.eachSeries(notification_ids, function (notification_id, end) {
 				NotificationController.get(notification_id, function (err, data) {
 					if (err)
-						return done(err);
+						return end(err);
 
 					notifications.push(data);
-					return done();
+					return end();
 				});
-			});
+			}, done);
 
 		}
 

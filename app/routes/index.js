@@ -139,7 +139,7 @@ router.get('/data/participation-request/', isAuthenticated, ParticipationRequest
 router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
 
 // Notifications
-router.get('/data/loodle/:id/notifications', isAuthenticated, Notification.getFromUser);
+router.get('/data/user/notifications', isAuthenticated, Notification.getFromUser);
 
 // Users with
 router.get('/data/loodle/:id/users/configuration', isAuthenticated, Configuration.getUsersWithRole);

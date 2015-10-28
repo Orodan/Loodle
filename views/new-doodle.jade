@@ -8,11 +8,11 @@ block content
 			form(action="/new-doodle" method="POST")
 
 				.form-group()
-					label(for="name") Name
+					label(for="name")= __('Name')
 					input(type="text" name="name" class="form-control" placeholder="Name" required)
 
 				.form-group()
-					label(for="description") Description
+					label(for="description")= __('Description')
 					textarea(name="description" class="form-control" placeholder="Description")
 
-				button(type="submit" class="btn btn-primary") Send
+				button(type="submit" class="btn btn-primary")= __('Send')
