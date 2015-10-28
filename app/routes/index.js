@@ -101,8 +101,17 @@ router.get('/participation-request/:id/accept', isAuthenticated, function (req, 
 // DATA ======================
 
 // Get user data
-router.get('/data/user', isAuthenticated, function (req, res) {
+router.get('/data/user', function (req, res) {
+
+	// Authenticated
+	if (!req.user)
+		res.json({
+			type: true,
+			data: false
+		})
+
 	User.get(req.user.id, function (err, user) {
+
 		if (err)
 			throw new Error(err);
 

@@ -441,6 +441,44 @@
 
 	}]);
 
+	app.controller('navbarController', ['$scope', 'userService', 'configurationService', function ($scope, userService, configurationService) {
+
+		// Load current user data
+		// 3 possibilities
+		// Non authenticated --> Nothing on the navbar
+		// Authenticated and manager --> Everything on the navbar
+		// Authenticated and simple user --> Loodle and logout on the navbar
+
+		var loodle_id = window.location.pathname.split("/")[2];
+		var currentUser = false;
+		var config 		= false;
+
+		$scope.publicUser 	= false;
+		$scope.role 		= false;
+
+		userService.loadUser()
+			.then(function () {
+				currentUser = userService.getUser();
+
+				// Non authenticated
+				if (currentUser == false) {
+					$scope.publicUser = true;
+				}
+				// Authenticated
+				else {
+					configurationService.loadConfig(loodle_id)
+						.success(function () {
+							config = configurationService.getConfig();
+							$scope.role = config.role;
+						});
+				}
+				
+			});
+
+
+		
+	}]);
+
 
 	// Services =============================================================================
 
@@ -562,7 +600,6 @@
 					userService.user = res.data;
 				})
 				.error(function (res) {
-					userService.user = false;
 					console.log("userService.loadUser error : ", res);
 				});
 

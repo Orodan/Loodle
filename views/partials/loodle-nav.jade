@@ -1,19 +1,27 @@
-nav.navbar.navbar-inverse
+nav.navbar.navbar-inverse(ng-controller="navbarController")
 	.container-fluid
 		.navbar-header
-			a(class="navbar-brand" href="/") Loodle
-		.collapse.navbar-collapse
-			ul.nav.navbar-nav
-				li
-					a(href="/loodle/{{loodle.id}}/schedule/add") Add schedule
-				li
-					a(href="/loodle/{{loodle.id}}/user/add") Add user
-				li
-					a(href="/loodle/{{loodle.id}}/schedule/delete") Delete schedule
-				li
-					a(href="/loodle/{{loodle.id}}/user/delete") Delete user
-				li
-					a(href="/loodle/{{loodle.id}}/configure") Configuration
-			ul.nav.navbar-nav.navbar-right
-				li
-					a(href="/logout") Logout
+			a(class="navbar-brand" href="/")= __('Loodle')
+
+		div(ng-show="currentUser && role == 'manager'")
+			.collapse.navbar-collapse
+				ul.nav.navbar-nav
+					li
+						a(href="/loodle/{{loodle.id}}/schedule/add")= __('Add schedule')
+					li
+						a(href="/loodle/{{loodle.id}}/user/add")= __('Add user')
+					li
+						a(href="/loodle/{{loodle.id}}/schedule/delete")= __('Delete schedule')
+					li
+						a(href="/loodle/{{loodle.id}}/user/delete")= __('Delete user')
+					li
+						a(href="/loodle/{{loodle.id}}/configure")= __('Configuration')
+				ul.nav.navbar-nav.navbar-right
+					li
+						a(href="/logout")= __('Logout')
+
+		div(ng-show="currentUser && role == 'user'")
+			.collapse.navbar-collapse
+				ul.nav.navbar-nav.navbar-right
+					li
+						a(href="/logout")= __('Logout')

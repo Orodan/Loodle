@@ -23,16 +23,13 @@ block content
 						thead
 							tr
 								th #
-								th(ng-repeat="month in months" colspan="{{month.nbSchedules}}")
-									{{month.time.format('MMMM YYYY')}}
+								th(ng-repeat="month in months" colspan="{{month.nbSchedules}}") {{month.time.format('MMMM YYYY')}}
 							tr
 								th #
-								th(ng-repeat="day in days" colspan="{{day.nbSchedules}}")
-									{{day.time.format('dddd D')}}
+								th(ng-repeat="day in days" colspan="{{day.nbSchedules}}") {{day.time.format('dddd D')}}
 							tr
 								th #
-								th(ng-repeat="hour in hours")
-									{{hour.format('LT')}}
+								th(ng-repeat="hour in hours") {{hour.format('LT')}}
 						tbody
 							tr(ng-repeat="user in loodle.users")
 								td {{user.first_name}} {{user.last_name}}

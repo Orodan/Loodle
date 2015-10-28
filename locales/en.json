@@ -137,5 +137,12 @@
 	"Choose your language": "Choose your language",
 	"Delete": "Delete",
 	"Notification": "Notification",
-	"Notification by email": "Notification by email"
+	"Notification by email": "Notification by email",
+	"Add public user": "Add public user",
+	"First name": "First name",
+	"Last name": "Last name",
+	"Close": "Close",
+	"Save changes": "Save changes",
+	"Loodle": "Loodle",
+	"Delete user": "Delete user"
 }
