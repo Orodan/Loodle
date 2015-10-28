@@ -145,7 +145,7 @@ Notification.getUserIdsOfLoodleMinusPublic = function (loodle_id, callback) {
 
 Notification.getIdsFromUser = function (user_id, callback) {
 
-	var query = 'SELECT notification_id FROM notification_by_user WHERE user_id = ?';
+	var query = 'SELECT notification_id FROM notification_by_user WHERE user_id = ? limit 10';
 	db.execute(query
 		, [ user_id ]
 		, { prepare : true }
