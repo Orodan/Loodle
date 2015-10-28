@@ -129,14 +129,21 @@ Configuration.getUserRole = function (user_id, loodle_id, callback) {
 
 Configuration.updateUserRole = function (user_id, loodle_id, role, callback) {
 
-	console.log('Configuration.updateUserRole');
-	console.log('Role : ', role);
-
 	var query = 'UPDATE configuration_by_user_and_doodle SET role = ? WHERE user_id = ? AND doodle_id = ?';
 	db.execute(query
 		, [ role, user_id, loodle_id ]
 		, { prepare : true }
 		, callback); 
+
+};
+
+Configuration.delete = function (user_id, loodle_id, callback) {
+
+	var query = 'DELETE FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
+	db.execute(query
+		, [ user_id, loodle_id ]
+		, { prepare : true }
+		, callback);
 
 };
 

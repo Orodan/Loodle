@@ -21,13 +21,18 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 		bind: function (done) {
 			Loodle.bindUser(user_id, loodle.id, done)
 		},
-		// Create default configuration for the user
+		// Create default configuration for the user and set the user role as manager
 		config: function (done) {
-			Configuration.createDefaultConfiguration(user_id, loodle.id, done);
-		},
-		// Set the user role as manager
-		setUserRole: function (done) {
-			Configuration.setUserRole(user_id, loodle.id, 'manager', done);
+
+			async.series([
+				function (end) {
+					Configuration.createDefaultConfiguration(user_id, loodle.id, end);
+				},
+
+				function (end) {
+					Configuration.setUserRole(user_id, loodle.id, 'manager', end);
+				}
+			], done);
 		}
 	}, function (err, results) {
 
@@ -168,6 +173,7 @@ LoodleController.remove = function (loodle_id, callback) {
 
 	// Get the user ids associated with the loodle
 	// Delete the association loodle - user
+	// Delete the configurations user - loodle
 
 	// Get the vote ids associated with the loodle
 	// Delete the votes
@@ -216,18 +222,35 @@ LoodleController.remove = function (loodle_id, callback) {
 		// Delete user association 
 		deleteUserAssociation: function (done) {
 
-			async.waterfall([
+			var user_ids = [];
+
+			async.series([
 
 				// Get the user ids associated with the loodle
 				function (end) {
-					Loodle.getUserIds(loodle_id, end);
+					Loodle.getUserIds(loodle_id, function (err, data) {
+						if (err)
+							return end(err);
+
+						user_ids = data;
+						return end();
+					});
 				},
 
 				// Delete the association loodle - user
-				function (user_ids, end) {
+				function (end) {
 
 					async.each(user_ids, function (user_id, finish) {
 						Loodle.removeAssociationLoodleUser(loodle_id, user_id, finish);
+					}, end);
+
+				},
+
+				// Delete the configuration user - loodle
+				function (end) {
+
+					async.each(user_ids, function (user_id, finish) {
+						Configuration.delete(user_id, loodle_id, finish);
 					}, end);
 
 				}

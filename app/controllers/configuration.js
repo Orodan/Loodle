@@ -41,6 +41,10 @@ ConfigurationController.getFromUser = function (user_id, loodle_id, callback) {
 };
 
 ConfigurationController.setUserRole = function (user_id, doodle_id, role, callback) {
+
+	console.log('ConfigurationController.setUserRole');
+	console.log('role : ', role);
+
 	Configuration.setUserRole(user_id, doodle_id, role, callback);
 };
 
@@ -133,6 +137,10 @@ ConfigurationController.updateUserRoles = function (req, res) {
 	});
 
 };
+
+ConfigurationController.delete = function (user_id, loodle_id, callback) {
+	Configuration.delete(user_id, loodle_id, callback);
+}
 
 module.exports = ConfigurationController;
 
