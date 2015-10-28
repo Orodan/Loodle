@@ -208,6 +208,93 @@ NotificationController.markAsRead = function (req, res) {
 
 };
 
+NotificationController.getIdsFromLoodle = function (loodle_id, callback) {
+	Notification.getIdsFromLoodle(loodle_id, callback);
+};
+
+// Delete all the notifications coming from the loodle
+NotificationController.deleteFromLoodle = function (loodle_id, callback) {
+
+	// Get notification ids
+	// Get user ids
+
+	// For each notification ids, delete the notification
+	// For each user ids, delete the notification association
+	// Delete the loodle association
+
+	var notification_ids 	= [],
+		user_ids 			= [];
+
+	async.series({
+		// Get notification ids
+		getNotificationIds: function (done) {
+			Notification.getIdsFromLoodle(loodle_id, function (err, data) {
+				if (err)
+					return done(err);
+
+				notification_ids = data;
+				return done();
+			});
+		},
+
+		// Get user ids
+		getUserIds: function (done) {
+
+			Notification.getUserIdsOfLoodle(loodle_id, function (err, data) {
+				if (err)
+					return done(err);
+
+				user_ids = data;
+				return done();
+			});
+		},
+
+		// Delete
+		// - notifications
+		// - association user - notification
+		// - association loodle - notification
+		delete: function (done) {
+
+			async.series({
+
+				// Delete notifications
+				deleteNotifications: function (end) {
+
+					async.each(notification_ids, function (notification_id, finish) {
+						Notification.delete(notification_id, finish);
+					}, end);
+
+				},
+
+				// Delete the association user - notification
+				deleteAssociationsWithUsers:  function (end) {
+
+					async.each(user_ids, function (user_id, finish) {
+
+						async.each(notification_ids, function (notification_id, next) {
+							Notification.deleteAssociationWithUser(user_id, notification_id, next);
+						}, finish);
+
+					}, end);
+
+				},
+
+				// Delete the association loodle - notification
+				deleteAssociationsWithLoodle: function (end) {
+
+					Notification.deleteAssociationsWithLoodle(loodle_id, end);
+				}
+
+			}, done);
+		}
+
+	}, callback);
+};
+
+NotificationController.delete = function () {
+
+};
+
 module.exports = NotificationController;
 
 function error(res, err) {

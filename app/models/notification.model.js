@@ -86,10 +86,8 @@ Notification.getUserIdsOfLoodle = function (loodle_id, callback) {
 		, [ loodle_id ]
 		, { prepare : true }
 		, function (err, data) {
-			if (err) {
-				console.log('Error : ', err);
+			if (err)
 				return callback(err);
-			}
 
 			var results = [];
 			data.rows.forEach(function (element) {
@@ -168,6 +166,56 @@ Notification.markAsRead = function (notification_id, callback) {
 	var query = 'UPDATE notifications SET is_read = true WHERE id = ?';
 	db.execute(query
 		, [ notification_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Notification.getIdsFromLoodle = function (loodle_id, callback) {
+
+	var query = 'SELECT notification_id FROM notification_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			var results = [];
+			data.rows.forEach(function (element) {
+				results.push(element.notification_id);
+			});
+
+			return callback(null, results);
+		});
+
+};
+
+Notification.delete = function (notification_id, callback) {
+
+	var query = 'DELETE FROM notifications WHERE id = ?';
+	db.execute(query
+		, [ notification_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Notification.deleteAssociationWithUser = function (user_id, notification_id, callback) {
+
+	var query = 'DELETE FROM notification_by_user WHERE user_id = ? AND notification_id = ?';
+	db.execute(query
+		, [ user_id, notification_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+Notification.deleteAssociationsWithLoodle = function (loodle_id, callback) {
+
+	var query = 'DELETE FROM notification_by_doodle WHERE doodle_id = ?';
+	db.execute(query
+		, [ loodle_id ]
 		, { prepare : true }
 		, callback);
 

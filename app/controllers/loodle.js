@@ -6,6 +6,7 @@ var User = require('./user');
 var ParticipationRequest = require('./participation-request');
 var Schedule = require('./schedule');
 var Configuration = require('./configuration');
+var Notification = require('./notification');
 
 var LoodleController = {};
 
@@ -173,7 +174,6 @@ LoodleController.remove = function (loodle_id, callback) {
 
 	// Get the user ids associated with the loodle
 	// Delete the association loodle - user
-	// Delete the configurations user - loodle
 
 	// Get the vote ids associated with the loodle
 	// Delete the votes
@@ -184,6 +184,13 @@ LoodleController.remove = function (loodle_id, callback) {
 	// Get the user ids who have a participation requests
 	// Delete the association user - participation request
 	// Delete the association loodle - participation request
+
+	// Delete the configurations user - loodle
+
+	// Get the notification ids associated with the loodle
+	// Delete these notifications
+
+	var user_ids = [];
 
 	async.series({
 
@@ -215,46 +222,6 @@ LoodleController.remove = function (loodle_id, callback) {
 				function (end) {
 					Loodle.removeAssociationLoodleSchedules(loodle_id, end);
 				}
-			], done);
-
-		},
-
-		// Delete user association 
-		deleteUserAssociation: function (done) {
-
-			var user_ids = [];
-
-			async.series([
-
-				// Get the user ids associated with the loodle
-				function (end) {
-					Loodle.getUserIds(loodle_id, function (err, data) {
-						if (err)
-							return end(err);
-
-						user_ids = data;
-						return end();
-					});
-				},
-
-				// Delete the association loodle - user
-				function (end) {
-
-					async.each(user_ids, function (user_id, finish) {
-						Loodle.removeAssociationLoodleUser(loodle_id, user_id, finish);
-					}, end);
-
-				},
-
-				// Delete the configuration user - loodle
-				function (end) {
-
-					async.each(user_ids, function (user_id, finish) {
-						Configuration.delete(user_id, loodle_id, finish);
-					}, end);
-
-				}
-
 			], done);
 
 		},
@@ -365,7 +332,52 @@ LoodleController.remove = function (loodle_id, callback) {
 
 			], done);
 
+		},
+
+		// Delete the configuration user - loodle
+		deleteConfiguration: function (done) {
+
+			async.each(user_ids, function (user_id, end) {
+				Configuration.delete(user_id, loodle_id, end);
+			}, done);
+
+		},
+
+		// Delete notifications
+		deleteNotifications: function (done) {
+			Notification.deleteFromLoodle(loodle_id, done);
+		},
+
+		// Delete user association 
+		deleteUserAssociation: function (done) {
+
+			async.series([
+
+				// Get the user ids associated with the loodle
+				function (end) {
+					Loodle.getUserIds(loodle_id, function (err, data) {
+						if (err)
+							return end(err);
+
+						user_ids = data;
+						return end();
+					});
+				},
+
+				// Delete the association loodle - user
+				function (end) {
+
+					async.each(user_ids, function (user_id, finish) {
+						Loodle.removeAssociationLoodleUser(loodle_id, user_id, finish);
+					}, end);
+
+				}
+
+			], done);
+
 		}
+
+
 	}, callback);
 
 };
