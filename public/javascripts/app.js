@@ -414,9 +414,22 @@
 
 	}]);
 
-	app.controller('publicLoodleController', ['$http', '$scope', 'loodleService', function ($http, $scope, loodleService) {
+	app.controller('publicLoodleController', ['$http', '$scope', '$cookies', 'loodleService', function ($http, $scope, $cookies, loodleService) {
 
 		var schedules = [];
+
+		var lang = $cookies.get('mylanguage');
+
+		$(function () {
+			$('#datetimepicker1').datetimepicker({
+				minDate: new Date(),
+				locale: lang
+			});
+			$('#datetimepicker2').datetimepicker({
+				minDate: new Date(),
+				locale: lang
+			});
+		});
 
 		// Firs step : user fill the name and description
 		// Second step : user choose his/her schedules
@@ -520,7 +533,6 @@
 		});
 
 	}]);
-
 
 	// Services =============================================================================
 

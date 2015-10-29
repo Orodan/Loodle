@@ -3,7 +3,7 @@ extends layout
 block content
 	include partials/sign-nav
 
-	.container(ng-controller="publicLoodleController as publicLoodleCtrl")
+	.container(ng-controller="publicLoodleController")
 		.center
 			div(ng-hide="showScheduleForm")
 
@@ -46,4 +46,3 @@ block content
 	script(type="text/javascript" src="/javascripts/bootstrap/transition.js")
 	script(type="text/javascript" src="/javascripts/bootstrap/collapse.js")
 	script(type="text/javascript" src="/javascripts/bootstrap-datetimepicker.js")
-	script(type="text/javascript" src="/javascripts/add-schedule.js")

@@ -569,12 +569,12 @@ LoodleController.addSchedule = function (req, res) {
 
 		// Check if the two dates of the schedule are on the same day
 		checkSchedule: function (done) {
-			Schedule.checkSchedule(req.body.begin_time, req.body.end_time, done);
+			Schedule.checkSchedule(req.body.begin_time, req.body.end_time, req.cookies.mylanguage, done);
 		},
 
 		// Create the new schedule 
 		createSchedule: function (done) {
-			Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, done);
+			Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, req.cookies.mylanguage, done);
 		}
 	}, function (err) {
 		if (err)
@@ -604,12 +604,12 @@ LoodleController.createPublicLoodle = function (req, res) {
 
 					// Check if the two dates of the schedule are on the same day
 					checkSchedule: function (finish) {
-						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, finish);
+						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, req.cookies.mylanguage, finish);
 					},
 
 					// Create the new schedule 
 					createSchedule: function (finish) {
-						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, finish);
+						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, req.cookies.mylanguage, finish);
 					}
 				}, end);
 

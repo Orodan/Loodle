@@ -8,9 +8,21 @@ var moment = require('moment');
 var ScheduleController = {};
 
 // Create the schedule and bind it to the loodle
-ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, callback) {
+ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, lang, callback) {
 
-	var schedule = new Schedule(begin_time, end_time);
+	var moment_begin_time,
+		moment_end_time;
+
+	if (lang == 'en') {
+		moment_begin_time = moment(begin_time);
+		moment_end_time = moment(end_time);
+	}
+	else if (lang == 'fr') {
+		moment_begin_time = moment(begin_time, 'DD-MM-YYYY HH:mm');
+		moment_end_time = moment(end_time, 'DD-MM-YYYY HH:mm');
+	}
+
+	var schedule = new Schedule(moment_begin_time.format(), moment_end_time.format());
 
 	async.parallel({
 		// Save the schedule
@@ -26,6 +38,7 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, c
 			Vote.createVotesForSchedule(loodle_id, schedule.id, done);
 		}
 	}, function (err, results) {
+
 		if (err)
 			return callback(err)
 		
@@ -49,10 +62,19 @@ ScheduleController.remove = function (loodle_id, schedule_id, callback) {
 };
 
 // Check if the begin time and the end time are on the same day
-ScheduleController.checkSchedule = function (begin_time, end_time, callback) {
+ScheduleController.checkSchedule = function (begin_time, end_time, lang, callback) {
 
-	var moment_begin_time = moment(begin_time);
-	var moment_end_time = moment(end_time);
+	var moment_begin_time,
+		moment_end_time;
+
+	if (lang == 'en') {
+		moment_begin_time = moment(begin_time);
+		moment_end_time = moment(end_time);
+	}
+	else if (lang == 'fr') {
+		moment_begin_time = moment(begin_time, 'DD-MM-YYYY HH:mm');
+		moment_end_time = moment(end_time, 'DD-MM-YYYY HH:mm');
+	}
 
 	if (moment_begin_time.dayOfYear() != moment_end_time.dayOfYear())
 		return callback('You must provide a schedule on the same day');
