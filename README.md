@@ -22,6 +22,23 @@ Move to the applicaton directory and do the following :
 npm install
 ```
 
+#### Configuration
+
+You have to configure the smtp server you want to use to be able to send notification by email. Go to your application directory.
+
+```
+cd app/models/
+```
+
+Edit the file 
+
+```
+notification-by-email.model.js
+```
+
+and edit the transporter.
+
+
 ### Starting the app
 
 Make sure every dependencies (nodejs, cassandra and npm dependencies are installed).
