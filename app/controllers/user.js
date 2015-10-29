@@ -1,13 +1,13 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
-var cassandra = require('cassandra-driver');
+var async      = require('async');
+var bcrypt     = require('bcrypt-nodejs');
+var cassandra  = require('cassandra-driver');
 
-var UserModel = require('../models/user.model');
+var UserModel  = require('../models/user.model');
 var PublicUser = require('../models/public-user.model');
 
-var Vote = require('../controllers/vote');
+var Vote       = require('../controllers/vote');
 
-var jwt = require('jsonwebtoken');
+var jwt        = require('jsonwebtoken');
 
 function User (email, first_name, last_name, password) {
 

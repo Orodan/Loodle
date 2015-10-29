@@ -1,6 +1,6 @@
-var db = require('../../config/database');
+var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
-var async = require('async');
+var async     = require('async');
 
 function Vote (vote) {
 	this.id = cassandra.types.Uuid.random();

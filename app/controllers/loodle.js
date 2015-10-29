@@ -1,12 +1,12 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
-var Loodle = require('../models/loodle.model');
+var async                = require('async');
+var bcrypt               = require('bcrypt-nodejs');
+var Loodle               = require('../models/loodle.model');
 
-var User = require('./user');
+var User                 = require('./user');
 var ParticipationRequest = require('./participation-request');
-var Schedule = require('./schedule');
-var Configuration = require('./configuration');
-var Notification = require('./notification');
+var Schedule             = require('./schedule');
+var Configuration        = require('./configuration');
+var Notification         = require('./notification');
 
 var LoodleController = {};
 

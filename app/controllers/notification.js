@@ -1,9 +1,9 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
-var Notification = require('../models/notification.model');
+var async               = require('async');
+var bcrypt              = require('bcrypt-nodejs');
+var Notification        = require('../models/notification.model');
 var NotificationByEmail = require('../models/notification-by-email.model');
 
-var Configuration = require('./configuration');
+var Configuration       = require('./configuration');
 
 var NotificationController = {};
 

@@ -1,6 +1,6 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
-var Vote = require('../models/vote.model');
+var async                  = require('async');
+var bcrypt                 = require('bcrypt-nodejs');
+var Vote                   = require('../models/vote.model');
 
 var NotificationController = require('./notification');
 

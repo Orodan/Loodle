@@ -1,8 +1,8 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
+var async                = require('async');
+var bcrypt               = require('bcrypt-nodejs');
 var ParticipationRequest = require('../models/participation-request.model');
 
-var Configuration = require('./configuration');
+var Configuration        = require('./configuration');
 
 var ParticipationRequestController = {};
 

@@ -1,8 +1,8 @@
-var db = require('../../config/database');
-var cassandra = require('cassandra-driver');
-var async = require('async');
+var db            = require('../../config/database');
+var cassandra     = require('cassandra-driver');
+var async         = require('async');
 
-var nodemailer = require('nodemailer');
+var nodemailer    = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 
 var transporter = nodemailer.createTransport({
@@ -15,6 +15,13 @@ var transporter = nodemailer.createTransport({
 
 var NotificationByEmail = {};
 
+/**
+ * @param  {[type]}
+ * @param  {[type]}
+ * @param  {[type]}
+ * @param  {Function}
+ * @return {[type]}
+ */
 NotificationByEmail.send = function (from_id, to_id, loodle_id, callback) {
 
 	// Get sender data

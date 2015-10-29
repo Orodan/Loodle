@@ -1,5 +1,5 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
+var async         = require('async');
+var bcrypt        = require('bcrypt-nodejs');
 var Configuration = require('../models/configuration.model');
 
 var ConfigurationController = {};

@@ -1,14 +1,14 @@
-var express = require('express');
-var router = express.Router();
-var passport = require('passport');
+var express              = require('express');
+var router               = express.Router();
+var passport             = require('passport');
 
-var User = require('../controllers/user');
-var Vote = require('../controllers/vote');
-var Loodle = require('../controllers/loodle');
-var Schedule = require('../controllers/schedule');
+var User                 = require('../controllers/user');
+var Vote                 = require('../controllers/vote');
+var Loodle               = require('../controllers/loodle');
+var Schedule             = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
-var Configuration = require('../controllers/configuration');
-var Notification = require('../controllers/notification');
+var Configuration        = require('../controllers/configuration');
+var Notification         = require('../controllers/notification');
 
 // GET =====================================================
 

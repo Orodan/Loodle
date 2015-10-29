@@ -1,9 +1,9 @@
-var async = require('async');
-var bcrypt = require('bcrypt-nodejs');
+var async    = require('async');
+var bcrypt   = require('bcrypt-nodejs');
 var Schedule = require('../models/schedule.model');
 
-var Vote = require('../controllers/vote');
-var moment = require('moment');
+var Vote     = require('../controllers/vote');
+var moment   = require('moment');
 
 var ScheduleController = {};
 

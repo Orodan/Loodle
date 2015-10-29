@@ -1,4 +1,4 @@
-var db = require('../../config/database');
+var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 
 /**

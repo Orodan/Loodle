@@ -1,14 +1,14 @@
-var express = require('express');
-var router = express.Router();
-var passport = require('passport');
-var jwt = require('express-jwt');
+var express              = require('express');
+var router               = express.Router();
+var passport             = require('passport');
+var jwt                  = require('express-jwt');
 
-var User = require('../controllers/user');
-var Loodle = require('../controllers/loodle');
-var Schedule = require('../controllers/schedule');
+var User                 = require('../controllers/user');
+var Loodle               = require('../controllers/loodle');
+var Schedule             = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
-var Configuration = require('../controllers/configuration');
-var Notification = require('../controllers/notification');
+var Configuration        = require('../controllers/configuration');
+var Notification         = require('../controllers/notification');
 
 // All the api routes need an acces token, except the route
 // to get the token
