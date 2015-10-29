@@ -200,6 +200,7 @@
 		loodleService.loadLoodle($scope.loodle_id)
 			.success(function () {
 				$scope.loodle = loodleService.getLoodle();
+				console.log('$scope.loodle : ', $scope.loodle);
 			});
 		
 		// Watch loodle change

@@ -105,17 +105,17 @@ router.get('/data/user', function (req, res) {
 
 	// Authenticated
 	if (!req.user)
-		res.json({
+		return res.json({
 			type: true,
 			data: false
 		})
 
 	User.get(req.user.id, function (err, user) {
-
+		
 		if (err)
 			throw new Error(err);
 
-		res.json({
+		return res.json({
 			type: true,
 			data: user
 		});
