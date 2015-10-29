@@ -27,7 +27,7 @@ npm install
 You have to configure the smtp server you want to use to be able to send notification by email. Go to your application directory.
 
 ```
-cd app/models/
+cd app/models
 ```
 
 Edit the file 
