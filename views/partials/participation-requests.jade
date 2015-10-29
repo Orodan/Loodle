@@ -1,13 +1,9 @@
 .panel.panel-warning(ng-controller="participationRequestsController as prCtrl")
 	.panel-heading
-		h3.panel-title Participation requests
+		h3.panel-title= __('Participation requests')
 	.panel-body(ng-show="participationRequests.length == 0")
-		p You currently have no participation requests
+		p= __('You currently have no participation requests')
 	ul.list-group
-		| <li class="list-group-item" ng-repeat="pr in participationRequests">
-		|	id: {{pr.id}} <br/>
-		|	from: {{pr.from.first_name}} {{pr.from.last_name}} <br/>
-		|	loodle: {{pr.loodle.name}} <br/><br/>
-		form(method="GET" action="{{'/participation-request/' + pr.id + '/accept'}}")
-			button(class="btn btn-primary") Access
-		| </li>
+		li.list-group-item(ng-repeat="pr in participationRequests") #{__('From')} : {{pr.from.first_name}} {{pr.from.last_name}} #[br] #{__('Loodle')} : {{pr.loodle.name}} #[br] #[br]
+			form(method="GET" action="{{'/participation-request/' + pr.id + '/accept'}}")
+				button(class="btn btn-primary")= __('Access')

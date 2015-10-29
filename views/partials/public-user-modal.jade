@@ -10,12 +10,12 @@
 				
 				.form-group
 					label(for="first_name")= __('First name')
-					input(type="text" name="first_name" class="form-control" placeholder="First name" ng-model="first_name" required)
+					input(type="text" name="first_name" class="form-control" placeholder="#{__('First name')}" ng-model="first_name" required)
 
 				.form-group
 					label(for="last_name")= __('Last name')
-					input(type="text" name="last_name" class="form-control" placeholder="Last name" ng-model="last_name" required)
+					input(type="text" name="last_name" class="form-control" placeholder="#{__('Last name')}" ng-model="last_name" required)
 
 			.modal-footer
 				button(type="button" class="btn btn-default" data-dismiss="modal")= __('Close')
-				button(type="button" class="btn btn-primary" ng-click="addPublicUser()" data-dismiss="modal")= __('Save changes')
+				button(type="button" class="btn btn-primary" ng-click="addPublicUser()" data-dismiss="modal")= __('Save')

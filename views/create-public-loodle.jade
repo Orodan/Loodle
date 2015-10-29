@@ -9,11 +9,11 @@ block content
 
 				.form-group()
 					label(for="name")= __('Name')
-					input(type="text" name="name" class="form-control" placeholder="Name" ng-model="name" required)
+					input(type="text" name="name" class="form-control" placeholder="#{__('Name')}" ng-model="name" required)
 
 				.form-group()
 					label(for="description")= __('Description')
-					textarea(name="description" class="form-control" placeholder="Description" ng-model="description")
+					textarea(name="description" class="form-control" placeholder="#{__('Description')}" ng-model="description")
 
 				button(type="button" ng-click="showScheduleForm = true" class="btn btn-primary")= __('Next')
 
@@ -22,14 +22,14 @@ block content
 				.form-group
 						div(class="input-group date" id="datetimepicker1")
 							label(for="begin_time")= __('Begin date')
-							input(name="begin_time" type="text" class="form-control" placeholder="begin date" id="begin_time")
+							input(name="begin_time" type="text" class="form-control" placeholder="#{__('Begin date')}" id="begin_time")
 							span.input-group-addon
 								span.glyphicon.glyphicon-calendar
 
 				.form-group
 						div(class="input-group date" id="datetimepicker2")
 							label(for="end_time")= __('End date')
-							input(name="end_time" type="text" class="form-control" placeholder="end date" id="end_time")
+							input(name="end_time" type="text" class="form-control" placeholder="#{__('End date')}" id="end_time")
 							span.input-group-addon
 								span.glyphicon.glyphicon-calendar
 
@@ -38,7 +38,7 @@ block content
 				&nbsp;
 				&nbsp;
 
-				button(type="button" ng-click="createLoodle()" class="btn btn-primary right")= __('Finish')
+				button(type="button" ng-click="createLoodle()" class="btn btn-primary right")= __('Send')
 
 
 	script(type="text/javascript" src="/javascripts/jquery.js")

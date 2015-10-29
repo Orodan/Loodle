@@ -9,10 +9,10 @@ block content
 
 				.form-group()
 					label(for="name")= __('Name')
-					input(type="text" name="name" class="form-control" placeholder="Name" required)
+					input(type="text" name="name" class="form-control" placeholder="#{__('Name')}" required)
 
 				.form-group()
 					label(for="description")= __('Description')
-					textarea(name="description" class="form-control" placeholder="Description")
+					textarea(name="description" class="form-control" placeholder="#{__('Description')}")
 
 				button(type="submit" class="btn btn-primary")= __('Send')

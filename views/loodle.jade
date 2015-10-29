@@ -35,8 +35,8 @@ block content
 								td {{user.first_name}} {{user.last_name}}
 
 								td(ng-hide="edit && currentUser.id == user.id" ng-repeat="vote in user.votes" colspan="2")
-									//{{vote.vote}}
 									span(ng-class="vote.vote == 1 ? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'")
+										
 								td(ng-show="edit && currentUser.id == user.id" ng-repeat="vote in user.votes" colspan="2")
 									input(type="checkbox" ng-checked="vote.vote == 1" class="input-vote" data-id="{{vote.vote_id}}")
 

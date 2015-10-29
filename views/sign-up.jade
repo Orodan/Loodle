@@ -12,18 +12,18 @@ block content
 
 					.form-group()
 						label(for="email")= __('Email')
-						input(type="email" name="email" class="form-control" placeholder="Email" required)
+						input(type="email" name="email" class="form-control" placeholder="#{__('Email')}" required)
 
 					.form-group()
 						label(for="first_name")= __('First Name')
-						input(type="text" name="first_name" class="form-control" placeholder="First Name" required)
+						input(type="text" name="first_name" class="form-control" placeholder="#{__('First Name')}" required)
 
 					.form-group()
 						label(for="first_name")= __('Last Name')
-						input(type="text" name="last_name" class="form-control" placeholder="Last Name" required)
+						input(type="text" name="last_name" class="form-control" placeholder="#{__('Last Name')}" required)
 
 					.form-group()
 						label(for="password")= __('Password')
-						input(type="password" name="password" class="form-control" placeholder="Password" required)
+						input(type="password" name="password" class="form-control" placeholder="#{__('Password')}" required)
 
 					button(type="submit" class="btn btn-primary" ng-disabled="loginForm.$invalid")= __('Send')
