@@ -49,5 +49,8 @@
 	"You currently have no participation requests": "You currently have no participation requests",
 	"First name": "First name",
 	"Last name": "Last name",
-	"Edit votes": "Edit votes"
+	"Edit votes": "Edit votes",
+	"Loodle status": "Loodle status",
+	"Private": "Private",
+	"Public": "Public"
 }

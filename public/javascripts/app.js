@@ -52,8 +52,8 @@
 
 			$scope.loodle.schedules.forEach(function (schedule) {
 
-				var moment_begin_time = moment(schedule.begin_time).lang(lang);
-				var moment_end_time = moment(schedule.end_time).lang(lang);
+				var moment_begin_time = moment(schedule.begin_time).locale(lang);
+				var moment_end_time = moment(schedule.end_time).locale(lang);
 
 				// Get the months ====================
 
@@ -502,8 +502,23 @@
 				
 			});
 
+	}]);
 
-		
+	app.controller('datetimePickerController', ['$scope', '$cookies', function ($scope, $cookies) {
+
+		var lang = $cookies.get('mylanguage');
+
+		$(function () {
+			$('#datetimepicker1').datetimepicker({
+				minDate: new Date(),
+				locale: lang
+			});
+			$('#datetimepicker2').datetimepicker({
+				minDate: new Date(),
+				locale: lang
+			});
+		});
+
 	}]);
 
 
