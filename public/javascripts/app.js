@@ -30,9 +30,11 @@
 
 	}]);
 
-	app.controller('loodleController', ['loodleService', '$timeout', '$http', '$scope', 'userService', 'participationRequestService', function (loodleService, $timeout, $http, $scope, userService, participationRequestService) {
+	app.controller('loodleController', ['loodleService', '$timeout', '$http', '$scope', 'userService', 'participationRequestService', '$cookies', function (loodleService, $timeout, $http, $scope, userService, participationRequestService, $cookies) {
 
 		$scope.loodle_id = window.location.pathname.split("/")[2];
+
+		var lang = $cookies.get('mylanguage');
 
 		// Format schedules date 
 		var formatSchedule = function () {
@@ -50,8 +52,8 @@
 
 			$scope.loodle.schedules.forEach(function (schedule) {
 
-				var moment_begin_time = moment(schedule.begin_time);
-				var moment_end_time = moment(schedule.end_time);
+				var moment_begin_time = moment(schedule.begin_time).lang(lang);
+				var moment_end_time = moment(schedule.end_time).lang(lang);
 
 				// Get the months ====================
 
