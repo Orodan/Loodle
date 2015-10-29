@@ -614,7 +614,7 @@ LoodleController.createPublicLoodle = function (req, res) {
 				}, end);
 
 			}, done);
-		}	
+		}
 	}, function (err, results) {
 
 		if (err)
@@ -623,6 +623,16 @@ LoodleController.createPublicLoodle = function (req, res) {
 		return success(res, results.save);
 
 	});	
+};
+
+LoodleController.setCategory = function (req, res) {
+
+	Loodle.setCategory(req.params.id, req.body.category, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Loodle category updated');
+	});
 };
 
 module.exports = LoodleController;

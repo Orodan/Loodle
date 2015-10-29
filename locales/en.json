@@ -18,7 +18,7 @@
 	"English": "English",
 	"First Name": "First Name",
 	"French": "French",
-	"From" : "From",
+	"From": "From",
 	"is invated": "is invated",
 	"Last Name": "Last Name",
 	"Login": "Login",
@@ -46,5 +46,8 @@
 	"Users management": "Users management",
 	"Welcome !": "Welcome !",
 	"You currently have no loodles": "You currently have no loodles",
-	"You currently have no participation requests": "You currently have no participation requests"
+	"You currently have no participation requests": "You currently have no participation requests",
+	"First name": "First name",
+	"Last name": "Last name",
+	"Edit votes": "Edit votes"
 }

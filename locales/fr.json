@@ -47,5 +47,12 @@
 	"Welcome !": "Bienvenue !",
 	"You currently have no loodles": "Vous n'avez actuellement aucun loodle",
 	"You currently have no participation requests": "Vous n'avez actuellement aucune demande de participation",
-	"No user found.": "No user found."
+	"No user found.": "No user found.",
+	"First name": "First name",
+	"Last name": "Last name",
+	"Edit votes": "Edit votes",
+	"You need to be authenticated to access this loodle": "You need to be authenticated to access this loodle",
+	"Loodle status": "Loodle status",
+	"Private": "Private",
+	"Public": "Public"
 }

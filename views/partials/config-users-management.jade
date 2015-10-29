@@ -1,0 +1,16 @@
+div.panel.panel-primary(ng-show="usersManagementForm")
+
+	.panel-heading
+		h3.panel-title= __('Users management')
+
+	.panel-body
+
+		.row
+			.form-group.col-md-3(ng-repeat="user in users")
+				strong {{user.first_name}} {{user.last_name}}
+				.radio
+					label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="user-radio-input")] #{__('Manager')}
+				.radio
+					label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="user-radio-input")] #{__('User')}
+
+		button(type="button" class="btn btn-primary" ng-click="updateUserRoles()")= __('Send')

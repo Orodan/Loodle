@@ -534,5 +534,15 @@ Loodle.getParticipationRequestsOfUser = function (user_id, callback) {
 
 };
 
+Loodle.setCategory = function (loodle_id, category, callback) {
+
+	var query = 'UPDATE doodles SET category = ? WHERE id = ?';
+	db.execute(query
+		, [ category, loodle_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
 
 module.exports = Loodle;

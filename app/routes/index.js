@@ -219,9 +219,9 @@ router.put('/data/notification/:id', Notification.markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);
 
-router.put('/data/loodle/:id/public', Loodle.openToPublic);
+router.put('/data/loodle/:id/category', isAuthenticated, Loodle.setCategory);
 
-router.put('/data/loodle/:id/users/roles', Configuration.updateUserRoles);
+router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration.updateUserRoles);
 
 
 // DEL =====================================================

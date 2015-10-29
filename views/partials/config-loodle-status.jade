@@ -1,0 +1,14 @@
+div.panel.panel-primary(ng-show="loodleStatusForm")
+
+	.panel-heading
+		h3.panel-title= __('Loodle status')
+
+	.panel-body
+
+		.form-group
+			.radio
+				label #[input(type="radio" name="loodle-status" data="private" ng-checked="loodle.category == 'private'")] #{__('Private')}
+			.radio
+				label #[input(type="radio" name="loodle-status" data="public" ng-checked="loodle.category == 'public'")] #{__('Public')}
+
+		button(type="button" class="btn btn-primary" ng-click="updateLoodleStatus()")= __('Send')

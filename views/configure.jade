@@ -4,7 +4,7 @@ block content
 	div(ng-controller='loodleController as loodleCtrl')
 		include partials/loodle-nav
 
-		.container(ng-controller='configurationController as configCtrl')
+		.container(ng-controller='configurationController')
 
 			.content
 
@@ -13,39 +13,13 @@ block content
 					ul.list-group
 						li.list-group-item(ng-class="(notificationsForm) ? 'active' : ''" ng-click="showNotifications()")= __('Notifications')
 						li.list-group-item(ng-class="(usersManagementForm) ? 'active' : ''" ng-show="configuration.role == 'manager'" ng-click="showUsersManagement()")= __('Users management')
+						li.list-group-item(ng-class="(loodleStatusForm) ? 'active' : ''" ng-show="configuration.role == 'manager'" ng-click="showLoodleStatus()")= __('Loodle status')
 
 				.col-md-8
 
-					div.panel.panel-primary(ng-show="notificationsForm")
+					include partials/config-notifications
 
-						.panel-heading
-							h3.panel-title= __('Notifications')
+					include partials/config-users-management
 
-						.panel-body
-							.form-group
-								.checkbox
-									label #[input(name="notification" type="checkbox" ng-checked="configuration.notification" ng-model="configuration.notification")] #{__('Notification')}
-
-							.form-group
-								.checkbox
-									label #[input(name="notification_by_email" type="checkbox" ng-checked="configuration.notification_by_email" ng-model="configuration.notification_by_email")] #{__('Notification by email')}
-
-							button(type="submit" class="btn btn-primary" ng-click="editConfiguration()")= __('Send')
-
-					div.panel.panel-primary(ng-show="usersManagementForm")
-
-						.panel-heading
-							h3.panel-title= __('Users management')
-
-						.panel-body
-
-							.row
-								.form-group.col-md-3(ng-repeat="user in users")
-									strong {{user.first_name}} {{user.last_name}}
-									.radio
-										label #[input(type="radio" name="{{user.id}}" data="manager" ng-checked="user.role == 'manager'" class="radio-input")] #{__('Manager')}
-									.radio
-										label #[input(type="radio" name="{{user.id}}" data="user" ng-checked="user.role == 'user'" class="radio-input")] #{__('User')}
-
-							button(type="button" class="btn btn-primary" ng-click="updateUserRoles()")= __('Send')
+					include partials/config-loodle-status
 							

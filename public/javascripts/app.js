@@ -145,11 +145,6 @@
 
 		};
 
-		// Open the loodle to public (access without authentication)
-		$scope.openLoodleToPublic = function () {
-			loodleService.openLoodleToPublic($scope.loodle_id);
-		};
-
 		$scope.saveVotes = function () {
 
 			// Hide the save votes button
@@ -236,6 +231,7 @@
 
 		$scope.notificationsForm = true;
 		$scope.usersManagementForm = false;
+		$scope.loodleStatusForm = false;
 
 		configurationService.loadConfig(loodle_id)
 			.success(function () {
@@ -249,15 +245,25 @@
 
 		$scope.showNotifications = function () {
 
-			$scope.notificationsForm = true;
 			$scope.usersManagementForm = false;
+			$scope.loodleStatusForm = false;
+			$scope.notificationsForm = true;
 
 		};			
 
 		$scope.showUsersManagement = function () {
 
 			$scope.notificationsForm = false;
+			$scope.loodleStatusForm = false;
 			$scope.usersManagementForm = true;
+
+		};
+
+		$scope.showLoodleStatus = function () {
+
+			$scope.notificationsForm = false;
+			$scope.usersManagementForm = false;
+			$scope.loodleStatusForm = true;
 
 		};
 
@@ -290,7 +296,7 @@
 		$scope.updateUserRoles = function () {
 
 			// Get the radio inputs
-			var inputs = document.getElementsByClassName('radio-input');
+			var inputs = document.getElementsByClassName('user-radio-input');
 
 			var data = [];
 			// Organize the data for the server call
@@ -312,10 +318,29 @@
 				})
 		};
 
+		$scope.updateLoodleStatus = function () {
+
+			var inputs = document.getElementsByName('loodle-status');
+
+			var newStatus = undefined;
+
+			Array.prototype.forEach.call(inputs, function (input) {
+				if (input.checked)
+					newStatus = input.getAttribute('data');
+			});
+
+			if (newStatus) {
+				configurationService.updateLoodleStatus(loodle_id, newStatus)
+					.success(function () {
+						window.location = '/loodle/' + loodle_id;
+					});
+			}
+
+		};
+
 	}]);
 
 	app.controller('notificationsController', ['$http', '$scope', 'notificationService',function ($http, $scope, notificationService) {
-
 
 		$scope.unreadNotif = 0;
 		$scope.show = false;
@@ -505,19 +530,6 @@
 				})
 				.error(function (res) {
 					console.log("loodleService.loadLoodle error : ", res);
-				})
-
-		};
-
-		// Set the loodle as public
-		loodleService.openLoodleToPublic = function (loodle_id) {
-
-			return $http.put('/data/loodle/' + loodle_id + '/public')
-				.success(function (res) {
-					loodleService.loadLoodle(loodle_id);
-				})
-				.error(function (res) {
-					console.log("loodleService.openLoodleToPublic error : ", res);
 				})
 
 		};
@@ -761,6 +773,18 @@
 				.error(function (res) {
 					console.log('configurationService.updateUserRoles error : ', res);
 				});
+
+		};
+
+		configurationService.updateLoodleStatus = function (loodle_id, newStatus) {
+
+			return $http.put('/data/loodle/' + loodle_id + '/category'
+				, {
+					category: newStatus
+				})
+				.error(function (res) {
+					console.log('configurationService.updateLoodleStatus error : ', res);
+				})
 
 		};
 
