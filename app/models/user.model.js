@@ -1,12 +1,103 @@
+var async      = require('async');
 var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
+
+var bcrypt     = require('bcrypt-nodejs');
+
+// User ========================================================================
+
+function User (email, first_name, last_name, password) {
+
+    this.id = cassandra.types.Uuid.random();
+    this.email = email;
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.password = User.generateHash(password);
+    this.status = 'registred';
+}
+
+// Prototypal functions ========================================================
+
+User.prototype.save = function (callback) {
+
+	// Save user 
+	// Bind user to email
+
+    var that = this;
+
+    var queries = [
+    	{
+    		query: 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)',
+    		params: [ that.id, that.email, that.first_name, that.last_name, that.password, that.status, Date.now() ]
+    	},
+    	{
+    		query: 'INSERT INTO user_by_email (email, user_id) values (?, ?)',
+    		params: [ that.email, that.id ]
+    	}
+    ];
+
+    db.batch(queries
+    	, { prepare : true }
+    	, function (err) {
+    		if (err)
+    			return callback(err);
+
+    		return callback(null, that);
+    	});
+};
+
+User.validPassword = function (password, user_password) {
+    return bcrypt.compareSync(password, user_password);
+};
+
+User.generateHash = function (text) {
+    return bcrypt.hashSync(text, bcrypt.genSaltSync(8), null);
+};
+
+User.remove = function (loodle_id, user_id, callback) {
+
+	async.parallel({
+        // Delete the association user - loodle
+        removeUserFromLoodle: function (done) {
+            User.remove(loodle_id, user_id, done);
+        },
+        // Delete the votes of the user for each schedules of the loodle
+        deleteVotes: function (done) {
+            Vote.deleteVotesFromUser(loodle_id, user_id, done);
+        }
+    }, callback);
+
+};
+
+User.getByEmail = function (user_email, callback) {
+
+    async.waterfall([
+
+        function (end) {
+            User.getUserIdByEmail(user_email, function (err, user_id) {
+                if (err) 
+                    return end(err);
+                
+                return end(null, user_id);
+            });
+        },
+        function (user_id, end) {
+            if(!user_id) 
+                return end();
+
+            User.get(user_id, end);
+        }
+    ], callback);
+
+};
+
 
 /**
  * Get the user data
  * @param id
  * @param callback
  */
-exports.get = function (id, callback) {
+User.get = function (id, callback) {
 
 	var query = 'SELECT id, email, first_name, last_name, password, status FROM Users WHERE id = ?';
 	db.execute(query, [ id ], { prepare : true }, function (err, result) {
@@ -21,7 +112,7 @@ exports.get = function (id, callback) {
  * @param email
  * @param callback
  */
-exports.getUserIdByEmail = function (email, callback) {
+User.getUserIdByEmail = function (email, callback) {
 
 	var query = 'SELECT user_id FROM user_by_email WHERE email = ?';
 	db.execute(query, [ email ], { prepare : true }, function (err, result) {
@@ -41,7 +132,7 @@ exports.getUserIdByEmail = function (email, callback) {
  * @param status
  * @param callback
  */
-exports.save = function (id, email, first_name, last_name, password, status, callback) {
+User.save = function (id, email, first_name, last_name, password, status, callback) {
 
     var query = 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)';
     db.execute(query,
@@ -57,13 +148,13 @@ exports.save = function (id, email, first_name, last_name, password, status, cal
  * @param email
  * @param callback
  */
-exports.saveLinkWithEmail = function (id, email, callback) {
+User.saveLinkWithEmail = function (id, email, callback) {
 
     var query = 'INSERT INTO user_by_email (email, user_id) values (?, ?)';
     db.execute(query, [ email, id ], { prepare: true }, callback);
 };
 
-exports.remove = function (loodle_id, user_id, callback) {
+User.remove = function (loodle_id, user_id, callback) {
 
 	var queries = [
 		{
@@ -81,6 +172,8 @@ exports.remove = function (loodle_id, user_id, callback) {
 		, callback);
 
 };
+
+module.exports = User;
 
 
 

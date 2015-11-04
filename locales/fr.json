@@ -59,5 +59,6 @@
 	"User deleted": "User deleted",
 	"No user found with that email": "No user found with that email",
 	"You must provide a schedule on the same day": "You must provide a schedule on the same day",
-	"[object Object]": "[object Object]"
+	"[object Object]": "[object Object]",
+	"Oops ! Wrong password.": "Oops ! Wrong password."
 }

@@ -10,9 +10,11 @@ var ParticipationRequest = require('../controllers/participation-request');
 var Configuration        = require('../controllers/configuration');
 var Notification         = require('../controllers/notification');
 
+var Config               = require('../../config/config.js');
+
 // All the api routes need an acces token, except the route
 // to get the token
-router.use(jwt({ secret: 'secret'}).unless({path: ['/api/authenticate']}));
+router.use(jwt({ secret: Config.jwt_secret}).unless({path: ['/api/authenticate']}));
 router.use(function (err, req, res, next) {
 
   if (err.name === 'UnauthorizedError') {
@@ -69,9 +71,20 @@ router.get('/loodle/:id/configuration', Configuration.get);
 router.get('/loodle/:id/notifications', Notification.getFromUser);
 
 
-// POST ============================================
+// POST ============================================================
 
-router.post('/authenticate', User.authenticate);
+// Authenticate ========================================
+router.post('/authenticate', function (req, res) {
+	User.authenticate(req.body.email, req.body.password, function (err, data) {
+		if (err) {
+			res.status(500);
+		}
+
+		return res.json({
+			"data": data
+		});
+	});
+});
 
 router.post('/loodle', function (req, res) {
 
@@ -141,16 +154,18 @@ router.delete('/loodle/:id/schedule', function (req, res) {
 // Remove an user from a loodle
 router.delete('/loodle/:id/user', function (req, res) {
 
-	User.remove(req.params.id, req.body.user_id, function (err) {
-
+	User.remove(req.params.id, req.body.user_id, function (err, data) {
 		if (err)
-			return error(res, err);
+			res.status(500);
 
-		return success(res, 'User deleted');
-
+		return res.json({
+			"data": data
+		});
 	});
 
 });
+
+router.delete('/loodle/:id/user', User.remove);
 
 router.delete('/loodle/:id', function (req, res) {
 
@@ -161,6 +176,24 @@ router.delete('/loodle/:id', function (req, res) {
 		return success(res, 'Loodle deleted');
 	})
 
+});
+
+function test (req, res, data) {
+	console.log('Data : ', data);
+}
+
+router.use(function (req, res) {
+
+	console.log('Data : ', data);
+	// console.log('Status : ', status);
+	console.log('res.status : ', res.status);
+
+	if (status)
+		res.status(status);
+
+	res.json({
+		"data": data
+	});
 });
 
 function error(res, err) {
