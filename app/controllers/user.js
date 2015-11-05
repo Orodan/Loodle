@@ -13,6 +13,10 @@ var UserController = {};
 
 // Route calls ========================================================
 
+// Data validation are only made on this function because they are the
+// only ones which are called by the user
+
+// Authenticate the user
 UserController._authenticate = function (req, res) {
 
     UserController.authenticate(req.body.email, req.body.password, function (err, data) {
@@ -21,6 +25,7 @@ UserController._authenticate = function (req, res) {
 
 };
 
+// Remove the user from the loodle
 UserController._remove = function (req, res) {
 
     UserController.remove(req.params.id, req.body.user_id, function (err, data) {
@@ -29,6 +34,7 @@ UserController._remove = function (req, res) {
 
 };
 
+// Create a public user in the loodle
 UserController._createPublicUser = function (req, res) {
 
     UserController.createPublicUser(req.params.id, req.body.first_name, req.body.last_name, function (err, data) {
@@ -36,6 +42,7 @@ UserController._createPublicUser = function (req, res) {
     });
 };
 
+// Get the current user data
 UserController._get = function (req, res) {
 
     // Validation
@@ -51,6 +58,7 @@ UserController._get = function (req, res) {
 
 };
 
+// Standard call function to send back data in json
 function callback (res, err, data) {
     if (err) {
         res.status(500);
@@ -65,10 +73,11 @@ function callback (res, err, data) {
 /**
  * Authenticate a user
  * 
- * @param  {[type]}   email    [user email]
- * @param  {[type]}   password [user password]
- * @param  {Function} callback [standard callback function]
- * @return {[type]}            [the access token or an error]
+ * @param  {String}     email       [user email]
+ * @param  {String}     password    [user password]
+ * @param  {Function}   callback    [standard callback function]
+ * 
+ * @return {String}            [the access token or error message]
  */
 UserController.authenticate = function (email, password, callback) {
 
@@ -95,12 +104,14 @@ UserController.authenticate = function (email, password, callback) {
 };
 
 /**
- * [createPublicUser description]
+ * Create a public (temporary) user
  * 
- * @param  {[type]} loodle_id  [description]
- * @param  {[type]} first_name [description]
- * @param  {[type]} last_name  [description]
- * @return {[type]}            [description]
+ * @param  {uuid}       loodle_id   [loodle identifier]
+ * @param  {String}     first_name  [first name of the new user]
+ * @param  {String}     last_name   [last name of the new user]
+ * @param  {Function}   callback    [standard callback function]
+ * 
+ * @return {String}              [Success or error message]
  */
 UserController.createPublicUser = function (loodle_id, first_name, last_name, callback) {
 
@@ -135,11 +146,13 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
 };
 
 /**
- * Remove a user from a loodle (api call)
+ * Remove a user from a loodle
  * 
- * @param  {Object} req [request]
- * @param  {Object} res [response]
- * @return {Object}     [Success or error message]
+ * @param  {type}       loodle_id   [loodle identifier]
+ * @param  {type}       user_id     [user identifier]
+ * @param  {Function}   callback    [standard callback function]
+ * 
+ * @return {String}                 [Success or error message]
  */
 UserController.remove = function (loodle_id, user_id, callback) {
 
@@ -155,22 +168,27 @@ UserController.remove = function (loodle_id, user_id, callback) {
 };
 
 /**
- * Get the current user data
+ * Get user data
  * 
- * @param  {Object} req [request]
- * @param  {Object} res [response]
- * @return {Object}     [Current user data or error]
+ * @param  {uuid}       user_id     [user identifier]
+ * @param  {Function}   callback    [standard callback function]
+ * 
+ * @return {Object}                 [user object or error message]
  */
 UserController.get = function (user_id, callback) {
-
-    if (user_id)  
-        return User.get(user_id, callback);
-
-    return callback(null, false);
-
+  
+    return User.get(user_id, callback);
 
 };
 
+/**
+ * Get user data by his/her email
+ * 
+ * @param  {String}     user_email  [user email]
+ * @param  {Function}   callback    [standard callback function]
+ * 
+ * @return {Object}                 [user object or error message]
+ */
 UserController.getByEmail = function (user_email, callback) {
 
     async.waterfall([
@@ -192,6 +210,14 @@ UserController.getByEmail = function (user_email, callback) {
 
 };
 
+/**
+ * Validate a password (compare a hashed and a non-hashed password)
+ * 
+ * @param  {String}     password        [password given by the user]
+ * @param  {Hash}       user_password   [hashed password saved in db]
+ * 
+ * @return {Boolean}                    [true if password or equals, wrong if not]
+ */
 UserController.validPassword = function (password, user_password) {
     return User.validPassword(password, user_password);
 };
