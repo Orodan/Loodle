@@ -11,14 +11,64 @@ var Config     = require('../../Config/config');
 
 var UserController = {};
 
+// Route calls ========================================================
+
+UserController._authenticate = function (req, res) {
+
+    UserController.authenticate(req.body.email, req.body.password, function (err, data) {
+        return callback(res, err, data);
+    });
+
+};
+
+UserController._remove = function (req, res) {
+
+    UserController.remove(req.params.id, req.body.user_id, function (err, data) {
+        return callback(res, err, data);
+    });
+
+};
+
+UserController._createPublicUser = function (req, res) {
+
+    UserController.createPublicUser(req.params.id, req.body.first_name, req.body.last_name, function (err, data) {
+        return callback(res, err, data);
+    });
+};
+
+UserController._get = function (req, res) {
+
+    // Validation
+    // - req.user is defined
+
+    if (req.user) {
+        UserController.get(req.user.id, function (err, data) {
+            return callback(res, err, data);
+        });
+    }
+    else 
+        return callback(res, null, false);
+
+};
+
+function callback (res, err, data) {
+    if (err) {
+        res.status(500);
+        return res.json({"data": err})
+    }
+
+    return res.json({"data": data});
+}
+
 // User controller features ===========================================
 
 /**
- * [authenticate description]
- * @param  {[type]}   email    [description]
- * @param  {[type]}   password [description]
- * @param  {Function} callback [description]
- * @return {[type]}            [description]
+ * Authenticate a user
+ * 
+ * @param  {[type]}   email    [user email]
+ * @param  {[type]}   password [user password]
+ * @param  {Function} callback [standard callback function]
+ * @return {[type]}            [the access token or an error]
  */
 UserController.authenticate = function (email, password, callback) {
 
@@ -113,7 +163,11 @@ UserController.remove = function (loodle_id, user_id, callback) {
  */
 UserController.get = function (user_id, callback) {
 
-    User.get(user_id, callback);
+    if (user_id)  
+        return User.get(user_id, callback);
+
+    return callback(null, false);
+
 
 };
 

@@ -101,16 +101,7 @@ router.get('/participation-request/:id/accept', isAuthenticated, function (req, 
 // DATA ======================
 
 // Get user data
-router.get('/data/user', function (req, res) {
-	User.get(req.user.id, function (err, data) {
-		if (err) 
-			res.status(err);
-
-		return res.json({
-			"data": data
-		});
-	})
-});
+router.get('/data/user', User._get);
 
 // Get loodle data
 router.get('/data/loodle/:id'
@@ -183,27 +174,9 @@ router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) 
 });
 
 // Process delete user
-router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
-	User.remove(req.params.id, req.body.user_id, function (err, data) {
-		if (err)
-			res.status(500);
+router.post('/loodle/:id/user/delete', isAuthenticated, User._remove);
 
-		return res.json({
-			"data": data
-		});
-	});
-});
-
-router.post('/data/loodle/:id/user/public', function (req, res) {
-	User.createPublicUser(req.params.id, req.body.first_name, req.body.last_name, function (err, data) {
-		if (err)
-			res.status(500);
-
-		return res.json({
-			"data": data
-		});
-	});
-});
+router.post('/data/loodle/:id/user/public', User._createPublicUser);
 
 router.post('/data/public/loodle', Loodle.createPublicLoodle);
 

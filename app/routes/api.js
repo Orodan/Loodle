@@ -20,13 +20,14 @@ router.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {
     res.status(401);
     res.json({
-      type: false,
       data: 'Unauthorized'
     });
   }
 });
 
 // GET =============================================
+
+router.get('/user', User._get);
 
 router.get('/user/participation-requests', ParticipationRequest.getParticipationRequestsOfUser);
 
@@ -74,17 +75,7 @@ router.get('/loodle/:id/notifications', Notification.getFromUser);
 // POST ============================================================
 
 // Authenticate ========================================
-router.post('/authenticate', function (req, res) {
-	User.authenticate(req.body.email, req.body.password, function (err, data) {
-		if (err) {
-			res.status(500);
-		}
-
-		return res.json({
-			"data": data
-		});
-	});
-});
+router.post('/authenticate', User._authenticate);
 
 router.post('/loodle', function (req, res) {
 

@@ -202,7 +202,6 @@
 		loodleService.loadLoodle($scope.loodle_id)
 			.success(function () {
 				$scope.loodle = loodleService.getLoodle();
-				console.log('$scope.loodle : ', $scope.loodle);
 			});
 		
 		// Watch loodle change
@@ -577,8 +576,6 @@
 		};
 
 		loodleService.delete = function (loodle_id) {
-
-			console.log('Call to loodleService.delete');
 
 			return $http.delete('/loodle/' + loodle_id)
 				.success(function () {
