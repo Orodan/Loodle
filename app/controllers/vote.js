@@ -3,10 +3,156 @@ var bcrypt                 = require('bcrypt-nodejs');
 var Vote                   = require('../models/vote.model');
 
 var NotificationController = require('./notification');
+var Loodle                 = require('../models/loodle.model');
 
 var VoteController = {};
 
 var defaultValue = 0;
+
+/**
+ * Delete a vote
+ * 
+ * @param  {uuid}   	vote_id  		vote identifier
+ * @param  {Function} 	callback 		standard callback function
+ * 
+ * @return {void}            			null or error message
+ */
+VoteController.delete = function (vote_id, callback) {
+	Vote.delete(vote_id, callback);
+};
+
+/**
+ * Remove associations between the user and the votes she/he has on the loodle
+ * 
+ * @param  {uuid}   	loodle_id 		loodle identifier
+ * @param  {uuid}   	user_id   		user identifier
+ * @param  {Function} 	callback  		standard callback function
+ * 
+ * @return {void}             			null or error message
+ */
+VoteController.removeAssociationsByUser = function (loodle_id, user_id, callback) {
+
+	// Remove association loodle user
+	// Get schedule ids of the loodle
+	// Remove association loodle schedule
+
+	async.parallel({
+
+		// Remove associations loodle - user
+		removeAssociationsWithUser: function (done) {
+			Vote.removeAssociationsWithUser(loodle_id, user_id, done);
+		},
+
+		// Remove associations loodle - schedule
+		removeAssociationWithSchedule: function (done) {
+			async.waterfall([
+
+				// Get schedule ids of the loodle
+				function (end) {
+					Loodle.getScheduleIds(loodle_id, end);
+				},
+
+				// Remove association loodle schedule
+				function (schedule_ids, end) {
+					async.each(schedule_ids, function (schedule_id, finish) {
+						Vote.removeAssociationWithScheduleByUser(loodle_id, schedule_id, user_id, finish);
+					}, end);
+				}
+
+			], done);
+		}
+
+	}, callback);
+
+};
+
+/**
+ * Remove associations between the schedule and its votes on the loodle
+ * 
+ * @param  {uuid}   	loodle_id 		loodle identifier
+ * @param  {uuid}   	schedule_id 	schedule identifier
+ * @param  {Function} 	callback  		standard callback function
+ * 
+ * @return {void}             			null or error message
+ */
+VoteController.removeAssociationsBySchedule = function (loodle_id, schedule_id, callback) {
+
+	// Remove association loodle schedule
+	// Get user ids of the loodle
+	// Remove association loodle user
+
+	async.parallel({
+
+		// Remove associations loodle - schedule
+		removeAssociationsWithSchedule: function (done) {
+			Vote.removeAssociationsWithSchedule(loodle_id, schedule_id, done);
+		},
+
+		// Remove association loodle - user
+		removeAssociationsWithUser: function (done) {
+			async.waterfall([
+
+				// Get user ids of the loodle
+				function (end) {
+					Loodle.getUserIds(loodle_id, end);
+				},
+
+				// Remove association loodle user
+				function (user_ids,end) {
+					async.each(user_ids, function (user_id, finish) {
+						Vote.removeAssociationWithUserBySchedule(loodle_id, user_id, schedule_id, finish);
+					}, end);
+				}
+				
+			], done);
+		}
+
+	}, callback);
+
+};
+
+/**
+ * Create default votes for the user on all the schedules of the loodle
+ * 
+ * @param  {uuid}   	loodle_id 		loodle identifier
+ * @param  {uuid}   	user_id   		user identifier
+ * @param  {Function} 	callback  		standard callback function
+ * 
+ * @return {void}             			null or error message
+ */
+VoteController.createDefaultVotesForUser = function (loodle_id, user_id, callback) {
+
+	async.waterfall([
+		// Get schedule ids
+		function (done) {
+			Vote.getScheduleIds(loodle_id, done);
+		},
+		// Create default vote for each schedule
+		function (schedule_ids, done) {
+			async.each(schedule_ids, function (schedule_id, finish) {
+				VoteController.createDefaultVote(loodle_id, user_id, schedule_id, finish);
+			}, done);
+		}
+	], callback);
+
+};
+
+VoteController.createDefaultVote = function (loodle_id, user_id, schedule_id, callback) {
+
+	var vote = new Vote();
+
+	async.parallel({
+		// Save the vote
+		save: function (done) {
+			vote.save(done);
+		},
+		// Associate vote, loodle, user and schedule
+		bind: function (done) {
+			vote.bind(loodle_id, user_id, schedule_id, done);
+		}
+	}, callback);
+
+};
 
 VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callback) {
 
@@ -155,7 +301,7 @@ VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
 			async.waterfall([
 				// Get schedule ids of the loodle
 				function (end) {
-					Vote.getScheduleIdsOfLoodle(loodle_id, end)
+					Vote.getScheduleIds(loodle_id, end)
 				},
 				// For each of them, delete the association loodle - schedule - vote
 				function (schedule_ids, end) {
@@ -181,7 +327,7 @@ VoteController.createDefaultVotesForLoodle = function (loodle_id, user_id, callb
 
 		// Get schedule ids of the loodle
 		function (done) {
-			Vote.getScheduleIdsOfLoodle(loodle_id, done);
+			Vote.getScheduleIds(loodle_id, done);
 		},
 
 		// For each of them create a default vote

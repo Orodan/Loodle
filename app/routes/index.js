@@ -104,8 +104,7 @@ router.get('/participation-request/:id/accept', isAuthenticated, function (req, 
 router.get('/data/user', User._get);
 
 // Get loodle data
-router.get('/data/loodle/:id'
-	, Loodle.get);
+router.get('/data/loodle/:id', Loodle._get);
 
 // Loodles list data
 router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
@@ -151,11 +150,12 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 			throw err;
 
 		res.redirect('/loodle/' + data.id);
-	})
+	});
+	
 });
 
 // Process add schedule
-router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle.addSchedule);
+router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle._addSchedule);
 
 // Process add user
 router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)

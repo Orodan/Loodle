@@ -40,10 +40,10 @@ require('./config/passport')(passport);
 
 // required for passport
 app.use(session({
-                    secret : 'masupersessionsecrete',
-                    saveUninitialized : true,
-                    resave : true
-                }));
+    secret : 'masupersessionsecrete',
+    saveUninitialized : true,
+    resave : true
+}));
 app.use(passport.initialize());
 app.use(passport.session());        // persistent login sessions
 app.use(flash());                   // flash messages stored in session

@@ -30,6 +30,34 @@ Loodle.prototype.save = function (callback) {
 
 }
 
+/**
+ * Remove the association loodle - user
+ * 
+ * @param  {uuid}   	loodle_id 	loodle indentifier
+ * @param  {uuid}   	user_id   	user identifier
+ * @param  {Function} 	callback  	standard callback function
+ * 
+ * @return {void}             		null or error message
+ */
+Loodle.removeUser = function (loodle_id, user_id, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM user_by_doodle WHERE doodle_id = ? AND user_id = ?',
+			params: [ loodle_id, user_id ]
+		},
+		{
+			query: 'DELETE FROM doodle_by_user WHERE user_id = ? AND doodle_id = ?',
+			params: [ user_id, loodle_id ]
+		}
+	];
+
+	db.batch(queries
+		, { prepare : true }
+		, callback);
+
+};
+
 Loodle.bindUser = function (user_id, loodle_id, callback) {
 
 	var queries = [
@@ -281,11 +309,11 @@ Loodle.getScheduleIds = function (loodle_id, callback) {
 
 };
 
-Loodle.removeSchedule = function (schedule_id, callback) {
+Loodle.removeSchedule = function (loodle_id, schedule_id, callback) {
 
-	var query = 'DELETE FROM schedules WHERE id = ?';
+	var query = 'DELETE FROM schedule_by_doodle WHERE doodle_id = ? AND schedule_id = ?';
 	db.execute(query
-		, [ schedule_id ]
+		, [ loodle_id, schedule_id ]
 		, { prepare : true }
 		, callback);
 

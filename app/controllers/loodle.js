@@ -7,12 +7,157 @@ var ParticipationRequest = require('./participation-request');
 var Schedule             = require('./schedule');
 var Configuration        = require('./configuration');
 var Notification         = require('./notification');
+var Vote                 = require('./vote');
 
 var LoodleController = {};
 
+// Route calls ========================================================
+
+// Add a new schedule to a loodle
+LoodleController._addSchedule = function (req, res) {
+
+	// Check language :
+	// if call from the api --> use req.body.language
+	// if call from the application --> use req.cookies.mylanguage
+
+	var language;
+	if (req.baseUrl === '/api')
+		language = req.body.language;
+	else
+		language = req.cookies.mylanguage;
+
+	LoodleController.addSchedule(req.params.id, req.body.begin_time, req.body.end_time, language, function (err, data) {
+
+		if (req.baseUrl === '/api')
+			return reply(res, err, data);
+		else {
+			if (err)
+				req.flash('error', err);
+			else
+				req.flash('success', 'Schedule added');
+
+			res.redirect('/loodle/' + req.params.id);
+		}
+	});
+
+};
+
+// Add a user to a loodle
+LoodleController._addUser = function (req, res) {
+
+	LoodleController.addUser(req.params.id, req.body.user_id, function (err, data) {
+		return reply(res, err, data);
+	});
+
+};
+
+// Create a new loodle
+LoodleController._createLoodle = function (req, res) {
+
+	// Validation
+	// - req.user is defined
+	// - req.body.name is defined
+	// - req.body.description is optional
+
+	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
+		return reply(res, err, data);
+	});
+
+};
+
+LoodleController._deleteSchedule = function (req, res) {
+
+	LoodleController.deleteSchedule(req.params.id, req.body.schedule_id, function (err, data) {
+		return reply(res, err, data);
+	});
+
+};
+
+// Get loodle data
+LoodleController._get = function (req, res) {
+
+	LoodleController.get(req.params.id, function (err, data) {
+		return reply(res, err, data);
+	});
+
+};
+
+LoodleController._removeUser = function (req, res) {
+
+	LoodleController.removeUser(req.params.id, req.body.user_id, function (err, data) {
+		return reply(res, err, data);
+	});
+
+};
+
+// Standard call function to send back data in json
+function reply (res, err, data) {
+
+    if (err) {
+        res.status(500);
+        return res.json({"data": err})
+    }
+
+    return res.json({"data": data});
+}
+
+// Loodle controller features =========================================
+
+/**
+ * Add a user to a loodle
+ *
+ * @param {uuid}        loodle_id   loodle identifier
+ * @param {uuid}        user_id     user identifier
+ * @param {Function}    callback    standard callback function
+ */
+LoodleController.addUser = function (loodle_id, user_id, callback) {
+
+    // Check the loodle exists
+    // Check the user is not already in the loodle
+    // Create link loodle - user
+    // Create default votes for each schedule of the loodle
+    // Create default configuration for the user on the loodle
+    
+    async.parallel({
+
+    	// Create link loodle - user
+    	bind: function (done) {
+    		Loodle.bindUser(user_id, loodle_id, done);
+    	},
+
+    	// Create default configuration
+    	createDefaultConfiguration: function (done) {
+    		Configuration.createDefaultConfiguration(user_id, loodle_id, done);
+    	},
+
+    	// Create default votes for user
+    	createDefaultVotes: function (done) {
+    		Vote.createDefaultVotesForUser(loodle_id, user_id, done);
+    	}
+
+    }, function (err) {
+    	if (err)
+    		return callback(err);
+
+    	return callback(null, 'User added');
+    });
+
+};
+
+/**
+ * Create a new private loodle
+ * 
+ * @param  {uuid}   	user_id     	[user identifier]
+ * @param  {String}   	name        	[name of the new loodle]
+ * @param  {String}   	description 	[description of the new loodle]
+ * @param  {Function} 	callback    	[standard callback function]
+ * 
+ * @return {Object}               		[Loodle object or error message]
+ */
 LoodleController.createLoodle = function (user_id, name, description, callback) {
 
 	var loodle = new Loodle(name, description);
+
 	async.parallel({
 		// Save the loodle
 		save: function (done) {
@@ -43,6 +188,93 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 		return callback(null, results.save);
 
 	});
+
+};
+
+/**
+ * Delete a schedule from a loodle
+ * 
+ * @param  {uuid}   	loodle_id   	loodle identifier
+ * @param  {uuid}   	schedule_id 	schedule identifier
+ * @param  {Function} 	callback    	standard callback function
+ * @return {string}               		success or error message
+ */
+LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
+
+	// Delete the association schedule - loodle
+	// Delete schedule
+	// Delete votes of the schedule for each user of the loodle
+
+	async.parallel({
+
+		// Delete the association schedule - loodle
+		removeScheduleFromLoodle: function (done) {
+			Loodle.removeSchedule(loodle_id, schedule_id, done);
+		},
+
+		// Delete schedule
+		deleteSchedule: function (done) {
+			Schedule.delete(schedule_id, done);
+		},
+
+		// Delete votes of the schedule for each user of the loodle
+		deleteVotes: function (done) {
+			Schedule.deleteVotes(schedule_id, loodle_id, done);
+		}
+
+	}, function (err) {
+		if (err)
+			return callback(err);
+
+		return callback(null, 'schedule removed');
+	});
+
+};
+
+/**
+ * Remove a user from a loodle
+ * 
+ * @param  {uuid}   	loodle_id 	loodle identifier
+ * @param  {uuid}   	user_id   	user identifier
+ * @param  {Function} 	callback  	standard callback function
+ * 
+ * @return {string}             	success or error message
+ */
+LoodleController.removeUser = function (loodle_id, user_id, callback) {
+
+	// Delete the association user - loodle
+	// Delete votes of the user for each schedule of the loodle
+	// Delete user configuration for the loodle
+	// Delete user if he/she was temporary
+
+	async.parallel({
+
+        // Delete the association user - loodle
+        removeUserFromLoodle: function (done) {
+            Loodle.removeUser(loodle_id, user_id, done);
+        },
+
+        // Delete the votes of the user for each schedules of the loodle
+        deleteVotes: function (done) {
+            User.deleteVotes(user_id, loodle_id, done);
+        },
+
+        // Delete user configuration for the loodle
+        deleteConfiguration: function (done) {
+        	Configuration.delete(user_id, loodle_id, done);
+        },
+
+        // Delete user if he/she was temporary
+        deleteUser: function (done) {
+        	User.deleteIfTemporary(user_id, done);
+        }
+
+    }, function (err) {
+    	if (err)
+    		return callback(err);
+
+    	return callback(null, 'user removed');
+    });
 
 };
 
@@ -91,31 +323,31 @@ LoodleController.getSchedules = function (req, res) {
 
 };
 
-LoodleController.get = function (req, res) {
+LoodleController.get = function (loodle_id, callback) {
 
 	async.parallel({
 
 		// Get loodle data
 		loodle: function (done) {
-			Loodle.get(req.params.id, done);
+			Loodle.get(loodle_id, done);
 		},
 		// Get users of the loodle
 		users: function (done) {
-			Loodle.getUsers(req.params.id, done);
+			Loodle.getUsers(loodle_id, done);
 		},
 		// Get schedules of the loodle
 		schedules: function (done) {
-			Loodle.getSchedules(req.params.id, done);
+			Loodle.getSchedules(loodle_id, done);
 		},
 		// Get votes of the loodle
 		votes: function (done) {
-			Loodle.getVotes(req.params.id, done);
+			Loodle.getVotes(loodle_id, done);
 		}
 
 	}, function (err, results) {
 
 		if (results.loodle === undefined) {
-			return error(res, 'This loodle does not exists');
+			return callback('This loodle does not exists');
 		} 
 
 		// Format
@@ -124,9 +356,9 @@ LoodleController.get = function (req, res) {
 		results.loodle.users = results.users;
 
 		if (err)
-			return error(res, err);
+			return callback(err);
 
-		return success(res, results.loodle);
+		return callback(null, results.loodle);
 	});
 
 };
@@ -558,7 +790,7 @@ LoodleController.inviteUser = function (req, res) {
 
 };
 
-LoodleController.addSchedule = function (req, res) {
+LoodleController.addSchedule = function (loodle_id, begin_time, end_time, language, callback) {
 
 	// Check if the two dates of the schedule are on the same day
 	// Create the new schedule
@@ -569,20 +801,19 @@ LoodleController.addSchedule = function (req, res) {
 
 		// Check if the two dates of the schedule are on the same day
 		checkSchedule: function (done) {
-			Schedule.checkSchedule(req.body.begin_time, req.body.end_time, req.cookies.mylanguage, done);
+			Schedule.checkSchedule(begin_time, end_time, language, done);
 		},
 
 		// Create the new schedule 
 		createSchedule: function (done) {
-			Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, req.cookies.mylanguage, done);
+			Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
 		}
+
 	}, function (err) {
 		if (err)
-			req.flash('error', err);
-		else
-			req.flash('success', 'Schedule added');
+			return callback(err);
 
-		res.redirect('/loodle/' + req.params.id);
+		return callback(null, 'Schedule added');
 	});
 
 };

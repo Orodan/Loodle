@@ -10,6 +10,16 @@ function Configuration (user_id, loodle_id, notification, notification_by_email,
 	this.role = (role) ? role : 'user';
 }
 
+Configuration.delete = function (user_id, loodle_id, callback) {
+
+	var query = 'DELETE FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
+	db.execute(query
+		, [ user_id, loodle_id ]
+		, { prepare : true },
+		callback);
+	
+}
+
 Configuration.prototype.save = function (callback) {
 
 	var query = 'INSERT INTO configuration_by_user_and_doodle (user_id, doodle_id, notification, notification_by_email, role) values (?, ?, ?, ?, ?)';

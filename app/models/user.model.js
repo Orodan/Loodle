@@ -16,6 +16,23 @@ function User (email, first_name, last_name, password) {
     this.status = 'registred';
 }
 
+/**
+ * Delete the user
+ * 
+ * @param  {uuid}       user_id     user identifier
+ * @param  {Function}   callback    standard callback function
+ * @return {void}                   null or error message
+ */
+User.delete = function (user_id, callback) {
+
+    var query = 'DELETE FROM users WHERE id = ?';
+    db.execute(query
+        , [ user_id ]
+        , { prepare : true }
+        , callback);
+
+};
+
 // Prototypal functions ========================================================
 
 User.prototype.save = function (callback) {
@@ -120,6 +137,36 @@ User.getUserIdByEmail = function (email, callback) {
 		if (result.rows.length === 0) { return callback(null, false); }
         return callback(null, result.rows[0].user_id);
 	});
+};
+
+/**
+ * Get vote ids of the user in the loodle
+ * 
+ * @param  {uuid}       user_id     user indentifier
+ * @param  {uuid}       loodle_id   loodle identifier
+ * @param  {Function}   callback    standard callback function
+ * @return {array}                  array of vote ids or error message
+ */
+User.getVoteIds = function (user_id, loodle_id, callback) {
+
+    var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
+    db.execute(query
+        , [ loodle_id, user_id ]
+        , { prepare : true }
+        , function (err, data) {
+
+            if (err)
+                return callback(err);
+
+            var results = [];
+
+            data.rows.forEach(function (element) {
+                results.push(element.vote_id);
+            });
+
+            return callback(null, results);
+        });
+
 };
 
 /**

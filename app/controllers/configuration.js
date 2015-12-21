@@ -4,6 +4,20 @@ var Configuration = require('../models/configuration.model');
 
 var ConfigurationController = {};
 
+/**
+ * Delete configuration
+ * 
+ * @param  {uuid}   	user_id   	user identifier
+ * @param  {uuid}   	loodle_id 	loodle identifier
+ * @param  {Function} 	callback  	standard callback function
+ * @return {void}             		null or error message
+ */
+ConfigurationController.delete = function (user_id, loodle_id, callback) {
+
+	Configuration.delete(user_id, loodle_id, callback);
+
+};
+
 ConfigurationController.createDefaultConfiguration = function (user_id, loodle_id, callback) {
 
 	var config = new Configuration(user_id, loodle_id);

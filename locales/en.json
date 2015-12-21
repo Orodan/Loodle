@@ -53,5 +53,6 @@
 	"Loodle status": "Loodle status",
 	"Private": "Private",
 	"Public": "Public",
-	"Schedule added": "Schedule added"
+	"Schedule added": "Schedule added",
+	"You need to be authenticated to access this loodle": "You need to be authenticated to access this loodle"
 }
