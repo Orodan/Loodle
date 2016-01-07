@@ -41,10 +41,12 @@ module.exports = function (passport) {
 				// The user already exists, stop
 				if (user) { return callback(null, false, { message: 'That email is already taken.' }); }
 
-				user = new User(email, req.body.first_name, req.body.last_name, password);
-				user.save(function (err) {
-			    		if (err) { return callback(err); }
-			    		return callback(null, user);
+				User.createUser(email, req.body.first_name, req.body.last_name, password, function (err, user) {
+
+					if (err)
+						return callback(err);
+
+					return callback(null, user);
 				});
 		});
 
