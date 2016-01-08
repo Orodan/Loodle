@@ -118,7 +118,7 @@ UserController.authenticate = function (email, password, callback) {
             return callback('Wrong password');
 
         var token = jwt.sign(user, Config.jwt_secret, {
-            expiresIn: 86400 // Expires in 24 hours
+            // expiresIn: 86400 // Expires in 24 hours
         });
 
         return callback(null, token);
