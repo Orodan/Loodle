@@ -182,12 +182,29 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
 UserController.createUser = function (email, first_name, last_name, password, callback) {
 
     var user = new User(email, first_name, last_name, password);
-    user.save(function (err, data) {
 
-        if (err)
-            return callback(err);
+    async.series({
+        checkEmail: function (done) { 
 
-        return callback(null, data);
+            User.getUserIdByEmail(email, function (err, result) {
+                if (err) return done (err);
+                if (result) return done('This email is already used');
+
+                return done();
+            }); 
+
+        },
+        save: function (done) { 
+
+            user.save(function (err, data) {
+                if (err) return done(err);
+
+                return done(null, data);
+            });
+            
+        }
+    }, function (err, data) {
+        return callback(err, data.save);
     });
 
 };

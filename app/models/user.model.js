@@ -56,6 +56,10 @@ User.prototype.save = function (callback) {
     db.batch(queries
     	, { prepare : true }
     	, function (err) {
+
+            // console.log('Error : ', err);
+            // console.log('that : ', that);
+
     		if (err)
     			return callback(err);
 

@@ -19,8 +19,8 @@ describe('User', function () {
 				assert.equal(data.first_name, myUser.first_name);
 				assert.equal(data.last_name, myUser.last_name);
 				assert.equal(data.status, 'registred');
-
 				done();
+
 			});
 			
 		});
@@ -36,14 +36,11 @@ describe('User', function () {
 
 			User.createUser(myUser.email, myUser.first_name, myUser.last_name, myUser.password, function (err, data) {
 
-				console.log('err : ', err);
-				console.log('data : ', data);
-
-				assert(err === 'This email is already used');
-
+				assert.equal(err,'This email is already used');
 				done();
 			});
 
 		});
+
 	});
 });
