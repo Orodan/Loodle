@@ -183,6 +183,7 @@ UserController.createUser = function (email, first_name, last_name, password, ca
 
     var user = new User(email, first_name, last_name, password);
     user.save(function (err, data) {
+
         if (err)
             return callback(err);
 

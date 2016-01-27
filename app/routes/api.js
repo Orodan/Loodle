@@ -14,7 +14,7 @@ var Config               = require('../../config/config.js');
 
 // All the api routes need an acces token, except the route
 // to get the token
-router.use(jwt({ secret: Config.jwt_secret}).unless({path: ['/api/authenticate', {url: '/api/user', methods: 'POST'}]}));
+router.use(jwt({ secret: Config.jwt_secret }).unless({path: ['/api/authenticate', {url: '/api/user', methods: 'POST'}]}));
 router.use(function (err, req, res, next) {
 
   if (err.name === 'UnauthorizedError') {
@@ -23,6 +23,7 @@ router.use(function (err, req, res, next) {
       data: 'Unauthorized'
     });
   }
+
 });
 
 // GET ==========================================================================================
@@ -142,6 +143,10 @@ router.delete('/loodle/:id/schedule', Loodle._deleteSchedule);
 router.delete('/loodle/:id', function (req, res) {
 
 	Loodle.remove(req.params.id, function (err) {
+
+		console.log('router.delete');
+		console.log('error : ', err);
+
 		if (err)
 			return error(res, err);
 
@@ -150,19 +155,20 @@ router.delete('/loodle/:id', function (req, res) {
 
 });
 
+/**
 router.use(function (req, res) {
 
-	console.log('Data : ', data);
 	// console.log('Status : ', status);
 	console.log('res.status : ', res.status);
 
-	if (status)
+	//if (status)
 		res.status(status);
 
 	res.json({
 		"data": data
 	});
 });
+**/
 
 function error(res, err) {
 	res.status(500);
