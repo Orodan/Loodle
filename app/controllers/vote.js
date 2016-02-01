@@ -333,11 +333,7 @@ VoteController.createDefaultVotesForLoodle = function (loodle_id, user_id, callb
 		// For each of them create a default vote
 		function (schedule_ids, done) {
 
-			console.log("Schedule_ids : ", schedule_ids);
-
 			async.each(schedule_ids, function (schedule_id, end) {
-
-				console.log("Schedule id : ", schedule_id);
 
 				// Create a new default vote
 				var vote = new Vote(defaultValue);

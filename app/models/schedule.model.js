@@ -59,6 +59,7 @@ Schedule.prototype.save = function (callback) {
 		, [ this.id, this.begin_time, this.end_time]
 	    , { prepare: true }
 	    , function (err) {
+	    	console.log('err : ', err);
 	    	if (err)
 	    		return callback(err);
 
@@ -75,6 +76,7 @@ Schedule.get = function (id, callback) {
 		, [ id ]
 		, { prepare : true }
 		, function (err, data) {
+
 			if (err)
 				return callback(err);
 
@@ -85,6 +87,10 @@ Schedule.get = function (id, callback) {
 }
 
 Schedule.bindLoodle = function (loodle_id, schedule_id, callback) {
+
+	console.log('bindLoodle');
+	console.log('loodle_id : ', loodle_id);
+	console.log('schedule_id : ', schedule_id);
 
 	var query = 'INSERT INTO schedule_by_doodle (doodle_id, schedule_id) values (?, ?)';
 

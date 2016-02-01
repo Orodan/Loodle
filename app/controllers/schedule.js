@@ -52,10 +52,7 @@ ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
                 },
                 // Delete votes
                 function (vote_ids, end) {
-
-                	console.log('TEST');
-                	console.log('vote_ids : ', vote_ids);
-
+                	
                     async.each(vote_ids, function (vote_id, finish) {
                         Vote.delete(vote_id, finish);
                     }, end);
@@ -88,6 +85,8 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, l
 	}
 
 	var schedule = new Schedule(moment_begin_time.format(), moment_end_time.format());
+
+	console.log('Schedule : ', schedule);
 
 	async.parallel({
 		// Save the schedule

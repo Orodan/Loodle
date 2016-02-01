@@ -53,16 +53,10 @@ ConfigurationController.update = function (req, res) {
 };
 
 ConfigurationController.getFromUser = function (user_id, loodle_id, callback) {
-
-	Configuration.getFromUser(user_id, loodle_id, callback);
-	
+	Configuration.getFromUser(user_id, loodle_id, callback);	
 };
 
 ConfigurationController.setUserRole = function (user_id, doodle_id, role, callback) {
-
-	console.log('ConfigurationController.setUserRole');
-	console.log('role : ', role);
-
 	Configuration.setUserRole(user_id, doodle_id, role, callback);
 };
 

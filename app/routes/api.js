@@ -12,8 +12,7 @@ var Notification         = require('../controllers/notification');
 
 var Config               = require('../../config/config.js');
 
-// All the api routes need an acces token, except the route
-// to get the token
+// All the api routes need an acces token, except the route to get the token
 router.use(jwt({ secret: Config.jwt_secret }).unless({path: ['/api/authenticate', {url: '/api/user', methods: 'POST'}]}));
 router.use(function (err, req, res, next) {
 
@@ -72,6 +71,15 @@ router.get('/loodle/:id/configuration', Configuration.get);
 
 router.get('/loodle/:id/notifications', Notification.getFromUser);
 
+router.get('/user/getLoodles', function (req, res) {
+
+	User.getLoodles(req.user.id, function (err, data) {
+		if (err) { return error(res, err); }
+		return success(res, data);
+	});
+
+});
+
 
 // POST ============================================================
 
@@ -90,6 +98,7 @@ router.post('/loodle/:id/user', Loodle._addUser);
 // Add schedule ========================================
 router.post('/loodle/:id/schedule', Loodle._addSchedule);
 
+/**
 router.post('/loodle/:id/schedule', function (req, res) {
 
 	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
@@ -100,6 +109,7 @@ router.post('/loodle/:id/schedule', function (req, res) {
 	});
 
 });
+**/
 
 router.post('/loodle/:id/participation-request', function (req, res) {
 
@@ -144,9 +154,6 @@ router.delete('/loodle/:id', function (req, res) {
 
 	Loodle.remove(req.params.id, function (err) {
 
-		console.log('router.delete');
-		console.log('error : ', err);
-
 		if (err)
 			return error(res, err);
 
@@ -154,21 +161,6 @@ router.delete('/loodle/:id', function (req, res) {
 	})
 
 });
-
-/**
-router.use(function (req, res) {
-
-	// console.log('Status : ', status);
-	console.log('res.status : ', res.status);
-
-	//if (status)
-		res.status(status);
-
-	res.json({
-		"data": data
-	});
-});
-**/
 
 function error(res, err) {
 	res.status(500);

@@ -1,44 +1,85 @@
 var assert = require('assert');
+var User = require('../app/controllers/user');
+var Loodle = require('../app/models/loodle.model');
 
 describe('User', function () {
-	var User = require('../app/controllers/user');
 
 	describe('createUser', function () {
+
+		var riri = {
+			email: "ririduck@gmail.com",
+			first_name: "Riri",
+			last_name: "Duck",
+			password: "mypassword"
+		};
+		var result;
+
 		it('should send back the user data', function (done) {
 
-			var myUser = {
-				email: "ririduck@gmail.com",
-				first_name: "Riri",
-				last_name: "Duck",
-				password: "mypassword"
-			};
+			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
-			User.createUser(myUser.email, myUser.first_name, myUser.last_name, myUser.password, function (err, data) {
+				assert.equal(data.email, riri.email);
+				assert.equal(data.first_name, riri.first_name);
+				assert.equal(data.last_name, riri.last_name);
 
-				assert.equal(data.email,myUser.email);
-				assert.equal(data.first_name, myUser.first_name);
-				assert.equal(data.last_name, myUser.last_name);
-				assert.equal(data.status, 'registred');
+				result = data;
 				done();
 
 			});
 			
 		});
 
-		it('should send back an error if the email is already used', function (done) {
-			
-			var myUser = {
-				email: "ririduck@gmail.com",
-				first_name: "Riri",
-				last_name: "Duck",
-				password: "mypassword"
-			};
+		it('should save the user as "registred"', function () {
 
-			User.createUser(myUser.email, myUser.first_name, myUser.last_name, myUser.password, function (err, data) {
+			assert.equal(result.status, 'registred');
+
+		});
+
+		it('should send back an error if the email is already used', function (done) {
+
+			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
 				assert.equal(err,'This email is already used');
 				done();
+
 			});
+
+		});
+
+	});
+
+	describe('createPublicUser', function () {
+
+		var loodle = new Loodle('My wonderfull public loodle', 'Wonderfull !', 'public');
+		var riri = {
+			email: "ririduck@gmail.com",
+			first_name: "Riri",
+			last_name: "Duck",
+			password: "mypassword"
+		};
+		var result;
+
+		before(function (done) {
+			loodle.save(done);
+		});
+
+		it('should send back the user data', function (done) {
+
+			User.createPublicUser(loodle.id, riri.first_name, riri.last_name, function (err, data) {
+
+				assert.equal(data.first_name, riri.first_name);
+				assert.equal(data.last_name, riri.last_name);
+
+				result = data;
+				done();
+
+			});
+			
+		});
+
+		it('should save the user as "temporary"', function () {
+
+			assert.equal(result.status, 'temporary');
 
 		});
 

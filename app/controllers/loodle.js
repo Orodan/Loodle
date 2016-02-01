@@ -19,12 +19,17 @@ LoodleController._addSchedule = function (req, res) {
 	// Check language :
 	// if call from the api --> use req.body.language
 	// if call from the application --> use req.cookies.mylanguage
-
+	// 
 	var language;
 	if (req.baseUrl === '/api')
 		language = req.body.language;
 	else
 		language = req.cookies.mylanguage;
+
+	console.log('req.body : ', req.body);
+	console.log(req.body.begin_time);
+	console.log(req.body.end_time);
+	console.log(req.body.language);
 
 	LoodleController.addSchedule(req.params.id, req.body.begin_time, req.body.end_time, language, function (err, data) {
 
@@ -469,7 +474,7 @@ LoodleController.remove = function (loodle_id, callback) {
 				function (schedule_ids, end) {
 
 					async.each(schedule_ids, function (schedule_id, finish) {
-						Loodle.removeSchedule(schedule_id, finish);
+						Loodle.removeSchedule(loodle_id, schedule_id, finish);
 					}, end);
 
 				},

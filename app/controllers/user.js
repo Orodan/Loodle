@@ -311,12 +311,22 @@ UserController.remove = function (loodle_id, user_id, callback) {
  * 
  * @param  {uuid}       user_id     user identifier
  * @param  {Function}   callback    standard callback function
- * 
- * @return {Object}                 user object or error message
  */
 UserController.get = function (user_id, callback) {
   
     return User.get(user_id, callback);
+
+};
+
+/**
+ * Get loodles the user is associated with
+ * 
+ * @param  {String}   user_id   User identifier
+ * @param  {Function} callback  Standard callback function
+ */
+UserController.getLoodles = function (user_id, callback) {
+
+    return User.getLoodleIds(user_id, callback);
 
 };
 

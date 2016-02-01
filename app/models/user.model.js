@@ -57,9 +57,6 @@ User.prototype.save = function (callback) {
     	, { prepare : true }
     	, function (err) {
 
-            // console.log('Error : ', err);
-            // console.log('that : ', that);
-
     		if (err)
     			return callback(err);
 
@@ -191,6 +188,28 @@ User.save = function (id, email, first_name, last_name, password, status, callba
         { prepare: true },
         callback
     );
+};
+
+/**
+ * Get loodle ids the user is associated with
+ * 
+ * @param  {String}   userId       User identifier
+ * @param  {Function} callback     Standard callback function
+ */
+User.getLoodleIds = function (userId, callback) {
+
+    var query = 'SELECT doodle_id FROM doodle_by_user WHERE user_id = ?';
+    db.execute(query, [ userId ], { prepare : true }, function (err, data) {
+        if (err) { return callback(err); }
+
+        var results = [];
+        data.rows.forEach(function (element) {
+            results.push(element.doodle_id);
+        });
+
+        return callback(null, results);
+    });
+
 };
 
 /**
