@@ -198,8 +198,8 @@ VoteController.updateVotes = function (req, res) {
 	
 	async.parallel({
 		updateVotes: function (done) {
-			async.each(req.body.votes, function(vote, end) {
-				Vote.update(vote.id, vote.vote, end);
+			async.forEachOf(req.body, function(value, key, end) {
+				Vote.update(key, value, end);
 			}, done);
 		},
 		notify: function (done) {

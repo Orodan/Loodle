@@ -9,6 +9,7 @@ var Schedule             = require('../controllers/schedule');
 var ParticipationRequest = require('../controllers/participation-request');
 var Configuration        = require('../controllers/configuration');
 var Notification         = require('../controllers/notification');
+var Vote                 = require('../controllers/vote');
 
 var Config               = require('../../config/config.js');
 
@@ -124,6 +125,7 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 // PUT =============================================
 
+/**
 router.put('/loodle/:id/votes', function (req, res) {
 
 	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
@@ -135,6 +137,8 @@ router.put('/loodle/:id/votes', function (req, res) {
 	});
 
 });
+**/
+router.put('/loodle/votes', Vote.updateVotes);
 
 router.put('/loodle/:id/configuration', Configuration.update);
 
