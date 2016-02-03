@@ -117,8 +117,8 @@
 				hours.push(moment_begin_time);
 				hours.push(moment_end_time);
 
-				schedule.begin_time = moment(schedule.begin_time);
-				schedule.end_time = moment(schedule.end_time);
+				schedule.begin_time = moment_begin_time;
+				schedule.end_time = moment_end_time;
 			});
 			
 			// Make it available in our scope
@@ -413,7 +413,7 @@
 
 	}]);
 
-	app.controller('publicLoodleController', ['$http', '$scope', '$cookies', 'loodleService', function ($http, $scope, $cookies, loodleService) {
+	app.controller('publicloodleController', ['$http', '$scope', '$cookies', 'loodleService', function ($http, $scope, $cookies, loodleService) {
 
 		var schedules = [];
 
