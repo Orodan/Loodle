@@ -249,7 +249,7 @@ UserController.deleteIfTemporary = function (user_id, callback) {
 
         // Get user data
         function (done) {
-            User.get(user_id, callback);
+            User.get(user_id, done);
         },
 
         // Delete if temporary

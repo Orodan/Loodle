@@ -418,6 +418,12 @@ LoodleController.getLoodlesOfUser = function (req, res) {
 
 };
 
+/**
+ * Delete a loodle
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 LoodleController.remove = function (loodle_id, callback) {
 
 	// Delete the loodle
@@ -591,9 +597,24 @@ LoodleController.remove = function (loodle_id, callback) {
 		// Delete the configuration user - loodle
 		deleteConfiguration: function (done) {
 
+			async.waterfall([
+				// Get user ids associated with the loodle
+				async.apply(Loodle.getUserIds, loodle_id),
+				function deleteConfigurations (userIds, end) {
+					async.each(userIds, function (userId, finish) {
+						Configuration.delete(userId, loodle_id, finish);
+					}, end);
+				}
+			], function (err) {
+				return done(err);
+			});
+
+			/**
 			async.each(user_ids, function (user_id, end) {
+				console.log('user_id : ', user_id);
 				Configuration.delete(user_id, loodle_id, end);
 			}, done);
+			**/
 
 		},
 
@@ -625,38 +646,6 @@ LoodleController.remove = function (loodle_id, callback) {
 			], done);
 
 		},
-
-		// Delete user association 
-		/**
-		deleteUserAssociation: function (done) {
-
-			async.series([
-
-				// Get the user ids associated with the loodle
-				function (end) {
-					Loodle.getUserIds(loodle_id, function (err, data) {
-						if (err)
-							return end(err);
-
-						user_ids = data;
-						return end();
-					});
-				},
-
-				// Delete the association loodle - user
-				function (end) {
-
-					async.each(user_ids, function (user_id, finish) {
-						Loodle.removeAssociationWithUser(loodle_id, user_id, finish);
-					}, end);
-
-				}
-
-			], done);
-
-		}
-		**/
-
 
 	}, callback);
 
