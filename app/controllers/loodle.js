@@ -72,7 +72,7 @@ LoodleController._createLoodle = function (req, res) {
 
 LoodleController._deleteSchedule = function (req, res) {
 
-	LoodleController.deleteSchedule(req.params.id, req.body.schedule_id, function (err, data) {
+	LoodleController.deleteSchedule(req.params.loodleId, req.params.scheduleId, function (err, data) {
 		return reply(res, err, data);
 	});
 

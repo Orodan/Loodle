@@ -150,7 +150,7 @@ router.put('/notification/:id', Notification.markAsRead);
 router.delete('/loodle/:id/user', Loodle._removeUser);
 
 // Delete a schedule
-router.delete('/loodle/:id/schedule', Loodle._deleteSchedule);
+router.delete('/loodle/:loodleId/schedule/:scheduleId', Loodle._deleteSchedule);
 
 // router.delete('/loodle/:id/user', User.remove);
 
