@@ -210,6 +210,26 @@ UserController.createUser = function (email, first_name, last_name, password, ca
 };
 
 /**
+ * Delete the user
+ * 
+ * @param  {String}   user_id   User identifier
+ * @param  {Function} callback  Standard callback function
+ */
+UserController.delete = function (userId, callback) {
+
+    async.waterfall([
+        async.apply(User.get, userId),
+        function (user, done) {
+            async.parallel([
+                async.apply(User.delete, user.id),
+                async.apply(User.deleteEmailReference, user.email)
+            ], done);
+        }
+    ], callback);
+
+};
+
+/**
  * Delete the user if he/she is temporary
  * 
  * @param  {uuid}       user_id     user identifier
@@ -231,7 +251,7 @@ UserController.deleteIfTemporary = function (user_id, callback) {
             if (user.status === 'temporary')
                 User.delete(user_id, done);
             else
-                done();
+                return done();
         }
 
     ], callback);

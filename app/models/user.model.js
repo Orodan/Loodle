@@ -33,6 +33,19 @@ User.delete = function (user_id, callback) {
 
 };
 
+/**
+ * Delete email reference of the user   
+ * 
+ * @param  {[type]}   userEmail     Email of the user
+ * @param  {Function} callback      Standard callback function
+ */
+User.deleteEmailReference = function (userEmail, callback) {
+
+    var query = 'DELETE FROM user_by_email WHERE email = ?';
+    db.execute(query, [ userEmail ], { prepare : true }, callback);
+
+};
+
 // Prototypal functions ========================================================
 
 User.prototype.save = function (callback) {

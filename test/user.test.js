@@ -1,5 +1,6 @@
 var assert = require('assert');
 var User = require('../app/controllers/user');
+var UserModel = require('../app/models/user.model');
 var Loodle = require('../app/models/loodle.model');
 
 describe('User', function () {
@@ -13,6 +14,33 @@ describe('User', function () {
 			password: "mypassword"
 		};
 		var result;
+
+		before(function (done) {
+			// Ensure that the user email we're going to test is not already used
+			UserModel.getUserIdByEmail(riri.email, function (err, userId) {
+                if (err) 
+                	return done(err);
+
+                // This email is already used, we modify the our test user email
+                if (userId)
+                	riri.email = riri.email.split('@')[0] + riri.email.split('@')[0] + '@' + riri.email.split('@')[1];
+
+                return done();
+            });
+		});
+
+		after(function (done) {
+			UserModel.getUserIdByEmail(riri.email, function (err, userId) {
+				if (err) 
+					return done(err);
+
+				// We clean the database of the user we created for the test
+				if (userId)
+					User.delete(userId, done);
+				else 
+					return done();
+			});
+		});
 
 		it('should send back the user data', function (done) {
 
@@ -52,7 +80,7 @@ describe('User', function () {
 
 		var loodle = new Loodle('My wonderfull public loodle', 'Wonderfull !', 'public');
 		var riri = {
-			email: "ririduck@gmail.com",
+			email: "test@gmail.com",
 			first_name: "Riri",
 			last_name: "Duck",
 			password: "mypassword"
