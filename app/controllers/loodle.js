@@ -26,11 +26,6 @@ LoodleController._addSchedule = function (req, res) {
 	else
 		language = req.cookies.mylanguage;
 
-	console.log('req.body : ', req.body);
-	console.log(req.body.begin_time);
-	console.log(req.body.end_time);
-	console.log(req.body.language);
-
 	LoodleController.addSchedule(req.params.id, req.body.begin_time, req.body.end_time, language, function (err, data) {
 
 		if (req.baseUrl === '/api')
@@ -152,12 +147,10 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
 /**
  * Create a new private loodle
  * 
- * @param  {uuid}   	user_id     	[user identifier]
- * @param  {String}   	name        	[name of the new loodle]
- * @param  {String}   	description 	[description of the new loodle]
- * @param  {Function} 	callback    	[standard callback function]
- * 
- * @return {Object}               		[Loodle object or error message]
+ * @param  {uuid}   	user_id     	User identifier
+ * @param  {String}   	name        	Name of the new loodle
+ * @param  {String}   	description 	Description of the new loodle
+ * @param  {Function} 	callback    	Standard callback function
  */
 LoodleController.createLoodle = function (user_id, name, description, callback) {
 
@@ -609,7 +602,32 @@ LoodleController.remove = function (loodle_id, callback) {
 			Notification.deleteFromLoodle(loodle_id, done);
 		},
 
+		deleteUsers: function (done) {
+
+			// Get user - loodle associations
+			// Remove the temporary users
+			// Delete associations
+			
+			async.waterfall([
+				// Get user ids associated with the loodle
+				async.apply(Loodle.getUserIds, loodle_id),
+				// Delete associations and temporary users
+				function deleteUsersAndAssociations (userIds, end) {
+					async.parallel([
+						function deleteTemporaryUsers (finish) {
+							async.each(userIds, User.deleteIfTemporary, finish);		
+						},
+						function deleteAssociations (finish) {
+							async.each(userIds, async.apply(Loodle.removeAssociationWithUser, loodle_id), finish)
+						}
+					], end);
+				}
+			], done);
+
+		},
+
 		// Delete user association 
+		/**
 		deleteUserAssociation: function (done) {
 
 			async.series([
@@ -629,7 +647,7 @@ LoodleController.remove = function (loodle_id, callback) {
 				function (end) {
 
 					async.each(user_ids, function (user_id, finish) {
-						Loodle.removeAssociationLoodleUser(loodle_id, user_id, finish);
+						Loodle.removeAssociationWithUser(loodle_id, user_id, finish);
 					}, end);
 
 				}
@@ -637,6 +655,7 @@ LoodleController.remove = function (loodle_id, callback) {
 			], done);
 
 		}
+		**/
 
 
 	}, callback);
@@ -823,9 +842,9 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 
 };
 
-LoodleController.createPublicLoodle = function (req, res) {
+LoodleController.createPublicLoodle = function (name, description, schedules, locale, callback) {
 
-	var loodle = new Loodle(req.body.name, req.body.description, 'public');
+	var loodle = new Loodle(name, description, 'public');
 	async.parallel({
 		// Save the loodle
 		save: function (done) {
@@ -834,31 +853,41 @@ LoodleController.createPublicLoodle = function (req, res) {
 		// Create and add the schedule to it
 		addSchedule: function (done) {
 
-			async.each(req.body.schedules, function (schedule, end) {
+			async.each(schedules, function (schedule, end) {
 
 				async.series({
 
 					// Check if the two dates of the schedule are on the same day
 					checkSchedule: function (finish) {
-						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, req.cookies.mylanguage, finish);
+						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, locale, finish);
 					},
 
 					// Create the new schedule 
 					createSchedule: function (finish) {
-						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, req.cookies.mylanguage, finish);
+						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, locale, finish);
 					}
 				}, end);
 
 			}, done);
 		}
 	}, function (err, results) {
+		if (err)
+			return callback(err);
+		
+		return callback(null, results.save);
+	});
 
+}
+
+LoodleController._createPublicLoodle = function (req, res) {
+
+	LoodleController.createPublicLoodle(req.body.name, req.body.description, req.body.schedules, req.cookies.mylanguage, function (err, data) {
 		if (err)
 			return error(res, err);
 		
-		return success(res, results.save);
+		return success(res, data);
+	});
 
-	});	
 };
 
 LoodleController.setCategory = function (req, res) {

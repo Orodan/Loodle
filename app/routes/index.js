@@ -178,7 +178,7 @@ router.post('/loodle/:id/user/delete', isAuthenticated, User._remove);
 
 router.post('/data/loodle/:id/user/public', User._createPublicUser);
 
-router.post('/data/public/loodle', Loodle.createPublicLoodle);
+router.post('/data/public/loodle', Loodle._createPublicLoodle);
 
 // PUT =====================================================
 

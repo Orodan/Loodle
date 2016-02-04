@@ -74,7 +74,7 @@ router.get('/loodle/:id/notifications', Notification.getFromUser);
 
 router.get('/user/getLoodles', function (req, res) {
 
-	User.getLoodles(req.user.id, function (err, data) {
+	User.getLoodleIds(req.user.id, function (err, data) {
 		if (err) { return error(res, err); }
 		return success(res, data);
 	});

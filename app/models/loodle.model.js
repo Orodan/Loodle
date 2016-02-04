@@ -88,6 +88,9 @@ Loodle.get = function (id, callback) {
 			if (err)
 				return callback(err);
 
+			if (data.rows.length === 0)
+				return callback('No loodle found with this id');
+
 			return callback(null, data.rows[0]);
 		}
 	);
@@ -350,7 +353,7 @@ Loodle.getUserIds = function (loodle_id, callback) {
 
 };
 
-Loodle.removeAssociationLoodleUser = function (loodle_id, user_id, callback) {
+Loodle.removeAssociationWithUser = function (loodle_id, user_id, callback) {
 
 	var queries = [
 		{

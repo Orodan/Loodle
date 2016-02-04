@@ -146,26 +146,33 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
 
     var user = new PublicUser(first_name, last_name);
 
-    async.parallel({
-        // Save the user
-        save: function (done) {
-            user.save(done);
-        },
-
-        // Bind user - loodle
-        bind: function (done) {
-            PublicUser.bind(user.id, loodle_id, done);
-        },
-
-        defaultVotes: function (done) {
-            Vote.createDefaultVotesForLoodle(loodle_id, user.id, done);
-        }
-    }, function (err, result) {
+    Loodle.get(loodle_id, function (err, data) {
         if (err)
             return callback(err);
 
-        return callback(null, user);
-    });
+        async.parallel({
+            // Save the user
+            save: function (done) {
+                user.save(done);
+            },
+
+            // Bind user - loodle
+            bind: function (done) {
+                PublicUser.bind(user.id, loodle_id, done);
+            },
+
+            defaultVotes: function (done) {
+                Vote.createDefaultVotesForLoodle(loodle_id, user.id, done);
+            }
+        }, function (err, result) {
+
+            if (err)
+                return callback(err);
+
+            return callback(null, user);
+        });
+
+    })
 
 };
 
@@ -339,12 +346,12 @@ UserController.get = function (user_id, callback) {
 };
 
 /**
- * Get loodles the user is associated with
+ * Get loodle ids the user is associated with
  * 
  * @param  {String}   user_id   User identifier
  * @param  {Function} callback  Standard callback function
  */
-UserController.getLoodles = function (user_id, callback) {
+UserController.getLoodleIds = function (user_id, callback) {
 
     return User.getLoodleIds(user_id, callback);
 
