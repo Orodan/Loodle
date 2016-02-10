@@ -1,4 +1,4 @@
-var async      = require('async');
+var async     = require('async');
 var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 
@@ -14,6 +14,7 @@ function User (email, first_name, last_name, password) {
     this.last_name = last_name;
     this.password = User.generateHash(password);
     this.status = 'registred';
+    
 }
 
 /**
@@ -69,7 +70,6 @@ User.prototype.save = function (callback) {
     db.batch(queries
     	, { prepare : true }
     	, function (err) {
-
     		if (err)
     			return callback(err);
 
@@ -185,13 +185,6 @@ User.getVoteIds = function (user_id, loodle_id, callback) {
 
 /**
  * Save the user
- * @param id
- * @param email
- * @param first_name
- * @param last_name
- * @param password
- * @param status
- * @param callback
  */
 User.save = function (id, email, first_name, last_name, password, status, callback) {
 
@@ -213,6 +206,7 @@ User.getLoodleIds = function (userId, callback) {
 
     var query = 'SELECT doodle_id FROM doodle_by_user WHERE user_id = ?';
     db.execute(query, [ userId ], { prepare : true }, function (err, data) {
+
         if (err) { return callback(err); }
 
         var results = [];

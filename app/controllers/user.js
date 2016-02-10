@@ -130,23 +130,17 @@ UserController.authenticate = function (email, password, callback) {
 /**
  * Create a public (temporary) user
  * 
- * @param  {uuid}       loodle_id   loodle identifier
- * @param  {String}     first_name  first name of the new user
- * @param  {String}     last_name   last name of the new user
- * @param  {Function}   callback    standard callback function
- * 
- * @return {String}                 Success or error message
+ * @param  {String}         loodle_id       loodle identifier
+ * @param  {String}         first_name      first name of the new user
+ * @param  {String}         last_name       last name of the new user
+ * @param  {Function}       callback        standard callback function
  */
 UserController.createPublicUser = function (loodle_id, first_name, last_name, callback) {
-
-    // new public user
-    // save it
-    // bind it to the loodle
-    // Create default votes
 
     var user = new PublicUser(first_name, last_name);
 
     Loodle.get(loodle_id, function (err, data) {
+
         if (err)
             return callback(err);
 
@@ -161,6 +155,7 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
                 PublicUser.bind(user.id, loodle_id, done);
             },
 
+            // Create default votes
             defaultVotes: function (done) {
                 Vote.createDefaultVotesForLoodle(loodle_id, user.id, done);
             }

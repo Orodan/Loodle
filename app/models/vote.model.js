@@ -164,10 +164,11 @@ Vote.getUserIdsOfLoodle = function (loodle_id, callback) {
 Vote.getScheduleIds = function (loodle_id, callback) {
 
 	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, function (err, data) {
+
+	db.execute(query, 
+		[ loodle_id ], 
+		{ prepare : true }, 
+		function (err, data) {
 			if (err)
 				return callback(err);
 
@@ -191,7 +192,7 @@ Vote.update = function (id, vote, callback) {
 		, { prepare : true }
 		, callback);
 
-}
+};
 
 Vote.getVoteIdsFromSchedule = function (loodle_id, schedule_id, callback) {
 

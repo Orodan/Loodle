@@ -319,10 +319,6 @@ VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
 
 VoteController.createDefaultVotesForLoodle = function (loodle_id, user_id, callback) {
 
-	// Get schedule ids of the loodle
-	// For each of them
-	// Create a default vote
-
 	async.waterfall([
 
 		// Get schedule ids of the loodle
