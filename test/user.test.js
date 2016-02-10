@@ -35,6 +35,8 @@ describe('User', function () {
 
 	describe('createUser', function () {
 
+		var result;
+
 		after(function (done) {
 
 			UserModel.getUserIdByEmail(riri.email, function (err, userId) {
@@ -73,9 +75,7 @@ describe('User', function () {
 		});
 
 		it('should save the user as "registred"', function () {
-
 			assert.equal(result.status, 'registred');
-
 		});
 
 		it('should send back an error if the email is already used', function (done) {
@@ -98,9 +98,9 @@ describe('User', function () {
 	});
 
 	describe('createPublicUser', function () {
-		this.timeout(12000);
 
 		var loodle;
+		var result;
 
 		before(function (done) {
 
@@ -189,6 +189,8 @@ describe('User', function () {
 	
 	describe('get', function () {
 
+		var result;
+
 		before(function (done) {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
@@ -196,6 +198,7 @@ describe('User', function () {
 					return done(err);
 
 				result = data;
+
 				return done();
 
 			});
@@ -211,7 +214,7 @@ describe('User', function () {
 				// We clean the database of the user we created for the test
 				if (userId)
 					User.delete(userId, done);
-				else 
+				else
 					return done();
 			});
 
@@ -236,13 +239,14 @@ describe('User', function () {
 
 		});
 
-		it('should send false if the user id is unknown', function (done) {
+		it('should send an error if the user id is unknown', function (done) {
 
 			User.get('00000000-0000-0000-0000-000000000000', function (err, data) {
 
 				try {
-					assert.equal(err, null);
-					assert.equal(data, false);
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown user id');
+					assert.equal(data, null);
 				} catch (e) {
 					return done(e);
 				}
@@ -278,27 +282,38 @@ describe('User', function () {
 	describe('getLoodleIds', function () {
 
 		var loodle;
+		var myUser;
 
 		before(function (done) {
 
-			Loodle.createLoodle(result.id, 'Mon doodle', 'Ma description', function (err, data) {
-				if (err)
-					return done(err);
+			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, result) {
+				if (err) return done(err);
 
-				loodle = data;
-				return done();
+				myUser = result;
 
+				Loodle.createLoodle(result.id, 'Mon doodle', 'Ma description', function (err, data) {
+					if (err) return done(err);
+
+					loodle = data;
+					return done();
+
+				});
 			});
 
 		});
 
 		after(function (done) {
-			Loodle.remove(loodle.id, done);
+
+			async.parallel([
+				async.apply(Loodle.remove, loodle.id),
+				async.apply(User.delete, myUser.id)
+			], done)
+
 		});
 
 		it('should send an array of loodle ids', function (done) {
 
-			User.getLoodleIds(result.id, function (err, data) {
+			User.getLoodleIds(myUser.id, function (err, data) {
 
 				try {
 					assert.equal(err, null);
