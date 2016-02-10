@@ -11,6 +11,8 @@ var Vote       = require('../controllers/vote');
 var jwt        = require('jsonwebtoken');
 var Config     = require('../../Config/config');
 
+var Validator  = require('../../util/Validator');
+
 /**
  * User controller
  * @namespace 
@@ -335,8 +337,15 @@ UserController.remove = function (loodle_id, user_id, callback) {
  * @param  {Function}   callback    standard callback function
  */
 UserController.get = function (user_id, callback) {
-  
-    return User.get(user_id, callback);
+
+    Validator.isAKnownUserId(user_id, function (err, result) {
+        if (err) return callback(err);
+
+        if (!result)
+            return callback(new ReferenceError('Unknown user id'));
+
+        User.get(user_id, callback);
+    });
 
 };
 

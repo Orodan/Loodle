@@ -9,6 +9,8 @@ var Configuration        = require('./configuration');
 var Notification         = require('./notification');
 var Vote                 = require('./vote');
 
+var Validator = require('../../util/validator');
+
 var LoodleController = {};
 
 // Route calls ========================================================
@@ -19,7 +21,7 @@ LoodleController._addSchedule = function (req, res) {
 	// Check language :
 	// if call from the api --> use req.body.language
 	// if call from the application --> use req.cookies.mylanguage
-	// 
+
 	var language;
 	if (req.baseUrl === '/api')
 		language = req.body.language;
@@ -156,34 +158,42 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 
 	var loodle = new Loodle(name, description);
 
-	async.parallel({
-		// Save the loodle
-		save: function (done) {
-			loodle.save(done);
-		},
-		// Associate the loodle and the user
-		bind: function (done) {
-			Loodle.bindUser(user_id, loodle.id, done)
-		},
-		// Create default configuration for the user and set the user role as manager
-		config: function (done) {
+	Validator.isAKnownUserId(user_id, function (err, result) {
+		if (err) return callback(err);
 
-			async.series([
-				function (end) {
-					Configuration.createDefaultConfiguration(user_id, loodle.id, end);
-				},
+		if (!result)
+			return callback(new ReferenceError('Unknown user id'));
 
-				function (end) {
-					Configuration.setUserRole(user_id, loodle.id, 'manager', end);
-				}
-			], done);
-		}
-	}, function (err, results) {
+		async.parallel({
+			// Save the loodle
+			save: function (done) {
+				loodle.save(done);
+			},
+			// Associate the loodle and the user
+			bind: function (done) {
+				Loodle.bindUser(user_id, loodle.id, done)
+			},
+			// Create default configuration for the user and set the user role as manager
+			config: function (done) {
 
-		if (err)
-			return callback(err)
-		
-		return callback(null, results.save);
+				async.series([
+					function (end) {
+						Configuration.createDefaultConfiguration(user_id, loodle.id, end);
+					},
+
+					function (end) {
+						Configuration.setUserRole(user_id, loodle.id, 'manager', end);
+					}
+				], done);
+			}
+		}, function (err, results) {
+
+			if (err)
+				return callback(err)
+
+			return callback(null, results.save);
+
+		});
 
 	});
 
@@ -608,13 +618,6 @@ LoodleController.remove = function (loodle_id, callback) {
 			], function (err) {
 				return done(err);
 			});
-
-			/**
-			async.each(user_ids, function (user_id, end) {
-				console.log('user_id : ', user_id);
-				Configuration.delete(user_id, loodle_id, end);
-			}, done);
-			**/
 
 		},
 
