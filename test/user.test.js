@@ -50,7 +50,7 @@ describe('User', function () {
 
 		});
 
-		it('should send back the user data', function (done) {
+		it('should send the user data', function (done) {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
