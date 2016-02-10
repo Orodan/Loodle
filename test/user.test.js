@@ -21,7 +21,8 @@ describe('User', function () {
 	before(function (done) {
 		// Ensure that the user email we're going to test is not already used
 		UserModel.getUserIdByEmail(riri.email, function (err, userId) {
-            if (err) 
+
+            if (err)
             	return done(err);
 
             // This email is already used, we modify the our test user email
@@ -53,12 +54,18 @@ describe('User', function () {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
-				assert.equal(err, null);
-				assert.equal(data.email, riri.email);
-				assert.equal(data.first_name, riri.first_name);
-				assert.equal(data.last_name, riri.last_name);
-
 				result = data;
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data.email, riri.email);
+					assert.equal(data.first_name, riri.first_name);
+					assert.equal(data.last_name, riri.last_name);
+				}
+				catch (e) {
+					return done(e);
+				}
+
 				return done();
 
 			});
@@ -75,7 +82,13 @@ describe('User', function () {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
-				assert.equal(err,'This email is already used');
+				try {
+					assert.equal(err,'This email is already used');
+				}
+				catch (e) {
+					return done(e);
+				}
+
 				return done();
 
 			});
@@ -85,6 +98,7 @@ describe('User', function () {
 	});
 
 	describe('createPublicUser', function () {
+		this.timeout(12000);
 
 		var loodle;
 
@@ -109,44 +123,61 @@ describe('User', function () {
 
 			User.createPublicUser(loodle.id, riri.first_name, riri.last_name, function (err, data) {
 
-				assert.equal(err, null);
-				assert.equal(data.first_name, riri.first_name);
-				assert.equal(data.last_name, riri.last_name);
-
 				result = data;
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data.first_name, riri.first_name);
+					assert.equal(data.last_name, riri.last_name);
+					assert.equal(data.status, 'temporary');
+				}
+				catch (e) {
+					return done(e);
+				}
+				
 				return done();
 
 			});
 			
 		});
-
+		
 		it('should save the user as "temporary"', function () {
-
 			assert.equal(result.status, 'temporary');
-
 		});
 
+		
 		it('should send an error if the loodle id is unknown', function (done) {
 
 			User.createPublicUser('00000000-0000-0000-0000-000000000000', riri.first_name, riri.last_name, function (err, data) {
 
-				assert.equal(err, 'No loodle found with this id');
-				assert.equal(data, null);
-
+				try {
+					assert.equal(err, 'No loodle found with this id');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+				
 				return done();
 
 			});
 
 		});
 
+
 		it('should send an error if the loodle id is not a valid uuid', function (done) {
 
 			User.createPublicUser('', riri.first_name, riri.last_name, function (err, data) {
 
-				assert.equal(err.name, 'TypeError');
-				assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
-				assert.equal(data, null);
-
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				} 
+				
 				return done();
 
 			});
@@ -155,15 +186,14 @@ describe('User', function () {
 
 	});
 
+	
 	describe('get', function () {
 
 		before(function (done) {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
-
-				assert.equal(data.email, riri.email);
-				assert.equal(data.first_name, riri.first_name);
-				assert.equal(data.last_name, riri.last_name);
+				if (err)
+					return done(err);
 
 				result = data;
 				return done();
@@ -191,10 +221,16 @@ describe('User', function () {
 
 			User.get(result.id, function (err, data) {
 				
-				assert.equal(err, null);
-				assert.equal(riri.email, data.email);
-				assert.equal(riri.first_name, data.first_name);
-				assert.equal(riri.last_name, data.last_name);
+				try {
+					assert.equal(err, null);
+					assert.equal(riri.email, data.email);
+					assert.equal(riri.first_name, data.first_name);
+					assert.equal(riri.last_name, data.last_name);	
+				}
+				catch (e) {
+					return done(e);
+				}
+				
 				return done();
 			});
 
@@ -204,7 +240,13 @@ describe('User', function () {
 
 			User.get('00000000-0000-0000-0000-000000000000', function (err, data) {
 
-				assert.equal(data, false);
+				try {
+					assert.equal(err, null);
+					assert.equal(data, false);
+				} catch (e) {
+					return done(e);
+				}
+
 				return done();
 
 			});
@@ -215,9 +257,15 @@ describe('User', function () {
 
 			User.get('', function (err, data) {
 
-				assert.equal(err.name, 'TypeError');
-				assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
-				assert.equal(data, null);
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);	
+				}
+				catch (e) {
+					return done(e);
+				}
+				
 				return done();
 
 			});
@@ -226,6 +274,7 @@ describe('User', function () {
 
 	});
 
+	
 	describe('getLoodleIds', function () {
 
 		var loodle;
@@ -251,8 +300,14 @@ describe('User', function () {
 
 			User.getLoodleIds(result.id, function (err, data) {
 
-				assert.equal(err, null);
-				assert.equal(data[0].equals(loodle.id), true);
+				try {
+					assert.equal(err, null);
+					assert.equal(data[0].equals(loodle.id), true);	
+				}
+				catch (e) {
+					return done(e);
+				}
+
 				return done();
 
 			});
@@ -263,8 +318,14 @@ describe('User', function () {
 
 			User.getLoodleIds('00000000-0000-0000-0000-000000000000', function (err, data) {
 
-				assert.equal(err, null);
-				assert.equal(data.length, 0);
+				try {
+					assert.equal(err, null);
+					assert.equal(data.length, 0);	
+				}
+				catch (e) {
+					return done(e);	
+				}
+				
 				return done();
 
 			});
@@ -275,15 +336,20 @@ describe('User', function () {
 
 			User.getLoodleIds('', function (err, data) {
 
-				assert.equal(err.name, 'TypeError');
-				assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
-				assert.equal(data, null);
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);	
+				}
+				catch (e) {
+					return done(e);
+				}
+				
 				return done();
 
 			});
 
 		});
-
 	});
 
 });
