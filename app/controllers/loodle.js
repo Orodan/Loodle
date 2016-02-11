@@ -158,7 +158,7 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 
 	var loodle = new Loodle(name, description);
 
-	Validator.isAKnownUserId(user_id, function (err, result) {
+	Validator.user.KnownId(user_id, function (err, result) {
 		if (err) return callback(err);
 
 		if (!result)
@@ -806,6 +806,14 @@ LoodleController.inviteUser = function (req, res) {
 
 };
 
+/**
+ * Add a new schedule to a loodle
+ * 
+ * @param {String}   loodle_id  	Loodle identifier
+ * @param {String}   begin_time 	Begin time of the schedule
+ * @param {String}   end_time   	End time of the schedule
+ * @param {String}   language   	Locale language
+ */
 LoodleController.addSchedule = function (loodle_id, begin_time, end_time, language, callback) {
 
 	// Check if the two dates of the schedule are on the same day
@@ -813,27 +821,47 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 	// Bind it to the loodle
 	// Create the default votes according to the schedule
 
-	async.series({
+	if(!Validator.schedule.isAKnownLanguage(language)) 
+		return callback(new Error('Unknown language'));
+	if (!Validator.schedule.isOnTheSameDay(begin_time, end_time, language)) 
+		return callback(new Error('Schedule is not on the same day'));
 
-		// Check if the two dates of the schedule are on the same day
-		checkSchedule: function (done) {
-			Schedule.checkSchedule(begin_time, end_time, language, done);
-		},
+	Validator.isAKnownLoodleId(loodle_id, function (err, result) {
+		if (err) return callback(err);
 
-		// Create the new schedule 
-		createSchedule: function (done) {
-			Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
-		}
+		if (!result)
+			return callback(new ReferenceError('Unknown loodle id'));
 
-	}, function (err) {
-		if (err)
-			return callback(err);
+		async.series({
 
-		return callback(null, 'Schedule added');
-	});
+			// Check if the two dates of the schedule are on the same day
+			checkSchedule: function (done) {
+				Schedule.checkSchedule(begin_time, end_time, language, done);
+			},
+
+			// Create the new schedule 
+			createSchedule: function (done) {
+				Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
+			}
+
+		}, function (err) {
+			if (err)
+				return callback(err);
+
+			return callback(null, 'Schedule added');
+		});
+	})
 
 };
 
+/**
+ *
+ * @param name
+ * @param description
+ * @param schedules
+ * @param locale
+ * @param callback
+ */
 LoodleController.createPublicLoodle = function (name, description, schedules, locale, callback) {
 
 	var loodle = new Loodle(name, description, 'public');

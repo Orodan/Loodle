@@ -39,7 +39,7 @@ describe('Loodle', function () {
 
 	after(function (done) {
 
-		// Clean the user created for the test
+		// Delete the user created for the test
 		UserModel.getUserIdByEmail(riri.email, function (err, userId) {
 			if (err) 
 				return done(err);
@@ -115,6 +115,128 @@ describe('Loodle', function () {
 					assert.equal(err.name, 'TypeError');
 					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
 					assert.equal(loodle, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
+	describe('addSchedule', function (done) {
+
+		var myLoodle = {
+			'name': 'Mon super loodle',
+			'description': 'Ma super description'
+		};
+		var result;
+
+		// Create a loodle to play with
+		before(function (done) {
+
+			Loodle.createLoodle(riri.id, myLoodle.name, myLoodle.description, function (err, loodle) {
+				if (err) return done(err);
+
+				result = loodle;
+				return done();
+			});
+
+		});
+
+		// Delete the created loodle
+		after(function (done) {
+			Loodle.remove(result.id, done);
+		});
+
+		
+		it('should add the schedule to the loodle', function (done) {
+
+			Loodle.addSchedule(result.id, '10/02/2016 17:08', '10/02/2016 17:10', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data, 'Schedule added');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the language is unknown', function (done) {
+
+			Loodle.addSchedule(result.id, '10/02/2016 17:08', '10/02/2016 17:10', '', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Unknown language');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the schedule is not on the same day', function (done) {
+
+			Loodle.addSchedule(result.id, '10/02/2016 17:08', '11/02/2016 17:10', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Schedule is not on the same day');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+		
+		it('should send an error if the loodle id is unknown', function (done) {
+			
+			Loodle.addSchedule('00000000-0000-0000-0000-000000000000', '10/02/2016 17:08', '10/02/2016 17:10', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is not a valid uuid', function (done) {
+			
+			Loodle.addSchedule('', '10/02/2016 17:08', '10/02/2016 17:10', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);
 				}
 				catch (e) {
 					return done(e);
