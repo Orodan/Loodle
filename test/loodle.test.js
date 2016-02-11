@@ -87,6 +87,25 @@ describe('Loodle', function () {
 
 		});
 
+		it('should send an error if one information is missing', function (done) {
+
+			Loodle.createLoodle(riri.id, null, myLoodle.description, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Missing one parameter');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
 		it('should send an error if the user id is unknown', function (done) {
 			
 			
@@ -109,7 +128,7 @@ describe('Loodle', function () {
 
 		it('should send an error if the user id is not a valid uuid', function (done) {
 
-			Loodle.createLoodle('', myLoodle.name, myLoodle.description, function (err, loodle) {
+			Loodle.createLoodle('zeofo', myLoodle.name, myLoodle.description, function (err, loodle) {
 
 				try {
 					assert.equal(err.name, 'TypeError');

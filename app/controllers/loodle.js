@@ -158,6 +158,9 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 
 	var loodle = new Loodle(name, description);
 
+	if (!Validator.loodle.hasAllInformations(name))
+		return callback(new Error('Missing one parameter'));
+
 	Validator.user.KnownId(user_id, function (err, result) {
 		if (err) return callback(err);
 
@@ -826,7 +829,7 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 	if (!Validator.schedule.isOnTheSameDay(begin_time, end_time, language)) 
 		return callback(new Error('Schedule is not on the same day'));
 
-	Validator.isAKnownLoodleId(loodle_id, function (err, result) {
+	Validator.loodle.KnownId(loodle_id, function (err, result) {
 		if (err) return callback(err);
 
 		if (!result)

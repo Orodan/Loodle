@@ -55,16 +55,36 @@ Validator.user.KnownId = function (userId, callback) {
 
 }
 
+// Loodle validation
+Validator.loodle = {};
+
+/**
+ * Check if all the informations required to create a loodle were given
+ * 
+ * @param  {String}     name        Loodle name
+ * @return {Boolean}                true if all the informations were given, false otherwise
+ */
+Validator.loodle.hasAllInformations = function (name) {
+
+    var missingInfo = false;
+
+    if (typeof name != 'string' || name.length === 0)
+        missingInfo = true;
+
+    return !missingInfo;
+
+};
+
 /**
  * Check if the loodle id match a loodle in db
  * 
  * @param  {String}   loodleId      Loodle identifier
  * @param  {Function} callback      Standard callback function
  */
-Validator.isAKnownLoodleId = function (loodleID, callback) {
+Validator.loodle.KnownId = function (loodleId, callback) {
 
     var query = 'SELECT * FROM doodles WHERE id = ?';
-    db.execute(query, [ loodleID ], { prepare : true }, function (err, data) {
+    db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
 
         if (err) return callback(err);
 
