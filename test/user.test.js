@@ -5,8 +5,6 @@ var Loodle = require('../app/controllers/loodle');
 var LoodleModel = require('../app/models/loodle.model');
 var async = require('async');
 
-var util = require('util');
-
 describe('User', function () {
 
 	var riri = {
