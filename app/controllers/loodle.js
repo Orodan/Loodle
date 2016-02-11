@@ -212,32 +212,62 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
  */
 LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 
-	// Delete the association schedule - loodle
-	// Delete schedule
-	// Delete votes of the schedule for each user of the loodle
+	async.series({
 
-	async.parallel({
+		// Validate the loodle id is known
+		loodleIdIsKnown: function (end) {
+			Validator.loodle.KnownId(loodle_id, function (err, result) {
 
-		// Delete the association schedule - loodle
-		removeScheduleFromLoodle: function (done) {
-			Loodle.removeSchedule(loodle_id, schedule_id, done);
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown loodle id'));
+
+				return end();
+			});
+		},
+
+		// Validate the schedule id is known
+		scheduleIdIsKnown: function (end) {
+			Validator.schedule.KnownId(schedule_id, function (err, result) {
+
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown schedule id'));
+
+				return end();
+			});
 		},
 
 		// Delete schedule
-		deleteSchedule: function (done) {
-			Schedule.delete(schedule_id, done);
-		},
+		deleteSchedule: function (end) {
 
-		// Delete votes of the schedule for each user of the loodle
-		deleteVotes: function (done) {
-			Schedule.deleteVotes(schedule_id, loodle_id, done);
+			async.parallel({
+
+				// Delete the association schedule - loodle
+				removeScheduleFromLoodle: function (done) {
+					Loodle.removeSchedule(loodle_id, schedule_id, done);
+				},
+
+				// Delete schedule
+				deleteSchedule: function (done) {
+					Schedule.delete(schedule_id, done);
+				},
+
+				// Delete votes of the schedule for each user of the loodle
+				deleteVotes: function (done) {
+					Schedule.deleteVotes(schedule_id, loodle_id, done);
+				}
+
+			}, end);
+
 		}
 
 	}, function (err) {
-		if (err)
-			return callback(err);
+		if (err) return callback(err);
 
-		return callback(null, 'schedule removed');
+		return callback(null, 'Schedule deleted');
 	});
 
 };
@@ -467,11 +497,6 @@ LoodleController.remove = function (loodle_id, callback) {
 
 	async.series({
 
-		// Delete the loodle
-		deleteLoodle: function (done) {
-			Loodle.remove(loodle_id, done);
-		},
-
 		// Delete schedules
 		deleteSchedules: function (done) {
 
@@ -492,6 +517,11 @@ LoodleController.remove = function (loodle_id, callback) {
 				}
 			], done);
 
+		},
+
+		// Delete the loodle
+		deleteLoodle: function (done) {
+			Loodle.remove(loodle_id, done);
 		},
 
 		// Delete votes

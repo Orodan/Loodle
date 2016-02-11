@@ -1,4 +1,5 @@
 var assert    = require('assert');
+var async     = require('async');
 
 var Loodle    = require('../app/controllers/loodle');
 var User      = require('../app/controllers/user');
@@ -251,6 +252,149 @@ describe('Loodle', function () {
 		it('should send an error if the loodle id is not a valid uuid', function (done) {
 			
 			Loodle.addSchedule('', '10/02/2016 17:08', '10/02/2016 17:10', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
+	describe('deleteSchedule', function (done) {
+
+		var myLoodle = {
+			'name': 'Mon super loodle',
+			'description': 'Ma super description'
+		};
+		var result;
+
+		// Create a loodle to play with
+		before(function (done) {
+		
+			async.series({
+
+				// Create the loodle
+				createLoodle: function (end) {
+					Loodle.createLoodle(riri.id, myLoodle.name, myLoodle.description, function (err, data) {
+						if (err) return end(err);
+
+						result = data;
+
+						return end();
+
+					});
+				},
+
+				// Add the schedule
+				addSchedule: function (end) {
+					Loodle.addSchedule(result.id, '10/02/2016 17:10', '10/02/2016 17:15', 'fr', end);
+				},
+
+				// Get the loodle data
+				getLoodleData: function (end) {
+					Loodle.get(result.id, function (err, data) {
+						if (err) return end(err);
+
+						result = data;
+						return end();
+					});
+				}
+			}, done);
+
+		});
+
+		// Delete the created loodle
+		after(function (done) {
+			Loodle.remove(result.id, done);
+		});
+
+		it('should delete the schedule', function (done) {
+
+			Loodle.deleteSchedule(result.id, result.schedules[0].id, function (err, data) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data, 'Schedule deleted')
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+		
+		it('should send an error if the loodle id is unknown', function (done) {
+
+			Loodle.deleteSchedule('00000000-0000-0000-0000-000000000000', result.schedules[0].id, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle is is not a valid uuid', function (done) {
+			
+			Loodle.deleteSchedule('agagaga', result.schedules[0].id, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the schedule id is unknown', function (done) {
+			
+			Loodle.deleteSchedule(result.id, '00000000-0000-0000-0000-000000000000', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown schedule id');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the schedule id is not a valid uuid', function (done) {
+			
+			Loodle.deleteSchedule(result.id, 'afaiohao', function (err, data) {
 
 				try {
 					assert.equal(err.name, 'TypeError');

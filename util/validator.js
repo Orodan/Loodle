@@ -102,6 +102,28 @@ Validator.loodle.KnownId = function (loodleId, callback) {
 Validator.schedule = {};
 
 /**
+ * Check if the schedule id match a schedule in db
+ * 
+ * @param  {String}   loodleId      Schedule identifier
+ * @param  {Function} callback      Standard callback function
+ */
+Validator.schedule.KnownId = function (scheduleId, callback) {
+
+    var query = 'SELECT * FROM schedules WHERE id = ?';
+    db.execute(query, [ scheduleId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        // The schedule id is unknown
+        if (data.rows.length === 0)
+            return callback(null, false);
+
+        // The schedule id is known
+        return callback(null, true);
+    });
+
+};
+
+/**
  * Check if the language is a known language
  * 
  * @param  {String}  language   Locale language
