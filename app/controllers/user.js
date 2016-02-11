@@ -188,6 +188,15 @@ UserController.createUser = function (email, first_name, last_name, password, ca
     var user = new User(email, first_name, last_name, password);
 
     async.series({
+
+        checkHasAllInformations: function (done) {
+
+            if (!Validator.user.hasAllInformations(email, first_name, last_name, password))
+                return done(new Error('Missing one parameter'));
+
+            return done();
+
+        },
         checkEmail: function (done) { 
 
             User.getUserIdByEmail(email, function (err, result) {
@@ -338,7 +347,7 @@ UserController.remove = function (loodle_id, user_id, callback) {
  */
 UserController.get = function (user_id, callback) {
 
-    Validator.isAKnownUserId(user_id, function (err, result) {
+    Validator.user.KnownId(user_id, function (err, result) {
         if (err) return callback(err);
 
         if (!result)

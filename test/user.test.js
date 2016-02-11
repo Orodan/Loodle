@@ -76,12 +76,32 @@ describe('User', function () {
 			assert.equal(result.status, 'registred');
 		});
 
-		it('should send back an error if the email is already used', function (done) {
+		it('should send an error if the email is already used', function (done) {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
 				try {
 					assert.equal(err,'This email is already used');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if one information is missing', function (done) {
+
+			User.createUser(riri.email, riri.first_name, riri.last_name, '', function (err, data) {
+
+				result = data;
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Missing one parameter');
 				}
 				catch (e) {
 					return done(e);
