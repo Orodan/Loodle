@@ -322,16 +322,6 @@ Loodle.removeSchedule = function (loodle_id, schedule_id, callback) {
 
 };
 
-Loodle.removeAssociationLoodleSchedules = function (loodle_id, callback) {
-
-	var query = 'DELETE FROM schedule_by_doodle WHERE doodle_id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
 Loodle.getUserIds = function (loodle_id, callback) {
 
 	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';

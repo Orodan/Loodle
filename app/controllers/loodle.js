@@ -486,14 +486,9 @@ LoodleController.remove = function (loodle_id, callback) {
 				function (schedule_ids, end) {
 
 					async.each(schedule_ids, function (schedule_id, finish) {
-						Loodle.removeSchedule(loodle_id, schedule_id, finish);
+						LoodleController.deleteSchedule(loodle_id, schedule_id, finish);
 					}, end);
 
-				},
-
-				// Delete the association loodle - schedule
-				function (end) {
-					Loodle.removeAssociationLoodleSchedules(loodle_id, end);
 				}
 			], done);
 

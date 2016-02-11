@@ -175,7 +175,7 @@ describe('Loodle', function () {
 		
 		it('should add the schedule to the loodle', function (done) {
 
-			Loodle.addSchedule(result.id, '10/02/2016 17:08', '10/02/2016 17:10', 'fr', function (err, data) {
+			Loodle.addSchedule(result.id, '10/02/2016 17:10', '10/02/2016 17:12', 'fr', function (err, data) {
 
 				try {
 					assert.equal(err, null);
