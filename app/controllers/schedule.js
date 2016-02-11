@@ -75,6 +75,8 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, l
 	var moment_begin_time,
 		moment_end_time;
 
+	// We are forced to adapt the creation of moment object according to the language
+	// otherwise it works but creates random dates by confusing date informations
 	if (lang == 'en') {
 		moment_begin_time = moment(begin_time, 'MM-DD-YYYY LT');
 		moment_end_time = moment(end_time, 'MM-DD-YYYY LT');
@@ -83,10 +85,11 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, l
 		moment_begin_time = moment(begin_time, 'DD-MM-YYYY HH:mm');
 		moment_end_time = moment(end_time, 'DD-MM-YYYY HH:mm');
 	}
+	else {
+		return callback(new Error('Unknown language'));
+	}
 
 	var schedule = new Schedule(moment_begin_time.format(), moment_end_time.format());
-
-	console.log('Schedule : ', schedule);
 
 	async.parallel({
 		// Save the schedule
@@ -136,7 +139,6 @@ ScheduleController.checkSchedule = function (begin_time, end_time, lang, callbac
 		moment_end_time = moment(end_time, 'MM-DD-YYYY LT');
 	}
 	else if (lang == 'fr') {
-		console.log('fr');
 		moment_begin_time = moment(begin_time, 'DD-MM-YYYY HH:mm');
 		moment_end_time = moment(end_time, 'DD-MM-YYYY HH:mm');
 	}
