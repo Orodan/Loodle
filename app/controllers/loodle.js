@@ -614,6 +614,19 @@ LoodleController.delete = function (loodle_id, callback) {
 
 	async.series({
 
+		// Validate the loodle id is known
+		loodleIdIsKnown: function (end) {
+			Validator.loodle.knownId(loodle_id, function (err, result) {
+
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown loodle id'));
+
+				return end();
+			});
+		},
+
 		// Delete schedules
 		deleteSchedules: function (done) {
 
@@ -795,7 +808,11 @@ LoodleController.delete = function (loodle_id, callback) {
 
 		},
 
-	}, callback);
+	}, function (err) {
+		if (err) return callback(err);
+
+		return callback(null, 'Loodle deleted');
+	});
 
 };
 

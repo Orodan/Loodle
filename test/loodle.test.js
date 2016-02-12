@@ -763,9 +763,76 @@ describe('Loodle', function () {
 
 	describe('remove', function () {
 
-		it('should remove the loodle');
+		var loodle = {
+			'name': 'Mon super loodle',
+			'description': 'Ma super description'
+		};
 
-		it('should ')
+		// We need a loodle to play with
+		before(function (done) {
+
+			Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+				if (err) return done(err);
+
+				loodle = data;
+				return done();
+			});
+
+		});
+
+		it('should remove the loodle', function (done) {
+
+			Loodle.delete(loodle.id, function (err, result) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(result, 'Loodle deleted');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id unknown', function (done) {
+
+			Loodle.delete('00000000-0000-0000-0000-000000000000', function (err, result) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+			Loodle.delete('abibg', function (err, result) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
 
 	});
 
