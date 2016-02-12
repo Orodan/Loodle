@@ -124,7 +124,7 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
 
    		// Validate the loodle id is known
 		loodleIdIsKnown: function (end) {
-			Validator.loodle.KnownId(loodle_id, function (err, result) {
+			Validator.loodle.knownId(loodle_id, function (err, result) {
 
 				if (err) return end(err);
 
@@ -137,7 +137,7 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
 
 		// Validate the user id is known
 		userIdIsKnown: function (end) {
-			Validator.user.KnownId(user_id, function (err, result) {
+			Validator.user.knownId(user_id, function (err, result) {
 
 				if (err) return end(err);
 
@@ -150,7 +150,7 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
 
    		// Validate the user is not already in the loodle
    		userAlreadyInLoodle: function (end) {
-   			Validator.user.alreadyInLoodle(loodle_id, user_id, function (err, result) {
+   			Validator.user.isInLoodle(loodle_id, user_id, function (err, result) {
    				if (err) return end(err);
 
    				if (result)
@@ -207,7 +207,7 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 	if (!Validator.loodle.hasAllInformations(name))
 		return callback(new Error('Missing one parameter'));
 
-	Validator.user.KnownId(user_id, function (err, result) {
+	Validator.user.knownId(user_id, function (err, result) {
 		if (err) return callback(err);
 
 		if (!result)
@@ -262,7 +262,7 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 
 		// Validate the loodle id is known
 		loodleIdIsKnown: function (end) {
-			Validator.loodle.KnownId(loodle_id, function (err, result) {
+			Validator.loodle.knownId(loodle_id, function (err, result) {
 
 				if (err) return end(err);
 
@@ -275,7 +275,7 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 
 		// Validate the schedule id is known
 		scheduleIdIsKnown: function (end) {
-			Validator.schedule.KnownId(schedule_id, function (err, result) {
+			Validator.schedule.knownId(schedule_id, function (err, result) {
 
 				if (err) return end(err);
 
@@ -329,39 +329,110 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
  */
 LoodleController.removeUser = function (loodle_id, user_id, callback) {
 
-	// Delete the association user - loodle
-	// Delete votes of the user for each schedule of the loodle
-	// Delete user configuration for the loodle
-	// Delete user if he/she was temporary
+	async.series({
 
-	async.parallel({
+		// Check if this loodle id is unknown
+		loodleIdIsKnown: function (end) {
 
-        // Delete the association user - loodle
-        removeUserFromLoodle: function (done) {
-            Loodle.removeUser(loodle_id, user_id, done);
-        },
+			Validator.loodle.knownId(loodle_id, function (err, result) {
+				if (err) return end(err);
 
-        // Delete the votes of the user for each schedules of the loodle
-        deleteVotes: function (done) {
-            User.deleteVotes(user_id, loodle_id, done);
-        },
+				if (!result)
+					return end(new ReferenceError('Unknown loodle id'));
 
-        // Delete user configuration for the loodle
-        deleteConfiguration: function (done) {
-        	Configuration.delete(user_id, loodle_id, done);
-        },
+				return end();
+			});
 
-        // Delete user if he/she was temporary
-        deleteUser: function (done) {
-        	User.deleteIfTemporary(user_id, done);
-        }
+		},
 
-    }, function (err) {
-    	if (err)
-    		return callback(err);
+		// Check if this user id is unknown
+		userIdIsKnown: function (end) {
 
-    	return callback(null, 'user removed');
-    });
+			Validator.user.knownId(user_id, function (err, result) {
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown user id'));
+
+				return end();
+			});
+
+		},
+
+		// Check if the user is indeed in the loodle
+		isInLoodle: function (end) {
+
+			Validator.user.isInLoodle(loodle_id, user_id, function (err, result) {
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('The user is not present is the loodle'));
+
+				return end();
+			});
+
+		},
+
+		isTheLastUser: function (end) {
+
+			// Get the users of the loodle to check if the one we want to delete is the last one
+			// If that's the case, we must delete the loodle itself
+			Loodle.getUserIds(loodle_id, function (err, user_ids) {
+				if (err) return end(err);
+
+				if (user_ids.length === 1) {
+					// The user we want to remove is the last user present in the loodle
+					if (user_ids[0].equals(user_id)) {
+						LoodleController.remove(loodle_id, function (err) {
+							if (err) return end(err);
+
+							return callback(null, 'Loodle deleted');
+						});
+					}
+					else {
+						return end(new ReferenceError('The user is not present in the loodle'));
+					}
+				}
+				else
+					return end();
+
+			})
+		},
+
+		// Remove user
+		removeUser: function (end) {
+
+			async.parallel({
+
+				// Delete the association user - loodle
+				removeUserFromLoodle: function (done) {
+					Loodle.removeUser(loodle_id, user_id, done);
+				},
+
+				// Delete the votes of the user for each schedules of the loodle
+				deleteVotes: function (done) {
+					User.deleteVotes(user_id, loodle_id, done);
+				},
+
+				// Delete user configuration for the loodle
+				deleteConfiguration: function (done) {
+					Configuration.delete(user_id, loodle_id, done);
+				},
+
+				// Delete user if he/she was temporary
+				deleteUser: function (done) {
+					User.deleteIfTemporary(user_id, done);
+				}
+
+			}, end);
+
+		}
+	}, function (err) {
+
+		if (err) return callback(err);
+
+		return callback(null, 'User removed');
+	});
 
 };
 
@@ -900,7 +971,7 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 	if (!Validator.schedule.isOnTheSameDay(begin_time, end_time, language)) 
 		return callback(new Error('Schedule is not on the same day'));
 
-	Validator.loodle.KnownId(loodle_id, function (err, result) {
+	Validator.loodle.knownId(loodle_id, function (err, result) {
 		if (err) return callback(err);
 
 		if (!result)

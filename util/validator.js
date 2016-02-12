@@ -13,7 +13,7 @@ Validator.user = {};
  * @param  {String}   userId        User identifier
  * @param  {Function} callback      Standard callback function 
  */
-Validator.user.alreadyInLoodle = function (loodleId, userId, callback) {
+Validator.user.isInLoodle = function (loodleId, userId, callback) {
 
     var query = 'SELECT * FROM user_by_doodle WHERE doodle_id = ? AND user_id = ?';
     db.execute(query, [ loodleId, userId ], { prepare : true }, function (err, data) {
@@ -60,7 +60,7 @@ Validator.user.hasAllInformations = function (email, first_name, last_name, pass
  * @param  {String}   userId        User identifier
  * @param  {Function} callback      Standard callback function
  */
-Validator.user.KnownId = function (userId, callback) {
+Validator.user.knownId = function (userId, callback) {
 
     var query = 'SELECT * FROM users WHERE id = ?';
     db.execute(query, [ userId ], { prepare : true }, function (err, data) {
@@ -103,7 +103,7 @@ Validator.loodle.hasAllInformations = function (name) {
  * @param  {String}   loodleId      Loodle identifier
  * @param  {Function} callback      Standard callback function
  */
-Validator.loodle.KnownId = function (loodleId, callback) {
+Validator.loodle.knownId = function (loodleId, callback) {
 
     var query = 'SELECT * FROM doodles WHERE id = ?';
     db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
@@ -129,7 +129,7 @@ Validator.schedule = {};
  * @param  {String}   loodleId      Schedule identifier
  * @param  {Function} callback      Standard callback function
  */
-Validator.schedule.KnownId = function (scheduleId, callback) {
+Validator.schedule.knownId = function (scheduleId, callback) {
 
     var query = 'SELECT * FROM schedules WHERE id = ?';
     db.execute(query, [ scheduleId ], { prepare : true }, function (err, data) {

@@ -576,4 +576,205 @@ describe('Loodle', function () {
 
 	});
 
+	describe('removeUser', function () {
+
+		var loodle = {
+			'name': 'Mon super loodle',
+			'description': 'Ma super description'
+		};
+
+		var fifi = {
+			email: "fifiduck@gmail.com",
+			first_name: "Fifi",
+			last_name: "Duck",
+			password: "mypassword"
+		};
+
+		// For this test we need one loodle with two users inside
+		before(function (done) {
+
+			async.series({
+
+				// Create the loodle using Riri
+				createLoodle: function (end) {
+					Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+						if (err) return end(err);
+
+						loodle = data;
+						return end();
+					})
+				},
+
+				// Create Fifi
+				createFifi: function (end) {
+					User.createUser(fifi.email, fifi.first_name, fifi.last_name, fifi.password, function (err, data) {
+						if (err) return end(err);
+
+						fifi = data;
+						return end(err);
+					});
+				},
+
+				// Add him to the loodle
+				addFifiToLoodle: function (end) {
+					Loodle.addUser(loodle.id, fifi.id, end);
+				}
+			}, done);
+
+		});
+
+		// Delete the loodle we played with and the fifi user
+		// ! Once the tests will succed we will not need to delete the loodle anymore
+		after(function (done) {
+
+
+			async.series({
+
+				// Delete the loodle
+				deleteLoodle: function (end) {
+					Loodle.remove(loodle.id, end);
+				},
+
+				// Delete Fifi
+				deleteFifi: function (end) {
+					User.delete(fifi.id, end);
+				}
+
+			}, done);
+
+		});
+
+		it('should remove the user from the loodle', function (done) {
+
+			Loodle.removeUser(loodle.id, fifi.id, function (err, result) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(result, 'User removed');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the user is not present in the loodle', function (done) {
+
+			Loodle.removeUser(loodle.id, fifi.id, function (err, result) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'The user is not present is the loodle');
+					assert.equal(result, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is unknwon', function (done) {
+
+			Loodle.removeUser('00000000-0000-0000-0000-000000000000', riri.id, function (err, result) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+					assert.equal(result, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+			Loodle.removeUser('agabaigb', riri.id, function (err, result) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(result, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the user id is unknwon', function (done) {
+
+			Loodle.removeUser(loodle.id, '00000000-0000-0000-0000-000000000000', function (err, result) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown user id');
+					assert.equal(result, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});;
+
+		it('should send an error if the user id is not a valid uuid', function (done) {
+
+			Loodle.removeUser(loodle.id, 'auhfuoahoh', function (err, result) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(result, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should delete the loodle if the removed person was the last one in it', function (done) {
+
+			Loodle.removeUser(loodle.id, riri.id, function (err, result) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(result, 'Loodle deleted');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
 });

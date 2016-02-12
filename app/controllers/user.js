@@ -347,7 +347,7 @@ UserController.remove = function (loodle_id, user_id, callback) {
  */
 UserController.get = function (user_id, callback) {
 
-    Validator.user.KnownId(user_id, function (err, result) {
+    Validator.user.knownId(user_id, function (err, result) {
         if (err) return callback(err);
 
         if (!result)
