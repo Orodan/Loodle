@@ -156,7 +156,7 @@ router.delete('/loodle/:loodleId/schedule/:scheduleId', Loodle._deleteSchedule);
 
 router.delete('/loodle/:id', function (req, res) {
 
-	Loodle.remove(req.params.id, function (err) {
+	Loodle.delete(req.params.id, function (err) {
 
 		if (err)
 			return error(res, err);

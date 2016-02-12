@@ -281,7 +281,7 @@ Loodle.getLoodleIdsOfUser = function (user_id, callback) {
 		});
 };
 
-Loodle.remove = function (loodle_id, callback) {
+Loodle.delete = function (loodle_id, callback) {
 
 	var query = 'DELETE FROM doodles WHERE id = ?';
 	db.execute(query

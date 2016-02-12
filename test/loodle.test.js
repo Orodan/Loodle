@@ -63,7 +63,7 @@ describe('Loodle', function () {
 		var result;
 
 		after(function (done) {
-			Loodle.remove(result.id, done);
+			Loodle.delete(result.id, done);
 		});
 
 		it('should create the loodle', function (done) {
@@ -170,7 +170,7 @@ describe('Loodle', function () {
 
 		// Delete the created loodle
 		after(function (done) {
-			Loodle.remove(result.id, done);
+			Loodle.delete(result.id, done);
 		});
 
 		
@@ -315,7 +315,7 @@ describe('Loodle', function () {
 
 		// Delete the created loodle
 		after(function (done) {
-			Loodle.remove(result.id, done);
+			Loodle.delete(result.id, done);
 		});
 
 		it('should delete the schedule', function (done) {
@@ -460,7 +460,7 @@ describe('Loodle', function () {
 		after(function (done) {
 
 			async.series([
-				async.apply(Loodle.remove, result.id),
+				async.apply(Loodle.delete, result.id),
 				async.apply(User.delete, fifi.id)
 			], done);
 
@@ -623,25 +623,9 @@ describe('Loodle', function () {
 
 		});
 
-		// Delete the loodle we played with and the fifi user
-		// ! Once the tests will succed we will not need to delete the loodle anymore
+		// Delete Fifi (the loodle we played with has already been deleted during the test)
 		after(function (done) {
-
-
-			async.series({
-
-				// Delete the loodle
-				deleteLoodle: function (end) {
-					Loodle.remove(loodle.id, end);
-				},
-
-				// Delete Fifi
-				deleteFifi: function (end) {
-					User.delete(fifi.id, end);
-				}
-
-			}, done);
-
+			User.delete(fifi.id, done);
 		});
 
 		it('should remove the user from the loodle', function (done) {
@@ -774,6 +758,14 @@ describe('Loodle', function () {
 			});
 
 		});
+
+	});
+
+	describe('remove', function () {
+
+		it('should remove the loodle');
+
+		it('should ')
 
 	});
 

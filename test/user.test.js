@@ -134,7 +134,7 @@ describe('User', function () {
 
 		// Delete the loodle
 		after(function (done) {
-			Loodle.remove(loodle.id, done);
+			Loodle.delete(loodle.id, done);
 		});
 
 		it('should send back the user data', function (done) {
@@ -323,7 +323,7 @@ describe('User', function () {
 		after(function (done) {
 
 			async.parallel([
-				async.apply(Loodle.remove, loodle.id),
+				async.apply(Loodle.delete, loodle.id),
 				async.apply(User.delete, myUser.id)
 			], done)
 

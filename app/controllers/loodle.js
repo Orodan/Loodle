@@ -383,7 +383,7 @@ LoodleController.removeUser = function (loodle_id, user_id, callback) {
 				if (user_ids.length === 1) {
 					// The user we want to remove is the last user present in the loodle
 					if (user_ids[0].equals(user_id)) {
-						LoodleController.remove(loodle_id, function (err) {
+						LoodleController.delete(loodle_id, function (err) {
 							if (err) return end(err);
 
 							return callback(null, 'Loodle deleted');
@@ -584,7 +584,7 @@ LoodleController.getLoodlesOfUser = function (req, res) {
  * @param  {String}   loodle_id 	Loodle identifier
  * @param  {Function} callback  	Standard callback function
  */
-LoodleController.remove = function (loodle_id, callback) {
+LoodleController.delete = function (loodle_id, callback) {
 
 	// Delete the loodle
 
@@ -638,7 +638,7 @@ LoodleController.remove = function (loodle_id, callback) {
 
 		// Delete the loodle
 		deleteLoodle: function (done) {
-			Loodle.remove(loodle_id, done);
+			Loodle.delete(loodle_id, done);
 		},
 
 		// Delete votes

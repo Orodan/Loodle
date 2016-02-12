@@ -197,7 +197,7 @@ router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration.update
 
 router.delete('/loodle/:id', function (req, res) {
 
-	Loodle.remove(req.params.id, function (err) {
+	Loodle.delete(req.params.id, function (err) {
 		if (err)
 			throw new Error(err);
 
