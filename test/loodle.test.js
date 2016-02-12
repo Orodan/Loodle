@@ -13,7 +13,6 @@ describe('Loodle', function () {
 		last_name: "Duck",
 		password: "mypassword"
 	};
-	var savedUser;
 
 	// For every test we are going to use the user riri
 	before(function (done) {
@@ -761,7 +760,7 @@ describe('Loodle', function () {
 
 	});
 
-	describe('remove', function () {
+	describe('delete', function () {
 
 		var loodle = {
 			'name': 'Mon super loodle',
@@ -780,7 +779,7 @@ describe('Loodle', function () {
 
 		});
 
-		it('should remove the loodle', function (done) {
+		it('should delete the loodle', function (done) {
 
 			Loodle.delete(loodle.id, function (err, result) {
 
@@ -798,7 +797,7 @@ describe('Loodle', function () {
 
 		});
 
-		it('should send an error if the loodle id unknown', function (done) {
+		it('should send an error if the loodle id is unknown', function (done) {
 
 			Loodle.delete('00000000-0000-0000-0000-000000000000', function (err, result) {
 

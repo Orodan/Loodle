@@ -138,7 +138,7 @@ router.put('/loodle/:id/votes', function (req, res) {
 
 });
 **/
-router.put('/loodle/votes', Vote.updateVotes);
+router.put('/loodle/:id/votes', Vote._updateVotes);
 
 router.put('/loodle/:id/configuration', Configuration.update);
 

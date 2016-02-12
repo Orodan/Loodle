@@ -182,7 +182,7 @@ router.post('/data/public/loodle', Loodle._createPublicLoodle);
 
 // PUT =====================================================
 
-router.put('/loodle/:id/votes', Vote.updateVotes);
+router.put('/loodle/:id/votes', Vote._updateVotes);
 
 router.put('/data/notification/:id', Notification.markAsRead);
 

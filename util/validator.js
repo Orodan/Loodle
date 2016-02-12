@@ -187,4 +187,40 @@ Validator.schedule.isOnTheSameDay = function (begin_time, end_time, lang) {
 
 };
 
+// Vote validation
+Validator.vote = {};
+
+/**
+ * Check if the vote value is 0 or 1
+ * 
+ * @param  {int}        vote    Vote value
+ * @return {Boolean}            True if the vote value is in range, false otherwise
+ */
+Validator.vote.isInRange = function (vote) {
+
+    return (vote === 0 || vote === 1);
+
+};
+
+/**
+ * Check if the vote id match a vote in db
+ * 
+ * @param  {String}   voteId        Vote identifier
+ * @param  {Function} callback      Standard callback function
+ */
+Validator.vote.knownId = function (voteId, callback) {
+
+    var query = 'SELECT * FROM votes WHERE id = ?';
+    db.execute(query, [ voteId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        if (data.rows.length === 0)
+            return callback(null, false);
+
+        return callback(null, true);
+    });
+
+};
+
+
 module.exports = Validator;

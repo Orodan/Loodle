@@ -5,6 +5,8 @@ var Vote                   = require('../models/vote.model');
 var NotificationController = require('./notification');
 var Loodle                 = require('../models/loodle.model');
 
+var Validator 			   = require('../../util/validator');
+
 var VoteController = {};
 
 var defaultValue = 0;
@@ -182,36 +184,114 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 
 };
 
-VoteController.updateVotes = function (req, res) {
+VoteController._updateVotes = function (req, res) {
 
-	var user_id;
+	var userId;
 
-	// Authenticated mode
-	if (req.user) 
-		user_id = req.user.id;
-	// Non authenticated mode
+	if (req.user)
+		userId = req.user.id;
 	else
-		user_id = req.body.user_id;
+		userId = req.body.user_id;
 
-	// Update the votes
-	// Send the notifications
-	
-	async.parallel({
-		updateVotes: function (done) {
-			async.forEachOf(req.body, function(value, key, end) {
-				Vote.update(key, value, end);
-			}, done);
-		},
-		notify: function (done) {
-			NotificationController.notify(req.params.id, user_id, done);
-		}
-	}, function (err) {
-		if (err)
-			return error(res, err);
+	VoteController.updateVotes(req.params.id, userId, req.body.votes, function (err, result) {
+		if (err) return error(res, err);
 
 		return success(res, 'Vote(s) updated');
 	});
 
+};
+
+/**
+ * Update the loodle's votes of the user
+ * 
+ * @param  {String}   	loodleId 		Loodle identifier
+ * @param  {String}   	userId   		User identifier
+ * @param  {Array}   	votes    		Vote's array
+ * @param  {Function} 	callback 		Standard callback function
+ */
+VoteController.updateVotes = function (loodleId, userId, votes, callback) {
+
+	// Check if the vote value are all 0 or 1
+	async.series({
+
+		// Validate the loodle id is known
+		loodleIdIsKnown: function (end) {
+
+			Validator.loodle.knownId(loodleId, function (err, result) {
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown loodle id'));
+
+				return end();
+			});
+
+		},
+
+		// Validate the user id is known
+		userIdIsKnown: function (end) {
+
+			Validator.user.knownId(userId, function (err, result) {
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown user id'));
+
+				return end();
+			});
+
+		},
+
+		// Validate the vote ids are known
+		voteIdsAreKnown: function (end) {
+
+			async.each(votes, function (vote, done) {
+				Validator.vote.knownId(vote.id, function (err, result) {
+					if (err) return done(err);
+
+					if (!result)
+						return done(new ReferenceError('Unknown vote id'));
+
+					return done();
+				});
+			}, end);
+
+		},
+
+		// Check if the votes value are all 0 or 1
+		checkVoteValueRange: function (end) {
+
+			async.each(votes, function (vote, done) {
+				if (!Validator.vote.isInRange(vote.vote))
+					return done(new RangeError('Vote value should be 0 or 1'));
+
+				return done();
+			}, end);
+
+		},
+
+		// Update votes
+		updateVotes: function (end) {
+
+			async.parallel({
+				updateVotes: function (done) {
+					async.each(votes, function(vote, end) {
+						Vote.update(vote.id, vote.vote, end);
+					}, done);
+				},
+				notify: function (done) {
+					NotificationController.notify(loodleId, userId, done);
+				}
+			}, end);
+
+		}
+
+
+	}, function (err) {
+		if (err) return callback(err);
+
+		return callback(null, 'Vote(s) updated');
+	});
 
 };
 

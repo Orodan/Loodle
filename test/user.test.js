@@ -50,7 +50,7 @@ describe('User', function () {
 
 		});
 
-		it('should send the user data', function (done) {
+		it('should create the user', function (done) {
 
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
@@ -137,7 +137,7 @@ describe('User', function () {
 			Loodle.delete(loodle.id, done);
 		});
 
-		it('should send back the user data', function (done) {
+		it('should create the public user', function (done) {
 
 			User.createPublicUser(loodle.id, riri.first_name, riri.last_name, function (err, data) {
 
