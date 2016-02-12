@@ -119,30 +119,76 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
     // Create link loodle - user
     // Create default votes for each schedule of the loodle
     // Create default configuration for the user on the loodle
-    
-    async.parallel({
+   	
+   	async.series({
 
-    	// Create link loodle - user
-    	bind: function (done) {
-    		Loodle.bindUser(user_id, loodle_id, done);
-    	},
+   		// Validate the loodle id is known
+		loodleIdIsKnown: function (end) {
+			Validator.loodle.KnownId(loodle_id, function (err, result) {
 
-    	// Create default configuration
-    	createDefaultConfiguration: function (done) {
-    		Configuration.createDefaultConfiguration(user_id, loodle_id, done);
-    	},
+				if (err) return end(err);
 
-    	// Create default votes for user
-    	createDefaultVotes: function (done) {
-    		Vote.createDefaultVotesForUser(loodle_id, user_id, done);
-    	}
+				if (!result)
+					return end(new ReferenceError('Unknown loodle id'));
 
-    }, function (err) {
-    	if (err)
-    		return callback(err);
+				return end();
+			});
+		},
 
-    	return callback(null, 'User added');
-    });
+		// Validate the user id is known
+		userIdIsKnown: function (end) {
+			Validator.user.KnownId(user_id, function (err, result) {
+
+				if (err) return end(err);
+
+				if (!result)
+					return end(new ReferenceError('Unknown user id'));
+
+				return end();
+			});
+		},
+
+   		// Validate the user is not already in the loodle
+   		userAlreadyInLoodle: function (end) {
+   			Validator.user.alreadyInLoodle(loodle_id, user_id, function (err, result) {
+   				if (err) return end(err);
+
+   				if (result)
+   					return end(new Error('User already present in loodle'));
+
+   				return end();
+   			});
+   		},
+
+   		// Add the user to the loodle
+   		addUser: function (end) {
+
+   			async.parallel({
+
+   				// Create link loodle - user
+   				bind: function (done) {
+   					Loodle.bindUser(user_id, loodle_id, done);
+   				},
+
+   				// Create default configuration
+   				createDefaultConfiguration: function (done) {
+   					Configuration.createDefaultConfiguration(user_id, loodle_id, done);
+   				},
+
+   				// Create default votes for user
+   				createDefaultVotes: function (done) {
+   					Vote.createDefaultVotesForUser(loodle_id, user_id, done);
+   				}
+
+   			}, end);
+
+   		}
+
+   	}, function (err) {
+   		if (err) return callback(err);
+
+   		return callback(null, 'User added');
+   	});
 
 };
 

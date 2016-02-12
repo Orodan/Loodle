@@ -7,6 +7,28 @@ var Validator = {};
 Validator.user = {};
 
 /**
+ * Check if the user is already associated with the loodle
+ * 
+ * @param  {String}   loodleId      Loodle identifier
+ * @param  {String}   userId        User identifier
+ * @param  {Function} callback      Standard callback function 
+ */
+Validator.user.alreadyInLoodle = function (loodleId, userId, callback) {
+
+    var query = 'SELECT * FROM user_by_doodle WHERE doodle_id = ? AND user_id = ?';
+    db.execute(query, [ loodleId, userId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        // The user was found already associated with the loodle
+        if (data.rows.length != 0) 
+            return callback(null, true);
+
+        return callback(null, false);
+    })
+
+};
+
+/**
  * Check if all the informations required to create an user were given
  * 
  * @param  {String}  email          User email

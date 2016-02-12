@@ -20,14 +20,14 @@ describe('Loodle', function () {
 
 		// Ensure that the user email we're going to test is not already used
 		UserModel.getUserIdByEmail(riri.email, function (err, userId) {
-            if (err)
-            	return done(err);
+            if (err) return done(err);
 
             // This email is already used, we modify the our test user email
             if (userId)
             	riri.email = riri.email.split('@')[0] + riri.email.split('@')[0] + '@' + riri.email.split('@')[1];
 
         	User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
+        		if (err) return done(err);
 
         		riri = data;
         		return done();
@@ -66,7 +66,7 @@ describe('Loodle', function () {
 			Loodle.remove(result.id, done);
 		});
 
-		it('should send the loodle data', function (done) {
+		it('should create the loodle', function (done) {
 
 			Loodle.createLoodle(riri.id, myLoodle.name, myLoodle.description, function (err, loodle) {
 
@@ -400,6 +400,169 @@ describe('Loodle', function () {
 					assert.equal(err.name, 'TypeError');
 					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
 					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
+	describe('addUser', function () {
+
+		var myLoodle = {
+			'name': 'Mon super loodle',
+			'description': 'Ma super description'
+		};
+		var result;
+
+		var fifi = {
+			email: "fifiduck@gmail.com",
+			first_name: "Fifi",
+			last_name: "Duck",
+			password: "mypassword"
+		};
+
+		before(function (done) {
+
+			async.parallel({
+
+				// Create a loodle
+				createLoodle: function (end) {
+					Loodle.createLoodle(riri.id, myLoodle.name, myLoodle.description, function (err, loodle) {
+						if (err) return end(err);
+
+						result = loodle;
+						return end();
+					});
+				},
+
+				// Create Fifi user
+				createUser: function (end) {
+					User.createUser(fifi.email, fifi.first_name, fifi.last_name, fifi.password, function (err, data) {
+						if (err) return end(err);
+
+						fifi = data;
+						return end();
+					});
+				}
+
+			}, done);
+
+		});
+
+		// Delete the created loodle
+		after(function (done) {
+
+			async.series([
+				async.apply(Loodle.remove, result.id),
+				async.apply(User.delete, fifi.id)
+			], done);
+
+		});
+
+		it('should add the user to the loodle', function (done) {
+			
+			Loodle.addUser(result.id, fifi.id, function (err, result) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(result, 'User added');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the user is already added to the user', function (done) {
+			
+			Loodle.addUser(result.id, fifi.id, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'User already present in loodle');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is unknown', function (done) {
+			
+			Loodle.addUser('00000000-0000-0000-0000-000000000000', fifi.id, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is not a valid uuid', function (done) {
+			
+			Loodle.addUser('lgzgojz', fifi.id, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the user id is unknown', function (done) {
+			
+			Loodle.addUser(result.id, '00000000-0000-0000-0000-000000000000', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown user id');
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the user id is not a valid uuid', function (done) {
+			
+			Loodle.addUser(result.id, 'jzhob', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
 				}
 				catch (e) {
 					return done(e);
