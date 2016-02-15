@@ -19,9 +19,7 @@ router.use(function (err, req, res, next) {
 
   if (err.name === 'UnauthorizedError') {
     res.status(401);
-    return res.json({
-      data: 'Unauthorized'
-    });
+    return res.json('Unauthorized');
   }
 
 });

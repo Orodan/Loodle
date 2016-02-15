@@ -111,10 +111,10 @@ function reply (res, err, data) {
             data = 500;
 
         res.status(data);
-        return res.json(err)
+        return res.json({"data": err});
     }
 
-    return res.json(data);
+    return res.json({"data": data});
 }
 
 // User controller features ===========================================

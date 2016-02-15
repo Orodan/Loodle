@@ -1,7 +1,6 @@
 var assert    = require('assert');
 var async     = require('async');
 var request   = require('supertest');
-var http      = require('http');
 
 var User      = require('../app/controllers/user');
 
@@ -32,12 +31,12 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.equal(res.body.email, fifi.email);
-                        assert.equal(res.body.first_name, fifi.first_name);
-                        assert.equal(res.body.last_name, fifi.last_name);
-                        assert.equal(res.body.status, 'registred');
+                        assert.equal(res.body.data.email, fifi.email);
+                        assert.equal(res.body.data.first_name, fifi.first_name);
+                        assert.equal(res.body.data.last_name, fifi.last_name);
+                        assert.equal(res.body.data.status, 'registred');
 
-                        fifi = res.body;
+                        fifi = res.body.data;
                     }
                     catch (e) {
                         return done(e);
@@ -58,7 +57,7 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.equal(res.body, 'This email is already used');
+                        assert.equal(res.body.data, 'This email is already used');
                     }
                     catch (e) {
                         return done(e);
@@ -85,7 +84,7 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.equal(res.body, 'Last name required');
+                        assert.equal(res.body.data, 'Last name required');
                     }
                     catch (e) {
                         return done(e);
@@ -138,7 +137,7 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.notEqual(res.body, null);
+                        assert.notEqual(res.body.data, null);
                     }
                     catch (e) {
                         return done(e);
@@ -164,7 +163,7 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.equal(res.body, 'No user found');
+                        assert.equal(res.body.data, 'No user found');
                     }
                     catch (e) {
                         return done(e);
@@ -189,7 +188,7 @@ describe('API User', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        assert.equal(res.body, 'Email required');
+                        assert.equal(res.body.data, 'Email required');
                     }
                     catch (e) {
                         return done(e);

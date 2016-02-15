@@ -64,6 +64,8 @@ LoodleController._createLoodle = function (req, res) {
 	// - req.body.description is optional
 
 	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
+		if (err) return reply(res, err.message, data);
+
 		return reply(res, err, data);
 	});
 
