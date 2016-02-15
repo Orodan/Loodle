@@ -3,6 +3,16 @@ var moment = require('moment');
 
 var Validator = {};
 
+/**
+ * Check if a variable is defined
+ * 
+ * @param  {String}  data   Variable to check
+ * @return {Boolean}        True if the value is defined, false otherwise
+ */
+Validator.isDefined = function (data) {
+    return !(data === undefined);
+}
+
 // User validation
 Validator.user = {};
 

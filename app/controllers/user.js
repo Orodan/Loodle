@@ -28,6 +28,12 @@ var UserController = {};
 // Authenticate the user
 UserController._authenticate = function (req, res) {
 
+    if (!Validator.isDefined(req.body.email))
+        return reply(res, 'Email required', 400);
+
+    if (!Validator.isDefined(req.body.email))
+        return reply(res, 'Password required', 400);
+
     UserController.authenticate(req.body.email, req.body.password, function (err, data) {
         return reply(res, err, data);
     });
@@ -87,11 +93,11 @@ UserController._createUser = function (req, res) {
 function reply (res, err, data) {
 
     if (err) {
-        res.status(500);
-        return res.json({"data": err})
+        res.status(data);
+        return res.json(err)
     }
 
-    return res.json({"data": data});
+    return res.json(data);
 }
 
 // User controller features ===========================================
@@ -113,8 +119,9 @@ UserController.authenticate = function (email, password, callback) {
         if (err)
             return callback(err);
 
-        if (!user)
-            return callback('No user found');
+        if (!user) {
+            return callback('No user found', 404);
+        }
 
         if (!User.validPassword(password, user.password))
             return callback('Wrong password');
