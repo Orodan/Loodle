@@ -81,7 +81,8 @@ describe('User', function () {
 			User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
 
 				try {
-					assert.equal(err,'This email is already used');
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'This email is already used');
 				}
 				catch (e) {
 					return done(e);

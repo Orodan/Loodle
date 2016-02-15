@@ -82,9 +82,23 @@ UserController._createUser = function (req, res) {
     // - email must be defined
     // - password must be defined
 
+    if (!Validator.isDefined(req.body.email))
+        return reply(res, 'Email required', 400);
+
+    if (!Validator.isDefined(req.body.first_name))
+        return reply(res, 'First name required', 400);
+
+    if (!Validator.isDefined(req.body.last_name))
+        return reply(res, 'Last name required', 400);
+
+    if (!Validator.isDefined(req.body.password))
+        return reply(res, 'Password required', 400);
+
     UserController.createUser(req.body.email, req.body.first_name, req.body.last_name, req.body.password
         , function (err, data) {
-            return reply(res, err, data);
+            if (err) return reply(res, err.message, data);
+
+            return reply(res, null, data);
         });
 
 };
@@ -93,6 +107,9 @@ UserController._createUser = function (req, res) {
 function reply (res, err, data) {
 
     if (err) {
+        if (data === undefined)
+            data = 500;
+
         res.status(data);
         return res.json(err)
     }
@@ -204,11 +221,12 @@ UserController.createUser = function (email, first_name, last_name, password, ca
             return done();
 
         },
-        checkEmail: function (done) { 
+        checkEmail: function (done) {
 
             User.getUserIdByEmail(email, function (err, result) {
+
                 if (err) return done (err);
-                if (result) return done('This email is already used');
+                if (result) return done(new Error('This email is already used'));
 
                 return done();
             }); 
@@ -224,7 +242,9 @@ UserController.createUser = function (email, first_name, last_name, password, ca
             
         }
     }, function (err, data) {
-        return callback(err, data.save);
+        if (err) return callback(err);
+
+        return callback(null, data.save);
     });
 
 };

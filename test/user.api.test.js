@@ -9,6 +9,95 @@ var host = '127.0.0.1:3000';
 
 describe('API User', function () {
 
+    describe('POST /user', function () {
+
+        var fifi = {
+            email: 'fifiduck@gmail.com',
+            first_name: 'Firi',
+            last_name: 'Duck',
+            password: 'test'
+        };
+
+        after(function (done) {
+            User.delete(fifi.id, done);
+        });
+
+        it('should create the user', function (done) {
+
+            request(host)
+                .post('/api/user')
+                .set('Accept', 'application/json')
+                .send(fifi)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.email, fifi.email);
+                        assert.equal(res.body.first_name, fifi.first_name);
+                        assert.equal(res.body.last_name, fifi.last_name);
+                        assert.equal(res.body.status, 'registred');
+
+                        fifi = res.body;
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the user email is already used', function (done) {
+
+            request(host)
+                .post('/api/user')
+                .set('Accept', 'application/json')
+                .send(fifi)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body, 'This email is already used');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if one parameter is missing', function (done) {
+
+            var loulou = {
+                email: 'fifiduck@gmail.com',
+                first_name: 'Firi',
+                password: 'test'
+            }
+
+            request(host)
+                .post('/api/user')
+                .set('Accept', 'application/json')
+                .send(loulou)
+                .expect(400)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body, 'Last name required');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+    });
+
     describe('POST /authenticate', function () {
 
         var riri = {
@@ -112,6 +201,5 @@ describe('API User', function () {
         });
 
     });
-
 
 });
