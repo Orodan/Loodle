@@ -11,6 +11,38 @@ var VoteController = {};
 
 var defaultValue = 0;
 
+/////////////////
+// Routes call //
+/////////////////
+
+/**
+ * Route call use to update votes
+ * 
+ * @param  {Object} req 	Incomming request
+ * @param  {Object} res 	Response to send
+ */
+VoteController._updateVotes = function (req, res) {
+
+	var userId;
+
+	if (req.user)
+		userId = req.user.id;
+	else
+		userId = req.body.user_id;
+
+	VoteController.updateVotes(req.params.id, userId, req.body.votes, function (err, result) {
+		if (err) return error(res, err);
+
+		return success(res, 'Vote(s) updated');
+	});
+
+};
+
+
+/////////////////////////////
+// Vote controller feature //
+/////////////////////////////
+
 /**
  * Delete a vote
  * 
@@ -139,6 +171,14 @@ VoteController.createDefaultVotesForUser = function (loodle_id, user_id, callbac
 
 };
 
+/**
+ * Create a default vote the user on the loodle and about the schedule
+ * 
+ * @param  {String}   loodle_id   	Loodle identifier
+ * @param  {String}   user_id     	User identifier
+ * @param  {String}   schedule_id 	Schedule identifier
+ * @param  {Function} callback    	Standard callback function
+ */
 VoteController.createDefaultVote = function (loodle_id, user_id, schedule_id, callback) {
 
 	var vote = new Vote();
@@ -156,7 +196,14 @@ VoteController.createDefaultVote = function (loodle_id, user_id, schedule_id, ca
 
 };
 
-VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callback) {
+/**
+ * Create default votes about the schedule, for all the users of the loodle
+ * 
+ * @param  {String}   loodle_id   	Loodle identifier
+ * @param  {String}   schedule_id 	Schedule identifier
+ * @param  {Function} callback    	Standard callback function
+ */
+VoteController.createDefaultVotesForSchedule = function (loodle_id, schedule_id, callback) {
 
 	// Get the user ids
 	Vote.getUserIdsOfLoodle(loodle_id, function (err, user_ids) {
@@ -180,23 +227,6 @@ VoteController.createVotesForSchedule = function (loodle_id, schedule_id, callba
 			}, done);
 
 		}, callback);
-	});
-
-};
-
-VoteController._updateVotes = function (req, res) {
-
-	var userId;
-
-	if (req.user)
-		userId = req.user.id;
-	else
-		userId = req.body.user_id;
-
-	VoteController.updateVotes(req.params.id, userId, req.body.votes, function (err, result) {
-		if (err) return error(res, err);
-
-		return success(res, 'Vote(s) updated');
 	});
 
 };
@@ -295,13 +325,14 @@ VoteController.updateVotes = function (loodleId, userId, votes, callback) {
 
 };
 
+/**
+ * Delete votes associated with the loodle id and the schedule id
+ * 
+ * @param  {String}   loodle_id   	Loodle identifier
+ * @param  {String}   schedule_id 	Schedule identifier
+ * @param  {Function} callback    	Standard callback function
+ */
 VoteController.deleteVotesFromSchedule = function (loodle_id, schedule_id, callback) {
-
-	// Get vote ids of the schedule
-	// Delete the votes
-	// Delete the association doodle-schedule-vote
-	// Get user ids of the loodle
-	// For each of them, delete the association doodle-user-vote
 
 	async.series([
 		function (done) {
@@ -340,8 +371,16 @@ VoteController.deleteVotesFromSchedule = function (loodle_id, schedule_id, callb
 
 		}
 	], callback);
+	
 };
 
+/**
+ * Delete votes associated with the loodle id and the user id
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {String}   user_id   	User identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
 
 	// Get the vote ids of the user in this loodle
@@ -397,6 +436,13 @@ VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Create default votes for a new user in the loodle
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {String}   user_id   	User identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 VoteController.createDefaultVotesForLoodle = function (loodle_id, user_id, callback) {
 
 	async.waterfall([

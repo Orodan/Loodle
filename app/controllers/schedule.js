@@ -102,7 +102,7 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, l
 		},
 		// Create the default vote for this schedule
 		defaultVotes: function (done) {
-			Vote.createVotesForSchedule(loodle_id, schedule.id, done);
+			Vote.createDefaultVotesForSchedule(loodle_id, schedule.id, done);
 		}
 	}, function (err, results) {
 
