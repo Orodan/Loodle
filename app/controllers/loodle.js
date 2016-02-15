@@ -13,7 +13,9 @@ var Validator = require('../../util/validator');
 
 var LoodleController = {};
 
-// Route calls ========================================================
+/////////////////
+// Route calls //
+/////////////////
 
 // Add a new schedule to a loodle
 LoodleController._addSchedule = function (req, res) {
@@ -103,7 +105,9 @@ function reply (res, err, data) {
     return res.json({"data": data});
 }
 
-// Loodle controller features =========================================
+////////////////////////////////
+// Loodle controller features //
+////////////////////////////////
 
 /**
  * Add a user to a loodle
@@ -878,12 +882,6 @@ LoodleController.check = function (req, res, next) {
 
 LoodleController.inviteUser = function (req, res) {
 
-	// Check if the email is matching a user
-	// Check if the user is not already in the loodle
-	// Check if the user is not already invated to participate
-	// Create the participation request and
-	// bind it to the loodle and the invated user
-
 	var invated_user_id = undefined;
 
 	async.series({
@@ -995,12 +993,6 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 			return callback(new ReferenceError('Unknown loodle id'));
 
 		async.series({
-
-			// Check if the two dates of the schedule are on the same day
-			checkSchedule: function (done) {
-				Schedule.checkSchedule(begin_time, end_time, language, done);
-			},
-
 			// Create the new schedule 
 			createSchedule: function (done) {
 				Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
@@ -1026,37 +1018,55 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
  */
 LoodleController.createPublicLoodle = function (name, description, schedules, locale, callback) {
 
-	var loodle = new Loodle(name, description, 'public');
-	async.parallel({
-		// Save the loodle
-		save: function (done) {
-			loodle.save(done);
+	if (!Validator.loodle.hasAllInformations(name))
+		return callback(new Error('Missing one parameter'));
+
+	if(!Validator.schedule.isAKnownLanguage(locale))
+		return callback(new Error('Unknown language'));
+
+	if (!Validator.loodle.mustHaveAtLeastOneSchedule(schedules))
+		return callback(new Error('At least one schedule is required'));
+
+	async.series({
+
+		checkSchedules: function (end) {
+			async.each(schedules, function (schedule, done) {
+				if (!Validator.schedule.isOnTheSameDay(schedule.begin_time, schedule.end_time, locale))
+					return done(new Error('Schedule is not on the same day'));
+
+				return done();
+			}, end);
 		},
-		// Create and add the schedule to it
-		addSchedule: function (done) {
 
-			async.each(schedules, function (schedule, end) {
+		createLoodle: function (end) {
 
-				async.series({
+			var loodle = new Loodle(name, description, 'public');
 
-					// Check if the two dates of the schedule are on the same day
-					checkSchedule: function (finish) {
-						Schedule.checkSchedule(schedule.begin_time, schedule.end_time, locale, finish);
-					},
+			async.parallel({
+				// Save the loodle
+				save: function (done) {
+					loodle.save(done);
+				},
+				// Create and add the schedule to it
+				addSchedule: function (done) {
 
-					// Create the new schedule 
-					createSchedule: function (finish) {
+					async.each(schedules, function (schedule, finish) {
 						Schedule.createSchedule(loodle.id, schedule.begin_time, schedule.end_time, locale, finish);
-					}
-				}, end);
+					}, done);
 
-			}, done);
+				}
+			}, function (err, results) {
+				if (err) return end(err);
+
+				return end(null, results.save);
+			});
+
 		}
+
 	}, function (err, results) {
-		if (err)
-			return callback(err);
-		
-		return callback(null, results.save);
+		if (err) return callback(err);
+
+		return callback(null, results.createLoodle);
 	});
 
 }

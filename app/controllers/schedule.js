@@ -21,10 +21,8 @@ function reply (res, err, data) {
 /**
  * Delete a schedule
  * 
- * @param  {uuid}   	schedule_id 	schedule identifier
- * @param  {Function} 	callback    	standard callback function
- * 
- * @return {void}               		null or error message
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
  */
 ScheduleController.delete = function (schedule_id, callback) {
 	Schedule.delete(schedule_id, callback);
@@ -36,8 +34,6 @@ ScheduleController.delete = function (schedule_id, callback) {
  * @param  {uuid}   	schedule_id 	schedule identifier
  * @param  {uuid}   	loodle_id   	loodle identifier
  * @param  {Function} 	callback    	standard callback function
- * 
- * @return {void}               		null or error message
  */
 ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
 
@@ -69,7 +65,15 @@ ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
 
 };
 
-// Create the schedule and bind it to the loodle
+/**
+ * Create the schedule and bind it to the loodle
+ * 
+ * @param  {String}   loodle_id  	Loodle identifier
+ * @param  {String}   begin_time 	Begin time of the schedule to create
+ * @param  {String}   end_time   	End time of the schedule to create
+ * @param  {String}   lang       	Locale language
+ * @param  {Function} callback   	Standard callback function
+ */
 ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, lang, callback) {
 
 	var moment_begin_time,
@@ -111,8 +115,16 @@ ScheduleController.createSchedule = function (loodle_id, begin_time, end_time, l
 		
 		return callback(null, results.save);
 	});
-}
 
+};
+
+/**
+ * Delete the specified schedule
+ * 
+ * @param  {String}   loodle_id   	Loodle identifier
+ * @param  {String}   schedule_id 	Schedule identifier
+ * @param  {Function} callback    	Standard callback function
+ */
 ScheduleController.remove = function (loodle_id, schedule_id, callback) {
 
 	async.parallel({
@@ -125,31 +137,6 @@ ScheduleController.remove = function (loodle_id, schedule_id, callback) {
 			Vote.deleteVotesFromSchedule(loodle_id, schedule_id, done);
 		}
 	}, callback);
-
-};
-
-// Check if the begin time and the end time are on the same day
-ScheduleController.checkSchedule = function (begin_time, end_time, lang, callback) {
-
-	var moment_begin_time,
-		moment_end_time;
-
-	if (lang == 'en') {
-		moment_begin_time = moment(begin_time, 'MM-DD-YYYY LT');
-		moment_end_time = moment(end_time, 'MM-DD-YYYY LT');
-	}
-	else if (lang == 'fr') {
-		moment_begin_time = moment(begin_time, 'DD-MM-YYYY HH:mm');
-		moment_end_time = moment(end_time, 'DD-MM-YYYY HH:mm');
-	}
-	else {
-		return callback('Unknown language');
-	}
-
-	if (moment_begin_time.dayOfYear() != moment_end_time.dayOfYear())
-		return callback('You must provide a schedule on the same day');
-
-	return callback();
 
 };
 

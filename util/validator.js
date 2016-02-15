@@ -120,6 +120,18 @@ Validator.loodle.knownId = function (loodleId, callback) {
 
 };
 
+/**
+ * Check if the array of schedules contains at least one schedule
+ * 
+ * @param  {Array}  schedules    Schedules's array
+ * @return {Boolean}             True if there is at least one schedule, false otherwise
+ */
+Validator.loodle.mustHaveAtLeastOneSchedule = function (schedules) {
+
+    return (schedules.length > 0);
+
+};
+
 // Schedule validation
 Validator.schedule = {};
 

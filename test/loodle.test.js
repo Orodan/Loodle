@@ -835,4 +835,148 @@ describe('Loodle', function () {
 
 	});
 
+	describe('createPublicLoodle', function () {
+
+		var loodle = {
+			name: 'My public loodle',
+			description: 'Test of the createPublicLoodle functionality',
+			schedules: [
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '15/02/2016 10:34'
+				},
+				{
+					begin_time: '15/02/2016 10:44',
+					end_time: '15/02/2016 10:54'
+				}
+			],
+			locale: 'fr'
+		}
+
+		it('should create the public loodle', function (done) {
+
+			Loodle.createPublicLoodle(loodle.name, loodle.description, loodle.schedules, loodle.locale, function (err, data) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data.name, loodle.name);
+					assert.equal(data.description, loodle.description);
+					assert.equal(data.category, 'public');
+					loodle = data;
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+			// Delete the public loodle we created
+			after(function (done) {
+				Loodle.delete(loodle.id, done);
+			});
+
+		});
+
+		it('should send an error if one parameter is missing', function (done) {
+
+			Loodle.createPublicLoodle('', loodle.description, loodle.schedules, loodle.locale, function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Missing one parameter');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the language is unknown', function (done) {
+
+			var schedules = [
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '15/02/2016 10:34'
+				},
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '15/02/2016 10:34'
+				}
+			];
+
+			Loodle.createPublicLoodle(loodle.name, loodle.description, schedules, '', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Unknown language');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if no schedule has been specified', function (done) {
+
+			Loodle.createPublicLoodle(loodle.name, loodle.description, [], 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'At least one schedule is required');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if one schedule is not on the same day', function (done) {
+
+			var schedules = [
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '15/02/2016 10:34'
+				},
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '16/02/2016 10:34'
+				}
+			];
+
+			Loodle.createPublicLoodle(loodle.name, loodle.description, schedules, 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'Schedule is not on the same day');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
 });

@@ -117,12 +117,26 @@ describe('User', function () {
 
 	describe('createPublicUser', function () {
 
-		var loodle;
+		var loodle = {
+			name: 'My wonderfull public loodle',
+			description: 'Wonderfull',
+			schedules: [
+				{
+					begin_time: '15/02/2016 10:24',
+					end_time: '15/02/2016 10:34'
+				},
+				{
+					begin_time: '15/02/2016 10:44',
+					end_time: '15/02/2016 10:54'
+				}
+			],
+			locale: 'fr'
+		};
 		var result;
 
 		before(function (done) {
 
-			Loodle.createPublicLoodle('My wonderfull public loodle', 'Wonderfull !', [], 'en', function (err, data) {
+			Loodle.createPublicLoodle(loodle.name, loodle.description, loodle.schedules, loodle.locale, function (err, data) {
 				if (err) 
 					return done(err);
 
