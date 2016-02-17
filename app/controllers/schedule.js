@@ -37,7 +37,7 @@ ScheduleController.delete = function (schedule_id, callback) {
  */
 ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
 
-	async.parallel({
+	async.series({
 
         // Delete the votes
         deleteVotes: function (done) {
@@ -48,10 +48,7 @@ ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
                 },
                 // Delete votes
                 function (vote_ids, end) {
-                	
-                    async.each(vote_ids, function (vote_id, finish) {
-                        Vote.delete(vote_id, finish);
-                    }, end);
+                    async.each(vote_ids, Vote.delete, end);
                 }
             ], done);
         },

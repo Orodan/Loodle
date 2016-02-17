@@ -29,24 +29,17 @@ Schedule.delete = function (schedule_id, callback) {
 
 Schedule.getVoteIds = function (schedule_id, loodle_id, callback) {
 
-	var query = 'SELECT vote_id FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
-	db.execute(query
-		, [ loodle_id, schedule_id ]
-		, { prepare : true }
-		, function (err, data) {
+	var query = 'SELECT * FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
+	db.execute(query, [ loodle_id, schedule_id ], { prepare : true }, function (err, data) {
+		if (err) return callback(err);
 
-			if (err)
-			    return callback(err);
-
-			var results = [];
-
-			data.rows.forEach(function (element) {
-			    results.push(element.vote_id);
-			});
-
-			return callback(null, results);
-
+		var results = [];
+		data.rows.forEach(function (element) {
+			results.push(element.vote_id);
 		});
+
+		return callback(null, results);
+	});
 
 };
 

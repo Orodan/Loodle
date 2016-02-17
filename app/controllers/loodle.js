@@ -295,7 +295,12 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 		// Delete schedule
 		deleteSchedule: function (end) {
 
-			async.parallel({
+			async.series({
+
+				// Delete votes of the schedule for each user of the loodle
+				deleteVotes: function (done) {
+					Schedule.deleteVotes(schedule_id, loodle_id, done);
+				},
 
 				// Delete the association schedule - loodle
 				removeScheduleFromLoodle: function (done) {
@@ -305,11 +310,6 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 				// Delete schedule
 				deleteSchedule: function (done) {
 					Schedule.delete(schedule_id, done);
-				},
-
-				// Delete votes of the schedule for each user of the loodle
-				deleteVotes: function (done) {
-					Schedule.deleteVotes(schedule_id, loodle_id, done);
 				}
 
 			}, end);
@@ -766,11 +766,6 @@ LoodleController.inviteUser = function (req, res) {
  * @param {String}   language   	Locale language
  */
 LoodleController.addSchedule = function (loodle_id, begin_time, end_time, language, callback) {
-
-	// Check if the two dates of the schedule are on the same day
-	// Create the new schedule
-	// Bind it to the loodle
-	// Create the default votes according to the schedule
 
 	if(!Validator.schedule.isAKnownLanguage(language)) 
 		return callback(new Error('Unknown language'));

@@ -106,20 +106,18 @@ Vote.prototype.bind = function (loodle_id, user_id, schedule_id, callback) {
 
 	var queries = [
 		{
-			query: 'INSERT INTO vote_by_doodle_and_schedule(doodle_id, schedule_id, user_id, vote_id) values (?, ?, ?, ?)',
+			query: 'INSERT INTO vote_by_doodle_and_schedule (doodle_id, schedule_id, user_id, vote_id) values (?, ?, ?, ?)',
 			params: [ loodle_id, schedule_id, user_id, this.id ]
 		},
 		{
-			query: 'INSERT INTO vote_by_doodle_and_user(doodle_id, user_id, schedule_id, vote_id) values (?, ?, ?, ?)',
+			query: 'INSERT INTO vote_by_doodle_and_user (doodle_id, user_id, schedule_id, vote_id) values (?, ?, ?, ?)',
 			params: [ loodle_id, user_id, schedule_id, this.id ]
 		}
 	];
 
 	db.batch(queries
 		, { prepare : true }
-		, function (err) {
-			return callback(err);
-		});
+		, callback);
 
 }
 

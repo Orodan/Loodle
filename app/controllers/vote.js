@@ -111,10 +111,6 @@ VoteController.removeAssociationsByUser = function (loodle_id, user_id, callback
  */
 VoteController.removeAssociationsBySchedule = function (loodle_id, schedule_id, callback) {
 
-	// Remove association loodle schedule
-	// Get user ids of the loodle
-	// Remove association loodle user
-
 	async.parallel({
 
 		// Remove associations loodle - schedule
