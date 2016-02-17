@@ -50,6 +50,8 @@ LoodleController._addSchedule = function (req, res) {
 LoodleController._addUser = function (req, res) {
 
 	LoodleController.addUser(req.params.loodleId, req.params.userId, function (err, data) {
+		if (err) if (err) return reply(res, err.message, data);
+
 		return reply(res, err, data);
 	});
 
@@ -57,11 +59,6 @@ LoodleController._addUser = function (req, res) {
 
 // Create a new loodle
 LoodleController._createLoodle = function (req, res) {
-
-	// Validation
-	// - req.user is defined
-	// - req.body.name is defined
-	// - req.body.description is optional
 
 	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
 		if (err) return reply(res, err.message, data);
@@ -120,18 +117,11 @@ function reply (res, err, data) {
  */
 LoodleController.addUser = function (loodle_id, user_id, callback) {
 
-    // Check the loodle exists
-    // Check the user is not already in the loodle
-    // Create link loodle - user
-    // Create default votes for each schedule of the loodle
-    // Create default configuration for the user on the loodle
-   	
    	async.series({
 
    		// Validate the loodle id is known
 		loodleIdIsKnown: function (end) {
 			Validator.loodle.knownId(loodle_id, function (err, result) {
-
 				if (err) return end(err);
 
 				if (!result)
@@ -144,7 +134,6 @@ LoodleController.addUser = function (loodle_id, user_id, callback) {
 		// Validate the user id is known
 		userIdIsKnown: function (end) {
 			Validator.user.knownId(user_id, function (err, result) {
-
 				if (err) return end(err);
 
 				if (!result)

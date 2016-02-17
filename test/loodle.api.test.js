@@ -111,7 +111,7 @@ describe('API Loodle', function () {
 
     });
 
-    describe('POST /loodle/:id/user', function () {
+    describe('POST /loodle/:loodleId/user/:userId', function () {
 
         var riri = {
             email: "ririduck@gmail.com",
@@ -221,9 +221,93 @@ describe('API Loodle', function () {
 
         });
 
-        it('should send an error if the loodle id is not a valid uuid');
+        it('should send an error if the loodle id is not a valid uuid', function (done) {
 
-        it('should send an error if the user id is not a valid uuid');
+            request(host)
+                .post('/api/loodle/' + 'gheghe' + '/user/' + fifi.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the loodle id is unknown', function (done) {
+
+            request(host)
+                .post('/api/loodle/' + '00000000-0000-0000-0000-000000000000' + '/user/' + fifi.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown loodle id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the user id is not a valid uuid', function (done) {
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/user/' + 'fhzogho')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the user id is unknown', function (done) {
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/user/' + '00000000-0000-0000-0000-000000000000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown user id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
 
     });
 

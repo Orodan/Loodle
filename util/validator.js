@@ -117,7 +117,6 @@ Validator.loodle.knownId = function (loodleId, callback) {
 
     var query = 'SELECT * FROM doodles WHERE id = ?';
     db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
-
         if (err) return callback(err);
 
         // The loodle id is unknown
