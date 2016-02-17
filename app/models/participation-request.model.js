@@ -235,4 +235,59 @@ ParticipationRequest.remove = function (participation_request_id, loodle_id, use
 
 };
 
+/**
+ * Delete the participation request
+ * 
+ * @param  {String}   prId     	Participation request identifier
+ * @param  {Function} callback 	Standard callbck function
+ */
+ParticipationRequest.delete = function (prId, callback) {
+
+	var query = 'DELETE FROM participation_requests WHERE id = ?';
+	db.execute(query, [ prId ], { prepare : true }, callback);
+
+};
+
+/**
+ * Delete the assocations between the loodle and it's participation requests
+ * 
+ * @param  {String}   loodleId 	Loodle identifier
+ * @param  {Function} callback 	Standard callback function
+ */
+ParticipationRequest.deleteAssociationsWithLoodle = function (loodleId, callback) {
+
+	var query = 'DELETE FROM participation_request_by_doodle WHERE doodle_id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
+
+};
+
+/**
+ * Delete the assocation between the users and theirs participation requests
+ * 
+ * @param  {Array}   participationRequests 		Participation requests array
+ * @param  {Function} callback              	Standard callback function
+ */
+ParticipationRequest.deleteAssociationsWithUsers = function (participationRequests, callback) {
+
+	async.each(participationRequests, function (participationRequest, done) {
+		ParticipationRequest.deleteAssociationWithUser(participationRequest.to_id, participationRequest.id, done);
+	}, callback);
+
+};
+
+/**
+ * Delete the assocation between the user and it's participation request
+ * 
+ * @param  {String}   userId   		User identifier
+ * @param  {String}   prId     		Participation request identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+ParticipationRequest.deleteAssociationWithUser = function (userId, prId, callback) {
+
+	var query = 'DELETE FROM participation_request_by_user WHERE user_id = ? AND participation_request_id = ?';
+	db.execute(query, [ userId, prId ], { prepare : true }, callback);
+
+};
+
+
 module.exports = ParticipationRequest;

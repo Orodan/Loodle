@@ -97,6 +97,7 @@ describe('API User', function () {
 
     });
 
+
     describe('POST /authenticate', function () {
 
         var riri = {

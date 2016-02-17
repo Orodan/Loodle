@@ -250,6 +250,36 @@ User.remove = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Delete the user if he is temporary
+ * 
+ * @param  {String}   userId    User identifier
+ * @param  {Function} callback  Standard callback function
+ */
+User.deleteIfTemporary = function (userId, callback) {
+
+    async.waterfall([
+        // Get user info
+        function getUserInfo (done) {
+            User.get(userId, function (err, data) {
+               if (err) return done(err);
+
+                if (data.status === 'temporary')
+                    return done(null, true);
+
+                return done(null, false);
+            });
+        },
+
+        // Delete the user if he is temporary
+        function deleteIfTemporary(isTemporary, done) {
+            if (!isTemporary) return done();
+            User.delete(userId, done);
+        }
+    ], callback);
+
+};
+
 module.exports = User;
 
 

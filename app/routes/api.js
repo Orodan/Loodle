@@ -92,7 +92,7 @@ router.post('/user', User._createUser);
 router.post('/loodle', Loodle._createLoodle);
 
 // Add user ============================================
-router.post('/loodle/:id/user', Loodle._addUser);
+router.post('/loodle/:loodleId/user/:userId', Loodle._addUser);
 
 // Add schedule ========================================
 router.post('/loodle/:id/schedule', Loodle._addSchedule);

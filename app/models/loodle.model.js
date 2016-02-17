@@ -2,6 +2,11 @@ var db            = require('../../config/database');
 var cassandra     = require('cassandra-driver');
 var async         = require('async');
 
+var Vote          = require('./vote.model');
+var User 	 	  = require('./user.model');
+var Schedule      = require('./schedule.model');
+var Notification  = require('./notification.model');
+var PR 			  = require('./participation-request.model');;
 var Configuration = require('./configuration.model');
 
 function Loodle (name, description, category) {
@@ -281,16 +286,174 @@ Loodle.getLoodleIdsOfUser = function (user_id, callback) {
 		});
 };
 
-Loodle.delete = function (loodle_id, callback) {
+Loodle.delete = function (loodleId, callback) {
 
-	var query = 'DELETE FROM doodles WHERE id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, callback);
+	var userIds,
+		notificationIds,
+		participationRequests;
+
+	async.series({
+		getRequiredInformations: function (done) {
+
+			async.parallel({
+				getUserIds: async.apply(Loodle.getUserIds, loodleId),
+				getNotificationIds: async.apply(Loodle.getNotificationIds, loodleId),
+				getPR: async.apply(Loodle.getParticipationRequests, loodleId)
+			}, function (err, results) {
+				userIds = results.getUserIds;
+				participationRequests = results.getPR;
+				return done();
+			});
+
+		},
+
+		delete: function (done) {
+
+			async.parallel({
+				removeUsers: async.apply(Loodle.removeUsers, loodleId, userIds),
+				deleteVotes: async.apply(Loodle.deleteVotes, loodleId),
+				deleteSchedules: async.apply(Loodle.deleteSchedules, loodleId),
+				deleteNotifications: async.apply(Loodle.deleteNotifications, loodleId, userIds, notificationIds),
+				deletePR: async.apply(Loodle.deletePR, loodleId, participationRequests),
+				deleteLoodle: async.apply(Loodle.deleteLoodle, loodleId)
+			}, done);
+
+		}
+	}, callback);
 
 };
 
+/**
+ * Delete the participation requests of a loodle
+ * 
+ * @param  {String}   	loodleId              	Loodle identifier
+ * @param  {Array}   	participationRequests 	ParticipationRequests Array
+ * @param  {Function} 	callback              	Standard callback function
+ */
+Loodle.deletePR = function (loodleId, participationRequests, callback) {
+
+	// Get pr ids
+	Loodle.getParticipationRequestIds(loodleId, function (err, prIds) {
+		if (err) return callback(err);
+
+		async.parallel({
+			// Delete pr
+			deletePr: function (done) {
+				async.each(prIds, PR.delete, done);
+			},
+
+			// Delete associations
+			deleteAssociations: function (done) {
+				async.parallel({
+					deleteAssociationsWithLoodle: async.apply(PR.deleteAssociationsWithLoodle, loodleId),
+					deleteAssociationsWithUsers: async.apply(PR.deleteAssociationsWithUsers, participationRequests)
+				}, done);
+			}
+
+		}, callback);
+	});
+
+};
+
+/**
+ * Get ids of users invated to participate to the loodle
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Loodle.getInvatedUserIds = function (loodleId, callback) {
+
+	// Get participation requests
+	Loodle.getParticipationRequests(loodleId, function (err, data) {
+		if (err) return callback(err);
+
+		// Get "to_id" attributes
+		var invatedUserIds = [];
+		data.forEach(function (element) {
+			invatedUserIds.push(element.to_id);
+		});
+
+		return callback(null, invatedUserIds);
+	});
+
+};
+
+/**
+ * Get participation requests of the loodle
+ * 
+ * @param  {String}   loodleId 	Loodle identifier
+ * @param  {Function} callback 	Standard callback function
+ */
+Loodle.getParticipationRequests = function (loodleId, callback) {
+
+	var query = 'SELECT * FROM participation_requests WHERE id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, function (err, result) {
+		if (err) return callback(err);
+
+		return callback(null, result.rows);
+	});
+
+};
+
+/**
+ * Remove users of the loodle
+ * 
+ * @param  {String}   	loodleId 	Loodle identifier
+ * @param  {Array}   	userIds  	User ids's array
+ * @param  {Function} 	callback 	Standard callback function
+ */
+Loodle.removeUsers = function (loodleId, userIds, callback) {
+
+	async.parallel({
+		// Remove user - loodle associations
+		removeUserLoodleAssociations: function (done) {
+			async.each(userIds, function (userId, end) {
+				var query = 'DELETE FROM doodle_by_user WHERE user_id = ? AND doodle_id = ?';
+				db.execute(query, [ userId, loodleId ], { prepare: true }, end);
+			}, done);
+		},
+
+		// Remove loodle - user associations
+		removeLoodleUserAssociations: function (done) {
+			var query = 'DELETE FROM user_by_doodle WHERE doodle_id = ?';
+			db.execute(query, [ loodleId ], { prepare: true }, done);
+		},
+
+		// Delete user configurations
+		deleteConfigurations: function (done) {
+			async.each(userIds, function (userId, end) {
+				Configuration.delete(userId, loodleId, end);
+			}, done);
+		},
+
+		// Delete public users
+		deletePublicUsers: function (done) {
+			async.each(userIds, User.deleteIfTemporary, done);
+		}
+
+	}, callback);
+
+};
+
+/**
+ * Delete the loodle
+ * 
+ * @param  {[type]}   loodleId 	Loodle identifier
+ * @param  {Function} callback 	Standard callback function
+ */
+Loodle.deleteLoodle = function (loodleId, callback) {
+
+	var query = 'DELETE FROM doodles WHERE id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
+
+};
+
+/**
+ * Get the ids of the loodle's schedules
+ * 
+ * @param  {[type]}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.getScheduleIds = function (loodle_id, callback) {
 
 	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
@@ -312,6 +475,13 @@ Loodle.getScheduleIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Remove the schedule from the loodle
+ * 
+ * @param  {String}   loodle_id  	Loodle identifier
+ * @param  {String}   schedule_id 	Schedule identifier
+ * @param  {Function} callback    	Standard callback function
+ */
 Loodle.removeSchedule = function (loodle_id, schedule_id, callback) {
 
 	var query = 'DELETE FROM schedule_by_doodle WHERE doodle_id = ? AND schedule_id = ?';
@@ -322,6 +492,12 @@ Loodle.removeSchedule = function (loodle_id, schedule_id, callback) {
 
 };
 
+/**
+ * Get ids of the loodle's users
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.getUserIds = function (loodle_id, callback) {
 
 	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
@@ -343,6 +519,13 @@ Loodle.getUserIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Remove the association between the loodle and the user
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {String}   user_id   	User identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.removeAssociationWithUser = function (loodle_id, user_id, callback) {
 
 	var queries = [
@@ -362,6 +545,12 @@ Loodle.removeAssociationWithUser = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Get the ids of the loodle's votes
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.getVoteIds = function (loodle_id, callback) {
 
 	var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ?';
@@ -385,6 +574,12 @@ Loodle.getVoteIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Remove the vote
+ * 
+ * @param  {String}   vote_id  		Vote identifier
+ * @param  {Function} callback 		Standard callback function
+ */
 Loodle.removeVote = function (vote_id, callback) {
 
 	var query = 'DELETE FROM votes WHERE id = ?';
@@ -395,6 +590,12 @@ Loodle.removeVote = function (vote_id, callback) {
 
 };
 
+/**
+ * Remove the association between the loodle and its votes 
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.removeAssociationLoodleVote = function (loodle_id, callback) {
 
 	var queries = [
@@ -414,6 +615,13 @@ Loodle.removeAssociationLoodleVote = function (loodle_id, callback) {
 
 };
 
+
+/**
+ * Get the ids of the loodles's participation requests
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.getParticipationRequestIds = function (loodle_id, callback) {
 
 	var query = 'SELECT participation_request_id FROM participation_request_by_doodle WHERE doodle_id = ?';
@@ -435,6 +643,12 @@ Loodle.getParticipationRequestIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Remove the participatin request
+ * 
+ * @param  {String}   participation_request_id 		Participation request identifier
+ * @param  {Function} callback                 		Standard callback function
+ */
 Loodle.removeParticipationRequest = function (participation_request_id, callback) {
 
 	var query = 'DELETE FROM participation_requests WHERE id = ?';
@@ -445,6 +659,12 @@ Loodle.removeParticipationRequest = function (participation_request_id, callback
 
 };
 
+/**
+ * Get the id of the user who have the participation request
+ * 
+ * @param  {String}   participation_request_id 		Participation request identifier
+ * @param  {Function} callback                 		Standard callback function
+ */
 Loodle.getUserIdWithParticipationRequest = function (participation_request_id, callback) {
 
 	var query = 'SELECT to_id FROM participation_requests WHERE id = ?';
@@ -460,6 +680,12 @@ Loodle.getUserIdWithParticipationRequest = function (participation_request_id, c
 
 };
 
+/**
+ * Remove the assocation between the user and his/her participation requests
+ * 
+ * @param  {String}   user_id  		User identifier
+ * @param  {Function} callback 		Standard callback function
+ */
 Loodle.removeAssocationUserParticipationRequest = function (user_id, callback) {
 
 	var query = 'DELETE FROM participation_request_by_user WHERE user_id = ?';
@@ -470,6 +696,12 @@ Loodle.removeAssocationUserParticipationRequest = function (user_id, callback) {
 
 };
 
+/**
+ * Remove the assocation between the loodle and its participation requests
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callback) {
 
 	var query = 'DELETE FROM participation_request_by_doodle WHERE doodle_id = ?';
@@ -480,6 +712,12 @@ Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callba
 
 };
 
+/**
+ * Set the loodle as public
+ * 
+ * @param  {String}   loodle_id 	Loodle identifier
+ * @param  {Function} callback  	Standard callback function
+ */
 Loodle.openToPublic = function (loodle_id, callback) {
 
 	var query = 'UPDATE doodles SET category = ? WHERE id = ?';
@@ -490,6 +728,12 @@ Loodle.openToPublic = function (loodle_id, callback) {
 
 };
 
+/**
+ * Get the participation requests of the user
+ * 
+ * @param  {String}   user_id  		User identifier
+ * @param  {Function} callback 		Standard callback function
+ */
 Loodle.getParticipationRequestsOfUser = function (user_id, callback) {
 
 	// Get participation request ids
@@ -555,6 +799,12 @@ Loodle.getParticipationRequestsOfUser = function (user_id, callback) {
 
 };
 
+/**
+ * Set the loodle's category
+ * 
+ * @param {String}   loodle_id 		Loodle identifier
+ * @param {String}   category  		Category
+ */
 Loodle.setCategory = function (loodle_id, category, callback) {
 
 	var query = 'UPDATE doodles SET category = ? WHERE id = ?';
@@ -562,6 +812,118 @@ Loodle.setCategory = function (loodle_id, category, callback) {
 		, [ category, loodle_id ]
 		, { prepare : true }
 		, callback);
+
+};
+
+/**
+ * Delete loodle's votes
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Loodle.deleteVotes = function (loodleId, callback) {
+
+	// Get the vote ids
+	Loodle.getVoteIds(loodleId, function (err, voteIds) {
+		if (err) return callback(err);
+
+		async.parallel({
+			// Delete vote ids
+			deleteVotes: function (done) {
+				async.each(voteIds, Vote.delete, done);
+			},
+
+			// Delete associations
+			deleteAssociations: function (done) {
+				Vote.deleteAssociationsWithLoodle(loodleId, done);
+			}
+		}, callback)
+
+	});
+
+};
+
+/**
+ * Delete loodle's schedules
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Loodle.deleteSchedules = function (loodleId, callback) {
+
+	// Get schedule ids
+	Loodle.getScheduleIds(loodleId, function (err, scheduleIds) {
+		if (err) return callback(err);
+
+		async.parallel({
+			// Delete schedules
+			deleteSchedules: function (done) {
+				async.each(scheduleIds, Schedule.delete, done);
+			},
+
+			// Delete associations
+			deleteAssociations: function (done) {
+				Schedule.deleteAssociationsWithLoodle(loodleId, done);
+			}
+		}, callback);
+
+	});
+
+};
+
+/**
+ * Delete loodle's notifications
+ * 
+ * @param  {String}   	loodleId        	Loodle identifier
+ * @param  {Array}   	userIds         	User ids's array
+ * @param  {Array}   	notificationIds 	Notification ids's array
+ */
+Loodle.deleteNotifications = function (loodleId, userIds, notificationIds, callback) {
+
+	// Get notification ids
+	Loodle.getNotificationIds(loodleId, function (err, notificationIds) {
+		if (err) return callback(err);
+
+		async.parallel({
+			// Delete notifications
+			deleteNotifications: function (done) {
+				async.each(notificationIds, Notification.delete, done);
+			},
+
+			// Delete associations
+			deleteAssociations: function (done) {
+				async.parallel({
+					deleteAssociationsWithLoodle: async.apply(Notification.deleteAssociationsWithLoodle, loodleId),
+					deleteAssociationsWithUsers: function (end) {
+						async.each(userIds, function (userId, finish) {
+							async.each(notificationIds, function (notificationId, over) {
+								Notification.deleteAssociationWithUser(userId, notificationId, over);
+							}, finish);
+						}, end);
+					}
+				}, done);
+			}
+
+		}, callback);
+
+	});
+
+};
+
+/**
+ * Get ids of loodle's notifications
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Loodle.getNotificationIds = function (loodleId, callback) {
+
+	var query = 'SELECT notification_id FROM notification_by_doodle WHERE doodle_id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
+		if (err) return callback(err);
+
+		return callback(null, data.rows);
+	});
 
 };
 

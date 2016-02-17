@@ -49,7 +49,7 @@ LoodleController._addSchedule = function (req, res) {
 // Add a user to a loodle
 LoodleController._addUser = function (req, res) {
 
-	LoodleController.addUser(req.params.id, req.body.user_id, function (err, data) {
+	LoodleController.addUser(req.params.loodleId, req.params.userId, function (err, data) {
 		return reply(res, err, data);
 	});
 
@@ -592,231 +592,20 @@ LoodleController.getLoodlesOfUser = function (req, res) {
  */
 LoodleController.delete = function (loodle_id, callback) {
 
-	// Delete the loodle
-
-	// Get the schedule ids associated with the loodle
-	// Delete the schedules
-	// Delete the association loodle - schedule
-
-	// Get the user ids associated with the loodle
-	// Delete the association loodle - user
-
-	// Get the vote ids associated with the loodle
-	// Delete the votes
-	// Delete the association loodle - vote
-
-	// Get the participation request ids associated with the loodle
-	// Delete the participation requests
-	// Get the user ids who have a participation requests
-	// Delete the association user - participation request
-	// Delete the association loodle - participation request
-
-	// Delete the configurations user - loodle
-
-	// Get the notification ids associated with the loodle
-	// Delete these notifications
-
-	var user_ids = [];
-
 	async.series({
-
-		// Validate the loodle id is known
-		loodleIdIsKnown: function (end) {
+		// Validate we know the loodle id
+		validateLoodleId: function (done) {
 			Validator.loodle.knownId(loodle_id, function (err, result) {
-
-				if (err) return end(err);
-
-				if (!result)
-					return end(new ReferenceError('Unknown loodle id'));
-
-				return end();
+				if (err) return done(err);
+				if (!result) return done(new ReferenceError('Unknown loodle id'));
+				return done();
 			});
-		},
-
-		// Delete schedules
-		deleteSchedules: function (done) {
-
-			async.waterfall([
-
-				// Get the schedule ids associated with the loodle
-				function (end) {
-					Loodle.getScheduleIds(loodle_id, end);
-				},
-
-				// Delete the schedules
-				function (schedule_ids, end) {
-
-					async.each(schedule_ids, function (schedule_id, finish) {
-						LoodleController.deleteSchedule(loodle_id, schedule_id, finish);
-					}, end);
-
-				}
-			], done);
-
 		},
 
 		// Delete the loodle
-		deleteLoodle: function (done) {
-			Loodle.delete(loodle_id, done);
-		},
-
-		// Delete votes
-		deleteVotes: function (done) {
-
-			async.waterfall([
-
-				// Get the vote ids associated with the loodle
-				function (end) {
-					Loodle.getVoteIds(loodle_id, end);
-				},
-
-				// Delete the votes
-				function (vote_ids, end) {
-
-					async.each(vote_ids, function (vote_id, finish) {
-						Loodle.removeVote(vote_id, finish);
-					}, end);
-
-				},
-
-				// Delete the association loodle - vote
-				function (end) {
-					Loodle.removeAssociationLoodleVote(loodle_id, end);
-				},
-
-
-
-			], done);
-
-		},
-
-		// Delete participation requests
-		deleteParticipationRequests: function (done) {
-
-			var participation_request_ids = [];
-			var user_ids = [];
-
-			async.series([
-
-				// Get the participation request ids associated with the loodle
-				function (end) {
-					Loodle.getParticipationRequestIds(loodle_id, function (err, data) {
-						if (err)
-							return end(err);
-
-						participation_request_ids = data;
-						return end();
-					});
-				},
-
-				// Get the user ids who have a participation requests
-				function (end) {
-
-					async.each(participation_request_ids, function (pr_id, finish) {
-
-						Loodle.getUserIdWithParticipationRequest(pr_id, function (err, user_id) {
-							if (err)
-								return finish(err);
-
-							user_ids.push(user_id);
-							return finish();
-						});
-
-					}, function (err) {
-						if (err)
-							return end(err);
-
-						return end(null, user_ids);
-					});
-
-				},
-
-				// Delete the association user - participation request
-				function (end) {
-
-					async.each(user_ids, function (user_id, finish) {
-
-						Loodle.removeAssocationUserParticipationRequest(user_id, finish);
-
-					}, end);
-
-				},
-
-				// Delete the association loodle - participation request
-				function (end) {
-					Loodle.removeAssociationLoodleParticipationRequest(loodle_id, end);
-				},
-
-
-				// Delete the participation requests
-				function (end) {
-					
-					async.each(participation_request_ids, function (pr_id, finish) {
-
-						Loodle.removeParticipationRequest(pr_id, finish);
-
-					}, function (err) {
-						if (err)
-							return end(err);
-
-						return end(null, participation_request_ids);
-					});
-
-				},
-
-			], done);
-
-		},
-
-		// Delete the configuration user - loodle
-		deleteConfiguration: function (done) {
-
-			async.waterfall([
-				// Get user ids associated with the loodle
-				async.apply(Loodle.getUserIds, loodle_id),
-				function deleteConfigurations (userIds, end) {
-					async.each(userIds, function (userId, finish) {
-						Configuration.delete(userId, loodle_id, finish);
-					}, end);
-				}
-			], function (err) {
-				return done(err);
-			});
-
-		},
-
-		// Delete notifications
-		deleteNotifications: function (done) {
-			Notification.deleteFromLoodle(loodle_id, done);
-		},
-
-		deleteUsers: function (done) {
-
-			// Get user - loodle associations
-			// Remove the temporary users
-			// Delete associations
-			
-			async.waterfall([
-				// Get user ids associated with the loodle
-				async.apply(Loodle.getUserIds, loodle_id),
-				// Delete associations and temporary users
-				function deleteUsersAndAssociations (userIds, end) {
-					async.parallel([
-						function deleteTemporaryUsers (finish) {
-							async.each(userIds, User.deleteIfTemporary, finish);		
-						},
-						function deleteAssociations (finish) {
-							async.each(userIds, async.apply(Loodle.removeAssociationWithUser, loodle_id), finish)
-						}
-					], end);
-				}
-			], done);
-
-		},
-
+		deleteLoodle: async.apply(Loodle.delete, loodle_id)
 	}, function (err) {
 		if (err) return callback(err);
-
 		return callback(null, 'Loodle deleted');
 	});
 

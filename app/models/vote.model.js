@@ -284,4 +284,21 @@ Vote.deleteAssociationScheduleVoteByUser = function (loodle_id, schedule_id, use
 
 };
 
+Vote.deleteAssociationsWithLoodle = function (loodleId, callback) {
+
+	var queries = [
+		{
+			query: 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ?',
+			params: [ loodleId ]
+		},
+		{
+			query: 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ?',
+			params: [ loodleId ]
+		}
+	];
+
+	db.batch(queries, { prepare: true }, callback);
+
+};
+
 module.exports = Vote;

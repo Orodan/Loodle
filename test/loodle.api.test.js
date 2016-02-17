@@ -20,6 +20,7 @@ describe('API Loodle', function () {
 
         var token;
 
+        // Create a user and get an access token
         before(function (done) {
 
             async.series({
@@ -106,6 +107,26 @@ describe('API Loodle', function () {
                 });
 
         });
+
+    });
+
+    describe('POST /loodle/:id/user', function () {
+
+        // Create an user and a loodle
+        before(function (done) {
+            return done();
+        });
+
+        // Delete the created loodle and user
+        after(function (done) {
+            return done();
+        });
+
+        it('should add the user');
+
+        it('should send an error if the loodle id is not a valid uuid');
+
+        it('should send an error if the user id is not a valid uuid');
 
     });
 

@@ -114,10 +114,12 @@ Schedule.remove = function (loodle_id, schedule_id, callback) {
 
 };
 
-Schedule.removeAssociation = function (loodle_id, schedule_id, callback) {
+Schedule.deleteAssociationsWithLoodle = function (loodleId, callback) {
 
-	var query = 'DELETE FROM schedule_by'
+	var query = 'DELETE FROM schedule_by_doodle WHERE doodle_id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
 
 };
+
 
 module.exports = Schedule;

@@ -6,6 +6,9 @@ var cassandra  = require('cassandra-driver');
 var Loodle     = require('../models/loodle.model');
 var User       = require('../models/user.model');
 var PublicUser = require('../models/public-user.model');
+var Schedule   = require('../models/schedule.model');
+var Configuration = require('../models/configuration.model');
+
 var Vote       = require('../controllers/vote');
 
 var jwt        = require('jsonwebtoken');
@@ -60,9 +63,6 @@ UserController._createPublicUser = function (req, res) {
 // Get the current user data
 UserController._get = function (req, res) {
 
-    // Validation
-    // - req.user is defined
-
     if (req.user) {
         UserController.get(req.user.id, function (err, data) {
             return reply(res, err, data);
@@ -75,12 +75,6 @@ UserController._get = function (req, res) {
 
 // Create a new user
 UserController._createUser = function (req, res) {
-
-    // Validation
-    // - first name must be defined
-    // - last name must be defined
-    // - email must be defined
-    // - password must be defined
 
     if (!Validator.isDefined(req.body.email))
         return reply(res, 'Email required', 400);
@@ -257,15 +251,71 @@ UserController.createUser = function (email, first_name, last_name, password, ca
  */
 UserController.delete = function (userId, callback) {
 
-    async.waterfall([
-        async.apply(User.get, userId),
-        function (user, done) {
-            async.parallel([
-                async.apply(User.delete, user.id),
-                async.apply(User.deleteEmailReference, user.email)
-            ], done);
+    var loodleIds;
+
+    async.series({
+        getLoodleIds: function (end) {
+
+            User.getLoodleIds(userId, function (err, data) {
+                if (err) return end(err);
+
+                loodleIds = data;
+                return end();
+            });
+
+        },
+
+        deleteAssociationsWithLoodle: function (end) {
+
+            async.each(loodleIds, function (loodleId, done) {
+                UserController.deleteAssociationsWithLoodle(userId, loodleId, done);
+            }, end);
+
+        },
+
+        deleteUser: function (end) {
+
+            User.getLoodleIds(userId, function (err, data) {
+
+                async.waterfall([
+                    async.apply(User.get, userId),
+                    function (user, done) {
+                        async.parallel([
+                            async.apply(User.delete, user.id),
+                            async.apply(User.deleteEmailReference, user.email)
+                        ], done);
+                    }
+                ], end);
+
+            });
+
         }
-    ], callback);
+
+    }, callback);
+
+};
+
+/**
+ * Delete associations between user and loodle
+ * 
+ * @param  {String}   userId    User identifier
+ * @param  {String}   loodleId  Loodle identifier
+ * @param  {Function} callback  Standard callback function
+ */
+UserController.deleteAssociationsWithLoodle = function (userId, loodleId, callback) {
+
+    Loodle.getUsersIds(loodleId, function (err, userIds) {
+        if (err) return callback(err);
+
+        // The user was the only one left, we delete the loodle completely
+        if (userIds.length === 1 && userIds[0].equals(userId)) {
+            Loodle.delete(loodleId, callback);
+        }
+        // The use was not the only one left, we simply delete its associations
+        else {
+            Loodle.removeUser(loodleId, userId, callback);
+        }
+    });
 
 };
 

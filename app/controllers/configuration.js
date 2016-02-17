@@ -136,9 +136,6 @@ ConfigurationController.getUsersWithRole = function (req, res) {
 
 ConfigurationController.updateUserRoles = function (req, res) {
 
-	console.log('ConfigurationController.updateUserRoles');
-	console.log('req.body.users : ', req.body.users);
-
 	async.each(req.body.users, function (user, callback) {
 		Configuration.updateUserRole(user.id, req.params.id, user.role, callback);
 	}, function (err) {

@@ -191,6 +191,12 @@ Notification.getIdsFromLoodle = function (loodle_id, callback) {
 
 };
 
+/**
+ * Delete the notification
+ * 
+ * @param  {String}   notification_id 	Notification identifier
+ * @param  {Function} callback        	Standard callback function
+ */
 Notification.delete = function (notification_id, callback) {
 
 	var query = 'DELETE FROM notifications WHERE id = ?';
@@ -201,23 +207,30 @@ Notification.delete = function (notification_id, callback) {
 
 };
 
+/**
+ * Delete the assocation between the user and the notification
+ * 
+ * @param  {String}   user_id         	User identifier
+ * @param  {String}   notification_id 	Notification identifier
+ * @param  {Function} callback        	Standard callback function
+ */
 Notification.deleteAssociationWithUser = function (user_id, notification_id, callback) {
 
 	var query = 'DELETE FROM notification_by_user WHERE user_id = ? AND notification_id = ?';
-	db.execute(query
-		, [ user_id, notification_id ]
-		, { prepare : true }
-		, callback);
+	db.execute(query, [ user_id, notification_id ], { prepare : true }, callback);
 
 };
 
-Notification.deleteAssociationsWithLoodle = function (loodle_id, callback) {
+/**
+ * Delete the assocations between the loodle and its notifications
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Notification.deleteAssociationsWithLoodle = function (loodleId, callback) {
 
 	var query = 'DELETE FROM notification_by_doodle WHERE doodle_id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, callback);
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
 
 };
 

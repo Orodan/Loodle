@@ -154,6 +154,7 @@ describe('User', function () {
 
 		it('should create the public user', function (done) {
 
+
 			User.createPublicUser(loodle.id, riri.first_name, riri.last_name, function (err, data) {
 
 				result = data;
