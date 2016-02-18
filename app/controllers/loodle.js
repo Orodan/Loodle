@@ -30,11 +30,6 @@ LoodleController._addSchedule = function (req, res) {
 	else
 		language = req.cookies.mylanguage;
 
-	console.log('LoodleController._addSchedule');
-	console.log('Validator.isDefined(language) : ', Validator.isDefined(language));
-	console.log('Validator.isDefined(req.body.begin_time) : ', Validator.isDefined(req.body.begin_time));
-	console.log('Validator.isDefined(req.body.end_time) : ', Validator.isDefined(req.body.end_time));
-
 	if(!Validator.isDefined(language))
 		return reply(res, 'Attribute "language" required', 400);
 	if(!Validator.isDefined(req.body.begin_time))
@@ -76,7 +71,6 @@ LoodleController._createLoodle = function (req, res) {
 
 	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
 		if (err) return reply(res, err.message, data);
-
 		return reply(res, err, data);
 	});
 
@@ -85,7 +79,8 @@ LoodleController._createLoodle = function (req, res) {
 LoodleController._deleteSchedule = function (req, res) {
 
 	LoodleController.deleteSchedule(req.params.loodleId, req.params.scheduleId, function (err, data) {
-		return reply(res, err.message, data);
+		if (err) return reply(res, err.message, data)
+		return reply(res, err, data);
 	});
 
 };
@@ -109,9 +104,6 @@ LoodleController._removeUser = function (req, res) {
 
 // Standard call function to send back data in json
 function reply (res, err, data) {
-
-	console.log('err : ', err);
-	console.log('data : ', data);
 
     if (err) {
 		if (data === undefined)
