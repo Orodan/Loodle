@@ -128,7 +128,7 @@ describe('API Loodle', function () {
         }
 
         var loodle = {
-            name: 'Mon great loodle',
+            name: 'My great loodle',
             description: 'Test'
         };
 
@@ -205,7 +205,6 @@ describe('API Loodle', function () {
                 .post('/api/loodle/' + loodle.id + '/user/' + fifi.id)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
-                .send(loodle)
                 .expect(200)
                 .end(function (err, res) {
                     try {
@@ -227,7 +226,6 @@ describe('API Loodle', function () {
                 .post('/api/loodle/' + 'gheghe' + '/user/' + fifi.id)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
-                .send(loodle)
                 .expect(500)
                 .end(function (err, res) {
                     try {
@@ -249,7 +247,6 @@ describe('API Loodle', function () {
                 .post('/api/loodle/' + '00000000-0000-0000-0000-000000000000' + '/user/' + fifi.id)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
-                .send(loodle)
                 .expect(500)
                 .end(function (err, res) {
                     try {
@@ -271,7 +268,6 @@ describe('API Loodle', function () {
                 .post('/api/loodle/' + loodle.id + '/user/' + 'fhzogho')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
-                .send(loodle)
                 .expect(500)
                 .end(function (err, res) {
                     try {
@@ -293,7 +289,6 @@ describe('API Loodle', function () {
                 .post('/api/loodle/' + loodle.id + '/user/' + '00000000-0000-0000-0000-000000000000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + token)
-                .send(loodle)
                 .expect(500)
                 .end(function (err, res) {
                     try {
@@ -311,4 +306,236 @@ describe('API Loodle', function () {
 
     });
 
+    describe('/loodle/:id/schedule', function () {
+
+        var riri = {
+            email: "ririduck@gmail.com",
+            first_name: "Riri",
+            last_name: "Duck",
+            password: "test"
+        };
+
+        var loodle = {
+            'name': 'Mon super loodle',
+            'description': 'Ma super description'
+        };
+
+        var token;
+
+        // Create an user, get an access token and create a loodle
+        before(function (done) {
+
+            async.series({
+
+                // Create users
+                createRiri: function (end) {
+                    User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        riri.id = data.id;
+                        return end();
+                    });
+                },
+
+                // Connect to get the access token
+                connect: function (end) {
+                    User.authenticate(riri.email, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        token = data;
+                        return end();
+                    });
+                },
+
+                // Create loodle
+                createLoodle: function (end) {
+                    Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+                        if (err) return end(err);
+
+                        loodle = data;
+                        return end();
+                    });
+                }
+
+            }, done);
+        });
+
+        // Delete the created loodle and user
+        after(function (done) {
+
+            async.series({
+                deleteLoodle: async.apply(Loodle.delete, loodle.id),
+                deleteRiri: async.apply(User.delete, riri.id)
+            }, done);
+
+        });
+
+        it('should add the schedule', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Schedule added');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if one parameter is missing', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(400)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Attribute "end_time" required');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the language is unknown', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'zbzeihbf'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown language');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the schedule is not on the same day', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/03/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Schedule is not on the same day');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the loodle id is unknown', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + '00000000-0000-0000-0000-000000000000' + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown loodle id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + 'gbgjieb' + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+    });
 });

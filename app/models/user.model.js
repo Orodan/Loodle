@@ -183,9 +183,7 @@ User.getVoteIds = function (user_id, loodle_id, callback) {
 
 };
 
-/**
- * Save the user
- */
+// To comment
 User.save = function (id, email, first_name, last_name, password, status, callback) {
 
     var query = 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)';

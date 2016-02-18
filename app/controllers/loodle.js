@@ -30,10 +30,24 @@ LoodleController._addSchedule = function (req, res) {
 	else
 		language = req.cookies.mylanguage;
 
+	console.log('LoodleController._addSchedule');
+	console.log('Validator.isDefined(language) : ', Validator.isDefined(language));
+	console.log('Validator.isDefined(req.body.begin_time) : ', Validator.isDefined(req.body.begin_time));
+	console.log('Validator.isDefined(req.body.end_time) : ', Validator.isDefined(req.body.end_time));
+
+	if(!Validator.isDefined(language))
+		return reply(res, 'Attribute "language" required', 400);
+	if(!Validator.isDefined(req.body.begin_time))
+		return reply(res, 'Attribute "begin_time" required', 400);
+	if(!Validator.isDefined(req.body.end_time))
+		return reply(res, 'Attribute "end_time" required', 400);
+
 	LoodleController.addSchedule(req.params.id, req.body.begin_time, req.body.end_time, language, function (err, data) {
 
-		if (req.baseUrl === '/api')
-			return reply(res, err, data);
+		if (req.baseUrl === '/api') {
+			if (err) return reply(res, err.message, data);
+			else return reply(res, err, 'Schedule added');
+		}
 		else {
 			if (err)
 				req.flash('error', err);
@@ -96,8 +110,14 @@ LoodleController._removeUser = function (req, res) {
 // Standard call function to send back data in json
 function reply (res, err, data) {
 
+	console.log('err : ', err);
+	console.log('data : ', data);
+
     if (err) {
-        res.status(500);
+		if (data === undefined)
+        	data = 500;
+
+		res.status(data);
         return res.json({"data": err})
     }
 

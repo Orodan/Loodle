@@ -288,7 +288,6 @@ describe('Loodle', function () {
 						if (err) return end(err);
 
 						result = data;
-
 						return end();
 
 					});
