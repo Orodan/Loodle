@@ -30,8 +30,8 @@ VoteController._updateVotes = function (req, res) {
 	else
 		userId = req.body.user_id;
 
-	VoteController.updateVotes(req.params.id, userId, req.body.votes, function (err, result) {
-		if (err) return error(res, err);
+	VoteController.updateVotes(req.params.id, userId, req.body, function (err, result) {
+		if (err) return error(res, err.message);
 
 		return success(res, 'Vote(s) updated');
 	});
@@ -479,7 +479,7 @@ function error(res, err) {
     res.status(500);
     res.json({
         type: false,
-        data: 'An error occured : ' + err
+        data: err
     });
 };
 

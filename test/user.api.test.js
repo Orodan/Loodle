@@ -8,6 +8,7 @@ var host = '127.0.0.1:3000';
 
 describe('API User', function () {
 
+    // Create an user
     describe('POST /user', function () {
 
         var fifi = {
@@ -97,7 +98,7 @@ describe('API User', function () {
 
     });
 
-
+    // Authenticate an user
     describe('POST /authenticate', function () {
 
         var riri = {

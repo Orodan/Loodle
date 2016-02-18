@@ -85,7 +85,7 @@ LoodleController._createLoodle = function (req, res) {
 LoodleController._deleteSchedule = function (req, res) {
 
 	LoodleController.deleteSchedule(req.params.loodleId, req.params.scheduleId, function (err, data) {
-		return reply(res, err, data);
+		return reply(res, err.message, data);
 	});
 
 };
@@ -794,8 +794,7 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 			}
 
 		}, function (err) {
-			if (err)
-				return callback(err);
+			if (err) return callback(err);
 
 			return callback(null, 'Schedule added');
 		});
