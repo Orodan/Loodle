@@ -96,7 +96,8 @@ LoodleController._get = function (req, res) {
 
 LoodleController._removeUser = function (req, res) {
 
-	LoodleController.removeUser(req.params.id, req.body.user_id, function (err, data) {
+	LoodleController.removeUser(req.params.loodleId, req.params.userId, function (err, data) {
+		if (err) return reply(res, err.message, data);
 		return reply(res, err, data);
 	});
 
@@ -387,9 +388,12 @@ LoodleController.removeUser = function (loodle_id, user_id, callback) {
 			Loodle.getUserIds(loodle_id, function (err, user_ids) {
 				if (err) return end(err);
 
+				if (typeof user_id === 'object')
+					user_id = user_id.toString();
+
 				if (user_ids.length === 1) {
 					// The user we want to remove is the last user present in the loodle
-					if (user_ids[0].equals(user_id)) {
+					if (user_ids[0] == user_id) {
 						LoodleController.delete(loodle_id, function (err) {
 							if (err) return end(err);
 

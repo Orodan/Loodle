@@ -127,7 +127,7 @@ describe('API Loodle', function () {
             first_name: "Fifi",
             last_name: "Duck",
             password: "test"
-        }
+        };
 
         var loodle = {
             name: 'My great loodle',
@@ -1007,6 +1007,231 @@ describe('API Loodle', function () {
     });
 
     // Remove user
+    describe('DELETE /loodle/:loodleId/user/:userId', function () {
+
+        var riri = {
+            email: "ririduck@gmail.com",
+            first_name: "Riri",
+            last_name: "Duck",
+            password: "test"
+        };
+
+        var fifi = {
+            email: "fifiduck@gmail.com",
+            first_name: "Fifi",
+            last_name: "Duck",
+            password: "test"
+        };
+
+        var loodle = {
+            'name': 'Mon super loodle',
+            'description': 'Ma super description'
+        };
+
+        var token;
+
+        // Create two users, get an access token, create a loodle and add them to the loodle
+        before(function (done) {
+
+            async.series({
+
+                // Create users
+                createUsers: function (end) {
+                    async.parallel({
+
+                        createRiri: function (finish) {
+                            User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
+                                if (err) return finish(err);
+
+                                riri.id = data.id;
+                                return finish();
+                            });
+                        },
+
+                        createFifi: function (finish) {
+                            User.createUser(fifi.email, fifi.first_name, fifi.last_name, fifi.password, function (err, data) {
+                                if (err) return finish(err);
+
+                                fifi.id = data.id;
+                                return finish();
+                            });
+                        }
+
+                    }, end);
+                },
+
+                // Connect to get the access token
+                connect: function (end) {
+                    User.authenticate(riri.email, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        token = data;
+                        return end();
+                    });
+                },
+
+                // Create loodle
+                createLoodle: function (end) {
+                    Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+                        if (err) return end(err);
+
+                        loodle = data;
+                        return end();
+                    });
+                },
+
+                addFifi: function (end) {
+                    Loodle.addUser(loodle.id, fifi.id, end);
+                }
+
+            }, done);
+
+        });
+
+        // Delete the user, delete the loodle (once the second test is valid, no need anymore)
+        after(function (done) {
+
+            async.series({
+                // deleteLoodle: async.apply(Loodle.delete, loodle.id),
+                deleteRiri: async.apply(User.delete, riri.id),
+                deleteFifi: async.apply(User.delete, fifi.id)
+            }, done);
+
+        });
+
+        it('should remove the user from the loodle', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id + '/user/' + fifi.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'User removed');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the user id is unknown', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id + '/user/' + '00000000-0000-0000-0000-000000000000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown user id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the user id is not a valid uuid', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id + '/user/' + 'dgjbeg')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should delete the loodle if the removed person was the last one in it', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id + '/user/' + riri.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Loodle deleted');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the loodle id is unknown', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id + '/user/' + riri.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown loodle id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + 'bfjebg' + '/user/' + riri.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+    });
 
     // Delete loodle
 });

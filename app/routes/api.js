@@ -145,7 +145,7 @@ router.put('/notification/:id', Notification.markAsRead);
 // DELETE ==========================================
 
 // Remove an user from a loodle
-router.delete('/loodle/:id/user', Loodle._removeUser);
+router.delete('/loodle/:loodleId/user/:userId', Loodle._removeUser);
 
 // Delete a schedule
 router.delete('/loodle/:loodleId/schedule/:scheduleId', Loodle._deleteSchedule);
