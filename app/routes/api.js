@@ -156,8 +156,7 @@ router.delete('/loodle/:id', function (req, res) {
 
 	Loodle.delete(req.params.id, function (err) {
 
-		if (err)
-			return error(res, err);
+		if (err) return error(res, err.message);
 
 		return success(res, 'Loodle deleted');
 	})
@@ -165,10 +164,13 @@ router.delete('/loodle/:id', function (req, res) {
 });
 
 function error(res, err) {
+
+	console.log('error : ', err);
+
 	res.status(500);
 	res.json({
 		type: false,
-		data: 'An error occured : ' + err
+		data: err
 	});
 };
 

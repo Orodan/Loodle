@@ -1092,7 +1092,6 @@ describe('API Loodle', function () {
         after(function (done) {
 
             async.series({
-                // deleteLoodle: async.apply(Loodle.delete, loodle.id),
                 deleteRiri: async.apply(User.delete, riri.id),
                 deleteFifi: async.apply(User.delete, fifi.id)
             }, done);
@@ -1234,4 +1233,132 @@ describe('API Loodle', function () {
     });
 
     // Delete loodle
+    describe('DELETE /loodle/:id', function () {
+
+        var riri = {
+            email: "ririduck@gmail.com",
+            first_name: "Riri",
+            last_name: "Duck",
+            password: "test"
+        };
+
+        var loodle = {
+            'name': 'Mon super loodle',
+            'description': 'Ma super description'
+        };
+
+        var token;
+
+        // Create an user, get an access token and create a loodle
+        before(function (done) {
+
+            async.series({
+
+                // Create users
+                createRiri: function (end) {
+                    User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        riri.id = data.id;
+                        return end();
+                    });
+                },
+
+                // Connect to get the access token
+                connect: function (end) {
+                    User.authenticate(riri.email, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        token = data;
+                        return end();
+                    });
+                },
+
+                // Create loodle
+                createLoodle: function (end) {
+                    Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+                        if (err) return end(err);
+
+                        loodle = data;
+                        return end();
+                    });
+                }
+
+            }, done);
+
+        });
+
+        // Delete the user
+        after(function (done) {
+
+            async.series({
+                deleteRiri: async.apply(User.delete, riri.id)
+            }, done);
+
+        });
+
+        it('should delete the loodle', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Loodle deleted');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the loodle id is unknown', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + loodle.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Unknown loodle id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+            request(host)
+                .delete('/api/loodle/' + 'jbdkfkejbg')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+    });
 });
