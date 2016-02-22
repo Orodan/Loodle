@@ -219,6 +219,9 @@ Validator.vote = {};
  */
 Validator.vote.isInRange = function (vote) {
 
+    if (typeof vote === 'string')
+        vote = parseInt(vote);
+
     return (vote === 0 || vote === 1);
 
 };
