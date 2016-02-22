@@ -32,6 +32,7 @@
 
 	app.controller('loodleController', ['loodleService', '$timeout', '$http', '$scope', 'userService', 'participationRequestService', '$cookies', function (loodleService, $timeout, $http, $scope, userService, participationRequestService, $cookies) {
 
+		$scope.noSchedules = true;
 		$scope.loodle_id = window.location.pathname.split("/")[2];
 
 		var lang = $cookies.get('mylanguage');
@@ -45,6 +46,9 @@
 
 			if (!$scope.loodle.schedules)
 				return;
+
+			if ($scope.loodle.schedules.length > 0)
+				$scope.noSchedules = false;
 
 			var months = []
 				, days = []
