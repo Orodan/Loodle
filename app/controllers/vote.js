@@ -27,8 +27,6 @@ VoteController._updateVotes = function (req, res) {
 
 	if (req.user)
 		userId = req.user.id;
-	else
-		userId = req.body.user_id;
 
 	VoteController.updateVotes(req.params.id, userId, req.body, function (err, result) {
 		if (err) return error(res, err.message);

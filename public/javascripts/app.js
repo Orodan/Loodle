@@ -565,7 +565,7 @@
 
 		loodleService.updateVotes = function (loodle_id, user_id, votes) {
 
-			return $http.put('/loodle/' + loodle_id + '/votes', {votes: votes, user_id: user_id})
+			return $http.put('/loodle/' + loodle_id + '/votes', votes)
 				.success(function (result) {
 					loodleService.loadLoodle(loodle_id);
 				})
