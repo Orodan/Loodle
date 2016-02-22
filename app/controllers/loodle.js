@@ -494,40 +494,52 @@ LoodleController.getSchedules = function (req, res) {
 
 LoodleController.get = function (loodle_id, callback) {
 
-	async.parallel({
+	async.series({
+
+		// Validate we know the loodle id
+		validateLoodleId: function (end) {
+			Validator.loodle.knownId(loodle_id, function (err, result) {
+				if (err) return end(err);
+				if (!result) return end(new ReferenceError('Unknown loodle id'));
+				return end();
+			});
+		},
 
 		// Get loodle data
-		loodle: function (done) {
-			Loodle.get(loodle_id, done);
-		},
-		// Get users of the loodle
-		users: function (done) {
-			Loodle.getUsers(loodle_id, done);
-		},
-		// Get schedules of the loodle
-		schedules: function (done) {
-			Loodle.getSchedules(loodle_id, done);
-		},
-		// Get votes of the loodle
-		votes: function (done) {
-			Loodle.getVotes(loodle_id, done);
+		getLoodle: function (end) {
+			async.parallel({
+
+				// Get loodle data
+				loodle: function (done) {
+					Loodle.get(loodle_id, done);
+				},
+				// Get users of the loodle
+				users: function (done) {
+					Loodle.getUsers(loodle_id, done);
+				},
+				// Get schedules of the loodle
+				schedules: function (done) {
+					Loodle.getSchedules(loodle_id, done);
+				},
+				// Get votes of the loodle
+				votes: function (done) {
+					Loodle.getVotes(loodle_id, done);
+				}
+
+			}, function (err, results) {
+				if (err) return end(err);
+
+				// Format
+				results.loodle.schedules = results.schedules;
+				results.loodle.votes = results.votes;
+				results.loodle.users = results.users;
+
+				return end(null, results.loodle);
+			});
 		}
-
-	}, function (err, results) {
-
-		if (results.loodle === undefined) {
-			return callback('This loodle does not exists');
-		} 
-
-		// Format
-		results.loodle.schedules = results.schedules;
-		results.loodle.votes = results.votes;
-		results.loodle.users = results.users;
-
-		if (err)
-			return callback(err);
-
-		return callback(null, results.loodle);
+	}, function (err, data) {
+		if (err) return callback(err);
+		return callback(null, data.getLoodle);
 	});
 
 };

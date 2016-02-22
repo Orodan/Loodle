@@ -1198,4 +1198,122 @@ describe('Loodle', function () {
 
 	});
 
+	describe('get', function () {
+
+		var loodle = {
+			name: 'Mon super loodle',
+			description: 'Test'
+		};
+
+		var schedule = {
+			begin_time: '10/02/2016 17:10',
+			end_time: '10/02/2016 17:12',
+			locale: 'fr'
+		};
+
+		// Create a loodle, add a schedule
+		before(function (done) {
+
+			async.series({
+
+				// Create a loodle
+				createLoodle: function (end) {
+					Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+						if (err) return end(err);
+
+						loodle = data;
+						return end();
+					})
+				},
+
+				// Add a schedule to the loodle
+				addSchedule: function (end) {
+					Loodle.addSchedule(loodle.id, schedule.begin_time, schedule.end_time, schedule.locale, end);
+				}
+
+			}, done);
+
+		});
+
+		// Delete the created loodle
+		after(function (done) {
+			Loodle.delete(loodle.id, done);
+		});
+
+		it('should send the loodle data', function (done) {
+
+			Loodle.get(loodle.id, function (err, data) {
+
+				try {
+					assert.equal(err, null);
+					assert.equal(data.id.equals(loodle.id), true);
+					assert.equal(data.name, loodle.name);
+					assert.equal(data.description, loodle.description);
+					assert.equal(data.category, 'private');
+					assert.equal(typeof data.schedules, 'object');
+					assert.equal(data.schedules.length, 1);
+					assert.equal(data.schedules[0].begin_time, 'Wed Feb 10 2016 17:10:00 GMT+0100 (CET)');
+					assert.equal(data.schedules[0].end_time, 'Wed Feb 10 2016 17:12:00 GMT+0100 (CET)');
+					assert.equal(typeof data.votes, 'object');
+					assert.equal(data.votes.length, 1);
+					assert.equal(data.votes[0].user_id.equals(riri.id), true);
+					assert.equal(data.votes[0].schedule_id.equals(data.schedules[0].id), true);
+					assert.equal(data.votes[0].vote, 0);
+					assert.equal(typeof data.users, 'object');
+					assert.equal(data.users.length, 1);
+					assert.equal(data.users[0].id.equals(riri.id), true);
+					assert.equal(data.users[0].email, riri.email);
+					assert.equal(data.users[0].first_name, riri.first_name);
+					assert.equal(data.users[0].last_name, riri.last_name);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is unknown', function (done) {
+
+			Loodle.get('00000000-0000-0000-0000-000000000000', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'ReferenceError');
+					assert.equal(err.message, 'Unknown loodle id');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+		it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+			Loodle.get('ehgbehgi', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'TypeError');
+					assert.equal(err.message, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			});
+
+		});
+
+	});
+
 });
