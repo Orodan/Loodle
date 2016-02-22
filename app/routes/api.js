@@ -97,19 +97,6 @@ router.post('/loodle/:loodleId/user/:userId', Loodle._addUser);
 // Add schedule ========================================
 router.post('/loodle/:id/schedule', Loodle._addSchedule);
 
-/**
-router.post('/loodle/:id/schedule', function (req, res) {
-
-	Schedule.createSchedule(req.params.id, req.body.begin_time, req.body.end_time, function (err, data) {
-		if (err)
-			return error(res, err);
-
-		return success(res, data);
-	});
-
-});
-**/
-
 router.post('/loodle/:id/participation-request', function (req, res) {
 
 	ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
@@ -123,19 +110,6 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 // PUT =============================================
 
-/**
-router.put('/loodle/:id/votes', function (req, res) {
-
-	Vote.updateVotes(req.params.id, req.user.id, req.body.votes, function (err) {
-
-		if (err)
-			return error(res, err);
-
-		return error(res, 'votes updated');
-	});
-
-});
-**/
 router.put('/loodle/:id/votes', Vote._updateVotes);
 
 router.put('/loodle/:id/configuration', Configuration.update);
