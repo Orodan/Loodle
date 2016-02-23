@@ -167,8 +167,15 @@
 				});
 			});
 
+			console.log('saveVotes');
+			console.log('loodle : ', $scope.loodle);
+
 			// Server call
-			loodleService.updateVotes($scope.loodle_id, $scope.currentUser.id, data);
+			if ($scope.loodle.category === 'private')
+				loodleService.updateVotes($scope.loodle_id, $scope.currentUser.id, data);
+			else
+				loodleService.updatePublicVotes($scope.loodle_id, $scope.currentUser.id, data);
+
 
 		}
 
@@ -575,6 +582,18 @@
 				})
 				.error(function (result) {
 					console.log("loodleService.updateVotes error : ", result);
+				})
+
+		};
+
+		loodleService.updatePublicVotes = function (loodleId, userId, votes) {
+
+			return $http.put('/loodle/' + loodleId + '/user/' + userId + '/votes', votes)
+				.success(function (result) {
+					loodleService.loadLoodle(loodleId);
+				})
+				.error(function (result) {
+					console.log("loodleService.updatePublicVotes error : ", result);
 				})
 
 		};

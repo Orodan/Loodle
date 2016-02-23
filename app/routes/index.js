@@ -184,6 +184,8 @@ router.post('/data/public/loodle', Loodle._createPublicLoodle);
 
 router.put('/loodle/:id/votes', Vote._updateVotes);
 
+router.put('/loodle/:loodleId/user/:userId/votes', Vote._updatePublicVotes);
+
 router.put('/data/notification/:id', Notification._markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);

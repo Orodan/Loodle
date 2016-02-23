@@ -18,17 +18,28 @@ var defaultValue = 0;
 /**
  * Route call use to update votes
  * 
- * @param  {Object} req 	Incomming request
+ * @param  {Object} req 	Incoming request
  * @param  {Object} res 	Response to send
  */
 VoteController._updateVotes = function (req, res) {
 
-	var userId;
+	VoteController.updateVotes(req.params.id, req.user.id, req.body, function (err, result) {
+		if (err) return error(res, err.message);
 
-	if (req.user)
-		userId = req.user.id;
+		return success(res, 'Vote(s) updated');
+	});
 
-	VoteController.updateVotes(req.params.id, userId, req.body, function (err, result) {
+};
+
+/**
+ * Route call use to update votes of a public user
+ *
+ * @param  {Object} req 	Incoming request
+ * @param  {Object} res 	Response to send
+ */
+VoteController._updatePublicVotes = function (req, res) {
+
+	VoteController.updateVotes(req.params.loodleId, req.params.userId, req.body, function (err, result) {
 		if (err) return error(res, err.message);
 
 		return success(res, 'Vote(s) updated');
