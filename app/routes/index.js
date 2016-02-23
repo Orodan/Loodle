@@ -53,7 +53,7 @@ router.get('/new-doodle', isAuthenticated, function (req, res) {
 // Loodle page
 router.get('/loodle/:id'
 	// Authentication
-	, Loodle.check
+	, Loodle._check
 	, function (req, res) {
 		res.render('loodle', {
 			message: req.flash()
@@ -107,7 +107,7 @@ router.get('/data/user', User._get);
 router.get('/data/loodle/:id', Loodle._get);
 
 // Loodles list data
-router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
+router.get('/data/loodle/', isAuthenticated, Loodle._getLoodlesOfUser);
 
 // Participation requests data of loodle
 router.get('/data/loodle/:id/participation-request', ParticipationRequest.getParticipationRequestsOfLoodle);
@@ -158,7 +158,7 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle._addSchedule);
 
 // Process add user
-router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)
+router.post('/loodle/:id/user/add', isAuthenticated, Loodle._inviteUser)
 
 // Process delete schedule
 router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) {
@@ -188,7 +188,7 @@ router.put('/data/notification/:id', Notification.markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);
 
-router.put('/data/loodle/:id/category', isAuthenticated, Loodle.setCategory);
+router.put('/data/loodle/:id/category', isAuthenticated, Loodle._setCategory);
 
 router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration.updateUserRoles);
 

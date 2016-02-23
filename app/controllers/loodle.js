@@ -17,6 +17,12 @@ var LoodleController = {};
 // Route calls //
 /////////////////
 
+/**
+ * Route call to add a schedule to the loodle
+ * 
+ * @param {Object} 	req 	Incomming request
+ * @param {Object} 	res 	Response to send
+ */
 LoodleController._addSchedule = function (req, res) {
 
 	var language;
@@ -51,7 +57,12 @@ LoodleController._addSchedule = function (req, res) {
 
 };
 
-// Add a user to a loodle
+/**
+ * Route call to add an user to the loodle
+ * 
+ * @param {Object} 	req 	Incomming request
+ * @param {Object} 	res 	Response to send
+ */
 LoodleController._addUser = function (req, res) {
 
 	LoodleController.addUser(req.params.loodleId, req.params.userId, function (err, data) {
@@ -62,7 +73,12 @@ LoodleController._addUser = function (req, res) {
 
 };
 
-// Create a new loodle
+/**
+ * Route call to create a new loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 LoodleController._createLoodle = function (req, res) {
 
 	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
@@ -72,6 +88,12 @@ LoodleController._createLoodle = function (req, res) {
 
 };
 
+/** 
+ * Route call to delete a schedule from the loodle
+ * 
+ * @param  {Object}		req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 LoodleController._deleteSchedule = function (req, res) {
 
 	LoodleController.deleteSchedule(req.params.loodleId, req.params.scheduleId, function (err, data) {
@@ -81,7 +103,12 @@ LoodleController._deleteSchedule = function (req, res) {
 
 };
 
-// Get loodle data
+/** 
+ * Route call to get the loodle data
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {[type]} 	res 	Response to send
+ */
 LoodleController._get = function (req, res) {
 
 	LoodleController.get(req.params.id, function (err, data) {
@@ -91,6 +118,12 @@ LoodleController._get = function (req, res) {
 
 };
 
+/**
+ * Route call to remove an user from the loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 LoodleController._removeUser = function (req, res) {
 
 	LoodleController.removeUser(req.params.loodleId, req.params.userId, function (err, data) {
@@ -100,6 +133,12 @@ LoodleController._removeUser = function (req, res) {
 
 };
 
+/**
+ * Route call to get registred users
+ * 
+ * @param  {Object} 	req 	Incomming request	
+ * @param  {Object} 	res 	Response to send
+ */
 LoodleController._getRegistredUsers = function (req, res) {
 
 	LoodleController.getRegistredUsers(req.params.id, function (err, data) {
@@ -107,6 +146,318 @@ LoodleController._getRegistredUsers = function (req, res) {
 		return reply(res, err, data);
 	});
 
+};
+
+/**
+ * Route call to get the resume data of the loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getResume = function (req, res) {
+
+	Loodle.get(req.params.id, function (err, data) {
+		if (err)
+			return error(res, err);
+
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to get loodle's users
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getUsers = function (req, res) {
+
+	Loodle.getUsers(req.params.id, function (err, data) {
+		if (err)
+			return error(res, error);
+
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to get loodle's votes
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getVotes = function (req, res) {
+
+	Loodle.getVotes(req.params.id, function (err, data) {
+		if (err)
+			return error(res, error);
+
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to get loodle's schedules
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getSchedules = function (req, res) {
+
+	Loodle.getSchedules(req.params.id, function (err, data) {
+
+		if (err)
+			return error(res, error);
+
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to get a resume of the data ov every loodle on the user with his/her configuration for every loodle
+ *  
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getLoodlesOfUser = function (req, res) {
+
+	async.waterfall([
+
+		// Get the loodles id 
+		function (done) {
+			Loodle.getLoodleIdsOfUser(req.user.id, done);
+		},
+
+		// Get the loodles data 
+		function (loodle_ids, done) {
+			var results = [];
+
+			async.eachSeries(loodle_ids, function (loodle_id, end) {
+
+				Loodle.get(loodle_id, function (err, data) {
+					if (err)
+						return end(err);
+
+					results.push(data);
+					return end();
+				})
+			}, function (err) {
+				return done(err, results);
+			});
+		},
+
+		// Get user configuration for the loodles
+		function (loodles, done) {
+
+			async.each(loodles, function (loodle, end) {
+
+				Configuration.getUserConfiguration(req.user.id, loodle.id, function (err, data) {
+					if (err)
+						return end(err);
+					
+					loodle.user_config = data;
+					return end();
+				});
+
+			}, function (err) {
+				return done(err, loodles);
+			});
+
+		}
+
+	], function (err, data) {
+		if (err)
+			return error(res, err);
+
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to check if the user is accessing an public or private loodle
+ * 
+ * @param  {Object}   req  		Incomming request
+ * @param  {Object}   res  		Response to send
+ * @param  {Function} next 		Following function
+ */
+LoodleController._check = function (req, res, next) {
+
+	// Get the loodle data
+	// If the loodle is set to public, no need to be authenticated
+	// Otherwise, check authorization to access
+
+	Loodle.get(req.params.id, function (err, loodle) {
+		if (err)
+			throw new Error(err);
+
+		// Loodle public, no authentification required ======
+		if (loodle.category === 'public')
+			return next();
+
+		// Loodle private, authentification required ========
+
+		// No user authenticated
+		if (!req.user) {
+			req.flash('error', 'You need to be authenticated to access this loodle');
+			return res.redirect('/login');
+		}
+
+		//  User authenticated
+
+		// Get user of the loodle to see if the user has access
+		// to the loodle
+		Loodle.getUserIds(req.params.id, function (err, user_ids) {
+			if (err)
+				throw new Error(err);
+
+			var authorized = false;
+
+			user_ids.forEach(function (user_id) {
+				if (user_id.equals(req.user.id))
+					authorized = true;
+			});
+
+			// Authenticated and authorized
+			if (authorized)
+				return next();
+
+			req.flash('error', "You don't have the permission to access this loodle");
+			res.redirect('/login');
+		});
+
+	});
+
+};
+
+/** 
+ * Route call to invite an user to participate to the loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._inviteUser = function (req, res) {
+
+	var invated_user_id = undefined;
+
+	async.series({
+
+		// Check if the email is matching a user
+		emailMatching: function (done) {
+			User.getByEmail(req.body.email, function (err, data) {
+				if (err)
+					return done(err);
+
+				// No user found
+				if (!data)
+					return done('No user found with that email');
+
+				invated_user_id = data.id;
+				return done();
+			});
+		},
+
+		// Check if the user is not already in the loodle
+		checkUsers: function (done) {
+
+			Loodle.getUserIds(req.params.id, function (err, user_ids) {
+				if (err)
+					return done(err);
+
+				var alreadyParticipating = false;
+
+				user_ids.forEach(function (user_id) {
+					if (user_id.equals(invated_user_id))
+						alreadyParticipating = true;
+				});
+
+				if (alreadyParticipating)
+					return done('This user is already participating to the loodle');
+
+				return done();
+			});
+
+		},
+
+		// Check if the user is not already invated to participate
+		checkInvatedUsers: function (done) {
+
+			Loodle.getParticipationRequestsOfUser(invated_user_id, function (err, participation_requests) {
+				if (err)
+					return done(err);
+
+				var alreadyInvated = false;
+
+				participation_requests.forEach(function (pr) {
+					if (pr.doodle_id == req.params.id)
+						alreadyInvated = true;
+				});
+
+				if (alreadyInvated)
+					return done('This user is already invated to participate to the loodle');
+
+				return done();
+			});
+
+		},
+
+		// Create the participation request and bind it to the
+		// loodle and the invated user
+		createPR: function (done) {
+			ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
+				if (err)
+					return done(err);
+
+				return done();
+			});
+		}
+	}, function (err) {
+		if (err)
+			req.flash('error', err);
+		else
+			req.flash('success', 'Participation request send');
+
+		res.redirect('/loodle/' + req.params.id);
+	});
+
+};
+
+/**
+ * Route call to create a public loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._createPublicLoodle = function (req, res) {
+
+	LoodleController.createPublicLoodle(req.body.name, req.body.description, req.body.schedules, req.cookies.mylanguage, function (err, data) {
+		if (err)
+			return error(res, err);
+		
+		return success(res, data);
+	});
+
+};
+
+/**
+ * Route call to set the category of the loodle (private or public)
+ * 
+ * @param {Object} 		req 	Incomming request
+ * @param {Object} 		res 	Response to send
+ */
+LoodleController._setCategory = function (req, res) {
+
+	Loodle.setCategory(req.params.id, req.body.category, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'Loodle category updated');
+	});
+	
 };
 
 // Standard call function to send back data in json
@@ -163,9 +514,9 @@ LoodleController.getRegistredUsers = function (loodleId, callback) {
 /**
  * Add a user to a loodle
  *
- * @param {uuid}        loodle_id   loodle identifier
- * @param {uuid}        user_id     user identifier
- * @param {Function}    callback    standard callback function
+ * @param {uuid}        loodle_id   Loodle identifier
+ * @param {uuid}        user_id     User identifier
+ * @param {Function}    callback    Standard callback function
  */
 LoodleController.addUser = function (loodle_id, user_id, callback) {
 
@@ -298,10 +649,9 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 /**
  * Delete a schedule from a loodle
  * 
- * @param  {uuid}   	loodle_id   	loodle identifier
- * @param  {uuid}   	schedule_id 	schedule identifier
- * @param  {Function} 	callback    	standard callback function
- * @return {string}               		success or error message
+ * @param  {uuid}   	loodle_id   	Loodle identifier
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
  */
 LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 
@@ -368,11 +718,9 @@ LoodleController.deleteSchedule = function (loodle_id, schedule_id, callback) {
 /**
  * Remove a user from a loodle
  * 
- * @param  {uuid}   	loodle_id 	loodle identifier
- * @param  {uuid}   	user_id   	user identifier
- * @param  {Function} 	callback  	standard callback function
- * 
- * @return {string}             	success or error message
+ * @param  {uuid}   	loodle_id 	Loodle identifier
+ * @param  {uuid}   	user_id   	User identifier
+ * @param  {Function} 	callback  	Standard callback function
  */
 LoodleController.removeUser = function (loodle_id, user_id, callback) {
 
@@ -486,51 +834,12 @@ LoodleController.removeUser = function (loodle_id, user_id, callback) {
 
 };
 
-LoodleController.getResume = function (req, res) {
-
-	Loodle.get(req.params.id, function (err, data) {
-		if (err)
-			return error(res, err);
-
-		return success(res, data);
-	});
-
-};
-
-LoodleController.getUsers = function (req, res) {
-
-	Loodle.getUsers(req.params.id, function (err, data) {
-		if (err)
-			return error(res, error);
-
-		return success(res, data);
-	});
-
-};
-
-LoodleController.getVotes = function (req, res) {
-
-	Loodle.getVotes(req.params.id, function (err, data) {
-		if (err)
-			return error(res, error);
-
-		return success(res, data);
-	});
-
-};
-
-LoodleController.getSchedules = function (req, res) {
-
-	Loodle.getSchedules(req.params.id, function (err, data) {
-
-		if (err)
-			return error(res, error);
-
-		return success(res, data);
-	});
-
-};
-
+/**
+ * Get the loodle data
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 LoodleController.get = function (loodle_id, callback) {
 
 	async.series({
@@ -583,63 +892,6 @@ LoodleController.get = function (loodle_id, callback) {
 
 };
 
-// Get a resume of the data ov every loodle on the user
-// with his/her configuration for every loodle
-LoodleController.getLoodlesOfUser = function (req, res) {
-
-	async.waterfall([
-
-		// Get the loodles id 
-		function (done) {
-			Loodle.getLoodleIdsOfUser(req.user.id, done);
-		},
-
-		// Get the loodles data 
-		function (loodle_ids, done) {
-			var results = [];
-
-			async.eachSeries(loodle_ids, function (loodle_id, end) {
-
-				Loodle.get(loodle_id, function (err, data) {
-					if (err)
-						return end(err);
-
-					results.push(data);
-					return end();
-				})
-			}, function (err) {
-				return done(err, results);
-			});
-		},
-
-		// Get user configuration for the loodles
-		function (loodles, done) {
-
-			async.each(loodles, function (loodle, end) {
-
-				Configuration.getUserConfiguration(req.user.id, loodle.id, function (err, data) {
-					if (err)
-						return end(err);
-					
-					loodle.user_config = data;
-					return end();
-				});
-
-			}, function (err) {
-				return done(err, loodles);
-			});
-
-		}
-
-	], function (err, data) {
-		if (err)
-			return error(res, err);
-
-		return success(res, data);
-	});
-
-};
-
 /**
  * Delete a loodle
  * 
@@ -663,152 +915,6 @@ LoodleController.delete = function (loodle_id, callback) {
 	}, function (err) {
 		if (err) return callback(err);
 		return callback(null, 'Loodle deleted');
-	});
-
-};
-
-LoodleController.openToPublic = function (req, res) {
-
-	Loodle.openToPublic(req.params.id, function (err) {
-		if (err)
-			return error(res, err);
-
-		return success(res, 'loodle open to public');
-	})
-
-};
-
-LoodleController.check = function (req, res, next) {
-
-	// Get the loodle data
-	// If the loodle is set to public, no need to be authenticated
-	// Otherwise, check authorization to access
-
-	Loodle.get(req.params.id, function (err, loodle) {
-		if (err)
-			throw new Error(err);
-
-		// Loodle public, no authentification required ======
-		if (loodle.category === 'public')
-			return next();
-
-		// Loodle private, authentification required ========
-
-		// No user authenticated
-		if (!req.user) {
-			req.flash('error', 'You need to be authenticated to access this loodle');
-			return res.redirect('/login');
-		}
-
-		//  User authenticated
-
-		// Get user of the loodle to see if the user has access
-		// to the loodle
-		Loodle.getUserIds(req.params.id, function (err, user_ids) {
-			if (err)
-				throw new Error(err);
-
-			var authorized = false;
-
-			user_ids.forEach(function (user_id) {
-				if (user_id.equals(req.user.id))
-					authorized = true;
-			});
-
-			// Authenticated and authorized
-			if (authorized)
-				return next();
-
-			req.flash('error', "You don't have the permission to access this loodle");
-			res.redirect('/login');
-		});
-
-	});
-
-};
-
-LoodleController.inviteUser = function (req, res) {
-
-	var invated_user_id = undefined;
-
-	async.series({
-
-		// Check if the email is matching a user
-		emailMatching: function (done) {
-			User.getByEmail(req.body.email, function (err, data) {
-				if (err)
-					return done(err);
-
-				// No user found
-				if (!data)
-					return done('No user found with that email');
-
-				invated_user_id = data.id;
-				return done();
-			});
-		},
-
-		// Check if the user is not already in the loodle
-		checkUsers: function (done) {
-
-			Loodle.getUserIds(req.params.id, function (err, user_ids) {
-				if (err)
-					return done(err);
-
-				var alreadyParticipating = false;
-
-				user_ids.forEach(function (user_id) {
-					if (user_id.equals(invated_user_id))
-						alreadyParticipating = true;
-				});
-
-				if (alreadyParticipating)
-					return done('This user is already participating to the loodle');
-
-				return done();
-			});
-
-		},
-
-		// Check if the user is not already invated to participate
-		checkInvatedUsers: function (done) {
-
-			Loodle.getParticipationRequestsOfUser(invated_user_id, function (err, participation_requests) {
-				if (err)
-					return done(err);
-
-				var alreadyInvated = false;
-
-				participation_requests.forEach(function (pr) {
-					if (pr.doodle_id == req.params.id)
-						alreadyInvated = true;
-				});
-
-				if (alreadyInvated)
-					return done('This user is already invated to participate to the loodle');
-
-				return done();
-			});
-
-		},
-
-		// Create the participation request and bind it to the
-		// loodle and the invated user
-		createPR: function (done) {
-			ParticipationRequest.createParticipationRequest(req.params.id, req.user.id, req.body.email, function (err, data) {
-				if (err)
-					return done(err);
-
-				return done();
-			});
-		}
-	}, function (err) {
-		if (err)
-			req.flash('error', err);
-		else
-			req.flash('success', 'Participation request send');
-
-		res.redirect('/loodle/' + req.params.id);
 	});
 
 };
@@ -850,12 +956,13 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 };
 
 /**
- *
- * @param name
- * @param description
- * @param schedules
- * @param locale
- * @param callback
+ * Create a public loodle
+ * 
+ * @param  {String}   	name        	Loodle's name
+ * @param  {String}   	description 	Loodle's description
+ * @param  {Array}   	schedules   	Loodle's schedules
+ * @param  {String}   	locale      	Loodle's schedule locale language
+ * @param  {Function} 	callback    	Standard callback function
  */
 LoodleController.createPublicLoodle = function (name, description, schedules, locale, callback) {
 
@@ -910,27 +1017,6 @@ LoodleController.createPublicLoodle = function (name, description, schedules, lo
 		return callback(null, results.createLoodle);
 	});
 
-}
-
-LoodleController._createPublicLoodle = function (req, res) {
-
-	LoodleController.createPublicLoodle(req.body.name, req.body.description, req.body.schedules, req.cookies.mylanguage, function (err, data) {
-		if (err)
-			return error(res, err);
-		
-		return success(res, data);
-	});
-
-};
-
-LoodleController.setCategory = function (req, res) {
-
-	Loodle.setCategory(req.params.id, req.body.category, function (err) {
-		if (err)
-			return error(res, err);
-
-		return success(res, 'Loodle category updated');
-	});
 };
 
 module.exports = LoodleController;

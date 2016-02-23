@@ -32,15 +32,15 @@ router.get('/user/participation-requests', ParticipationRequest.getParticipation
 
 router.get('/loodle/:id', Loodle._get);
 
-router.get('/loodle/resume/:id', Loodle.getResume);
+router.get('/loodle/resume/:id', Loodle._getResume);
 
-router.get('/loodle/', Loodle.getLoodlesOfUser);
+router.get('/loodle/', Loodle._getLoodlesOfUser);
 
-router.get('/loodle/getUsers/:id', Loodle.getUsers);
+router.get('/loodle/getUsers/:id', Loodle._getUsers);
 
-router.get('/loodle/getSchedules/:id', Loodle.getSchedules);
+router.get('/loodle/getSchedules/:id', Loodle._getSchedules);
 
-router.get('/loodle/getVotes/:id', Loodle.getVotes);
+router.get('/loodle/getVotes/:id', Loodle._getVotes);
 
 router.get('/loodle/:id/participation-request', ParticipationRequest.getParticipationRequestsOfLoodle);
 
