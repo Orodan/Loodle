@@ -6,6 +6,16 @@ var Configuration        = require('./configuration');
 
 var ParticipationRequestController = {};
 
+/////////////////
+// Route calls //
+/////////////////
+
+/**
+ * Get user's participation requests
+ * 
+ * @param  {Object} 	req 	Incoming request
+ * @param  {Object} 	res 	Response to send
+ */
 ParticipationRequestController.getParticipationRequestsOfUser = function (req, res) {
 
 	async.waterfall([
@@ -81,6 +91,12 @@ ParticipationRequestController.getParticipationRequestsOfUser = function (req, r
 
 };
 
+/**
+ * Get loodle's participation requests
+ * 
+ * @param  {Object} 	req 	Incoming request
+ * @param  {Object} 	res 	Response to send
+ */
 ParticipationRequestController.getParticipationRequestsOfLoodle = function (req, res) {
 
 	// Get participation requests ids from loodle id
@@ -159,6 +175,18 @@ ParticipationRequestController.getParticipationRequestsOfLoodle = function (req,
 
 };
 
+///////////////////////////////////////////////
+// Participation request controller features //
+///////////////////////////////////////////////
+
+/**
+ * Create a new participation request
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Uuid}   	from_id   	User identifier who emited the participation request
+ * @param  {[type]}   	to_email  	User identifier who received the participation request
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequestController.createParticipationRequest = function (loodle_id, from_id, to_email, callback) {
 
 	// Get the id of the user to send the participation requests
@@ -194,6 +222,13 @@ ParticipationRequestController.createParticipationRequest = function (loodle_id,
 
 };
 
+/**
+ * Accept a participation request
+ * 
+ * @param  {Uuid}   	participation_request_id 	Participation request identifier
+ * @param  {Uuid}   	user_id                  	User identifier
+ * @param  {Function} 	callback                 	Standard callback function
+ */
 ParticipationRequestController.accept = function (participation_request_id, user_id, callback) {
 
 	// Get the loodle id from the participation request data
@@ -247,6 +282,13 @@ ParticipationRequestController.accept = function (participation_request_id, user
 
 };
 
+/**
+ * Decline a participation request
+ * 
+ * @param  {Uuid}   	participation_request_id 	Participation request identifier
+ * @param  {Uuid}   	user_id                  	User identifier
+ * @param  {Function} 	callback                 	Standard callback function
+ */
 ParticipationRequestController.decline = function (participation_request_id, user_id, callback) {
 
 	ParticipationRequest.get(participation_request_id, function (err, data) {
