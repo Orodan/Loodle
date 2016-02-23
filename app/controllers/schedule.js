@@ -25,15 +25,17 @@ function reply (res, err, data) {
  * @param  {Function} 	callback    	Standard callback function
  */
 ScheduleController.delete = function (schedule_id, callback) {
+
 	Schedule.delete(schedule_id, callback);
+
 };
 
 /**
  * Delete the votes of the schedule on the loodle
  * 
- * @param  {uuid}   	schedule_id 	schedule identifier
- * @param  {uuid}   	loodle_id   	loodle identifier
- * @param  {Function} 	callback    	standard callback function
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {uuid}   	loodle_id   	Loodle identifier
+ * @param  {Function} 	callback    	Standard callback function
  */
 ScheduleController.deleteVotes = function (schedule_id, loodle_id, callback) {
 
