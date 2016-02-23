@@ -9,6 +9,13 @@ var Notification  = require('./notification.model');
 var PR 			  = require('./participation-request.model');;
 var Configuration = require('./configuration.model');
 
+/**
+ * Create a new loodle object
+ * 
+ * @param {String} name        	Loodle's name
+ * @param {String} description 	Loodle's description
+ * @param {String} category    	Loodle's category
+ */
 function Loodle (name, description, category) {
 	this.id = cassandra.types.Uuid.random();
 	this.name = name;
@@ -17,6 +24,15 @@ function Loodle (name, description, category) {
 	this.category = (category) ? category : 'private';
 }
 
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
+
+/**
+ * Save the loodle in db
+ * 
+ * @param  {Function} callback 	Standard callback function
+ */
 Loodle.prototype.save = function (callback) {
 
 	var self = this;
@@ -33,16 +49,14 @@ Loodle.prototype.save = function (callback) {
 	    }
 	);
 
-}
+};
 
 /**
- * Remove the association loodle - user
+ * Remove the user from the loodle
  * 
- * @param  {uuid}   	loodle_id 	loodle indentifier
- * @param  {uuid}   	user_id   	user identifier
- * @param  {Function} 	callback  	standard callback function
- * 
- * @return {void}             		null or error message
+ * @param  {Uuid}   	loodle_id 	Loodle indentifier
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Function} 	callback  	Standard callback function
  */
 Loodle.removeUser = function (loodle_id, user_id, callback) {
 
@@ -63,6 +77,13 @@ Loodle.removeUser = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Associate the user to the loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Loodle.bindUser = function (user_id, loodle_id, callback) {
 
 	var queries = [
@@ -81,8 +102,15 @@ Loodle.bindUser = function (user_id, loodle_id, callback) {
 		, function (err) {
 			return callback(err);
 		});
+
 };
 
+/**
+ * Get loodle data
+ * 
+ * @param  {Uuid}   	id       	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.get = function (id, callback) {
 
 	var query = 'SELECT * FROM doodles WHERE id = ?';
@@ -100,9 +128,16 @@ Loodle.get = function (id, callback) {
 		}
 	);
 
-}
+};
 
+/**
+ * Get ids of the loodle's users
+ * 
+ * @param  {Uuid}   	id       	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.getUsersIds = function (id, callback) {
+
 	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
 	db.execute(query
 		, [ id ]
@@ -120,8 +155,15 @@ Loodle.getUsersIds = function (id, callback) {
 			return callback(null, results);
 		}
 	);
-}
 
+};
+
+/**
+ * Get loodle's users
+ * 
+ * @param  {Uuid}   	id       	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.getUsers = function (id, callback) {
 
 	var results = [];
@@ -158,6 +200,12 @@ Loodle.getUsers = function (id, callback) {
 
 };
 
+/**
+ * Get loodle's schedules
+ * 
+ * @param  {Uuid}   	id       	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.getSchedules = function (id, callback) {
 
 	var results = [];
@@ -209,6 +257,12 @@ Loodle.getSchedules = function (id, callback) {
 
 };
 
+/**
+ * Get loodle's votes
+ * 
+ * @param  {Uuid}   	id       	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.getVotes = function (id, callback) {
 
 	var results = [];
@@ -265,6 +319,12 @@ Loodle.getVotes = function (id, callback) {
 
 };
 
+/**
+ * Get loodle ids of the user
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.getLoodleIdsOfUser = function (user_id, callback) {
 
 	var query = 'SELECT doodle_id FROM doodle_by_user WHERE user_id = ?';
@@ -284,8 +344,15 @@ Loodle.getLoodleIdsOfUser = function (user_id, callback) {
 
 			return callback(null, results);
 		});
+
 };
 
+/**
+ * Delete the loodle
+ * 
+ * @param  {Uuid}   	loodleId 	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Loodle.delete = function (loodleId, callback) {
 
 	var userIds,
@@ -324,7 +391,7 @@ Loodle.delete = function (loodleId, callback) {
 };
 
 /**
- * Delete the participation requests of a loodle
+ * Delete the loodle's participation requests
  * 
  * @param  {String}   	loodleId              	Loodle identifier
  * @param  {Array}   	participationRequests 	ParticipationRequests Array
@@ -436,10 +503,10 @@ Loodle.removeUsers = function (loodleId, userIds, callback) {
 };
 
 /**
- * Delete the loodle
+ * Delete the loodle itself
  * 
- * @param  {[type]}   loodleId 	Loodle identifier
- * @param  {Function} callback 	Standard callback function
+ * @param  {Uuid}   	loodleId 	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
  */
 Loodle.deleteLoodle = function (loodleId, callback) {
 
@@ -707,22 +774,6 @@ Loodle.removeAssociationLoodleParticipationRequest = function (loodle_id, callba
 	var query = 'DELETE FROM participation_request_by_doodle WHERE doodle_id = ?';
 	db.execute(query
 		, [ loodle_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
-/**
- * Set the loodle as public
- * 
- * @param  {String}   loodle_id 	Loodle identifier
- * @param  {Function} callback  	Standard callback function
- */
-Loodle.openToPublic = function (loodle_id, callback) {
-
-	var query = 'UPDATE doodles SET category = ? WHERE id = ?';
-	db.execute(query
-		, [ 'public', loodle_id ]
 		, { prepare : true }
 		, callback);
 
