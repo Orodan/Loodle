@@ -92,7 +92,7 @@ NotificationController.notify = function (loodle_id, current_user_id, callback) 
 		getConfiguration: function (done) {
 
 			async.each(users, function (user, end) {
-				Configuration.getFromUser(user.id, loodle_id, function (err, configuration) {
+				Configuration.getUserConfiguration(user.id, loodle_id, function (err, configuration) {
 					if (err)
 						return end(err);
 

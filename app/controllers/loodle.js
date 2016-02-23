@@ -17,12 +17,7 @@ var LoodleController = {};
 // Route calls //
 /////////////////
 
-// Add a new schedule to a loodle
 LoodleController._addSchedule = function (req, res) {
-
-	// Check language :
-	// if call from the api --> use req.body.language
-	// if call from the application --> use req.cookies.mylanguage
 
 	var language;
 	if (req.baseUrl === '/api')
@@ -30,6 +25,7 @@ LoodleController._addSchedule = function (req, res) {
 	else
 		language = req.cookies.mylanguage;
 
+	// Check if the mandatory arguments have been send
 	if(!Validator.isDefined(language))
 		return reply(res, 'Attribute "language" required', 400);
 	if(!Validator.isDefined(req.body.begin_time))

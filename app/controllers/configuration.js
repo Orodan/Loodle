@@ -4,28 +4,16 @@ var Configuration = require('../models/configuration.model');
 
 var ConfigurationController = {};
 
+/////////////////
+// Route calls //
+/////////////////
+
 /**
- * Delete configuration
+ * Get configuration data
  * 
- * @param  {uuid}   	user_id   	user identifier
- * @param  {uuid}   	loodle_id 	loodle identifier
- * @param  {Function} 	callback  	standard callback function
- * @return {void}             		null or error message
+ * @param  {Object} 	req 	Incoming request
+ * @param  {Object} 	res 	Response to send
  */
-ConfigurationController.delete = function (user_id, loodle_id, callback) {
-
-	Configuration.delete(user_id, loodle_id, callback);
-
-};
-
-ConfigurationController.createDefaultConfiguration = function (user_id, loodle_id, callback) {
-
-	var config = new Configuration(user_id, loodle_id);
-	config.save(callback);
-
-};
-
-// Get configuration data
 ConfigurationController.get = function (req, res) {
 
 	Configuration.get(req.user.id, req.params.id, function (err, data) {
@@ -37,10 +25,12 @@ ConfigurationController.get = function (req, res) {
 
 };
 
-ConfigurationController.getUserConfiguration = function (user_id, loodle_id, callback) {
-	Configuration.get(user_id, loodle_id, callback);
-};
-
+/**
+ * Update the configuration
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 ConfigurationController.update = function (req, res) {
 
 	Configuration.update(req.user.id, req.params.id, req.body.notification, req.body.notification_by_email, function (err, data) {
@@ -52,19 +42,13 @@ ConfigurationController.update = function (req, res) {
 
 };
 
-ConfigurationController.getFromUser = function (user_id, loodle_id, callback) {
-	Configuration.getFromUser(user_id, loodle_id, callback);	
-};
-
-ConfigurationController.setUserRole = function (user_id, doodle_id, role, callback) {
-	Configuration.setUserRole(user_id, doodle_id, role, callback);
-};
-
+/**
+ * Get users of the loodle with a role
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 ConfigurationController.getUsersWithRole = function (req, res) {
-
-	// Get user ids
-	// Get users role (only the registred users)
-	// Get configuration
 
 	async.waterfall([
 
@@ -134,6 +118,12 @@ ConfigurationController.getUsersWithRole = function (req, res) {
 
 };
 
+/**
+ * Update the roles of the specified users in the loodle
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
 ConfigurationController.updateUserRoles = function (req, res) {
 
 	async.each(req.body.users, function (user, callback) {
@@ -147,9 +137,63 @@ ConfigurationController.updateUserRoles = function (req, res) {
 
 };
 
+//////////////
+// Features //
+//////////////
+
+/**
+ * Delete configuration
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ConfigurationController.delete = function (user_id, loodle_id, callback) {
+
 	Configuration.delete(user_id, loodle_id, callback);
-}
+
+};
+
+/**
+ * Create a default configuration for an user
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
+ConfigurationController.createDefaultConfiguration = function (user_id, loodle_id, callback) {
+
+	var config = new Configuration(user_id, loodle_id);
+	config.save(callback);
+
+};
+
+/**
+ * Get the user configuration for the specified loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
+ConfigurationController.getUserConfiguration = function (user_id, loodle_id, callback) {
+
+	Configuration.get(user_id, loodle_id, callback);
+
+};
+
+/**
+ * Set the user role for the specified loodle
+ * 
+ * @param {Uuid}   		user_id   	User identifier
+ * @param {Uuid}   		doodle_id 	Loodle identifier
+ * @param {String}   	role      	Role to set the user
+ * @param {Function} callback  		Standard callback function
+ */
+ConfigurationController.setUserRole = function (user_id, doodle_id, role, callback) {
+
+	Configuration.setUserRole(user_id, doodle_id, role, callback);
+
+};
 
 module.exports = ConfigurationController;
 
@@ -157,7 +201,7 @@ function error(res, err) {
 	res.status(500);
 	res.json({
 		type: false,
-		data: 'An error occured : ' + err
+		data: err
 	});
 };
 

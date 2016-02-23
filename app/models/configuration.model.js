@@ -62,21 +62,6 @@ Configuration.update = function (user_id, loodle_id, notification, notification_
 
 };
 
-Configuration.getFromUser = function (user_id, loodle_id, callback) {
-
-	var query = 'SELECT * FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
-	db.execute(query
-		, [ user_id, loodle_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		});
-
-};
-
 Configuration.setUserRole = function (user_id, doodle_id, role, callback) {
 
 	var query = 'UPDATE configuration_by_user_and_doodle SET role = ? WHERE user_id = ? AND doodle_id = ?';

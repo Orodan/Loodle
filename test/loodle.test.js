@@ -1315,5 +1315,5 @@ describe('Loodle', function () {
 		});
 
 	});
-
+	
 });
