@@ -100,6 +100,15 @@ LoodleController._removeUser = function (req, res) {
 
 };
 
+LoodleController._getRegistredUsers = function (req, res) {
+
+	LoodleController.getRegistredUsers(req.params.id, function (err, data) {
+		if (err) return reply(res, err.message, data);
+		return reply(res, err, data);
+	});
+
+};
+
 // Standard call function to send back data in json
 function reply (res, err, data) {
 
@@ -117,6 +126,39 @@ function reply (res, err, data) {
 ////////////////////////////////
 // Loodle controller features //
 ////////////////////////////////
+
+/**
+ * Get the registred users of the loodle
+ * 
+ * @param  {Uuid}   	loodleId 	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
+LoodleController.getRegistredUsers = function (loodleId, callback) {
+
+	async.waterfall([
+
+		// Get the users of the loodle
+		function (done) {
+			Loodle.getUsers(loodleId, done);
+		},
+
+		// Filter the users to only get those registred
+		function (users, done) {
+
+			var registredUsers = [];
+
+			users.forEach(function (user, index) {
+				if (user.status === "registred")
+					registredUsers.push(user);
+			});
+
+			return done(null, registredUsers);
+			
+		}
+	], callback)
+
+
+};
 
 /**
  * Add a user to a loodle

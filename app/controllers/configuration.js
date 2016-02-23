@@ -43,82 +43,6 @@ ConfigurationController.update = function (req, res) {
 };
 
 /**
- * Get users of the loodle with a role
- * 
- * @param  {Object} 	req 	Incomming request
- * @param  {Object} 	res 	Response to send
- */
-ConfigurationController.getUsersWithRole = function (req, res) {
-
-	async.waterfall([
-
-		// Get user ids
-		function (done) {
-			Configuration.getUserIds(req.params.id, done);
-		},
-
-		// Get users data
-		function (user_ids, done) {
-
-			var users = [];
-
-			async.each(user_ids, function (user_id, end) {
-
-				Configuration.getUser(user_id, function (err, user) {
-					if (err)
-						return end(err);
-
-					// Only get the users registred
-					if (user.status == 'registred')
-						users.push(user);
-					
-					return end();
-				});
-
-			}, function (err) {
-				if (err)
-					return done(err);
-
-				return done(null, users);
-			});
-
-		},
-
-		// Get users role
-		function (users, done) {
-
-			var results = [];
-
-			async.each(users, function (user, end) {
-
-				Configuration.getUserRole(user.id, req.params.id, function (err, role) {
-					if (err)
-						return end(err);
-
-					user.role = role;
-					return end();
-				});
-
-			}, function (err) {
-				if (err)
-					return done(err);
-
-				return done(null, users);
-			});
-
-		}
-
-	], function (err, users) {
-
-		if (err)
-			return error(res, err);
-
-		return success(res, users);
-	});
-
-};
-
-/**
  * Update the roles of the specified users in the loodle
  * 
  * @param  {Object} 	req 	Incomming request
@@ -137,9 +61,9 @@ ConfigurationController.updateUserRoles = function (req, res) {
 
 };
 
-//////////////
-// Features //
-//////////////
+///////////////////////////////////////
+// Configuration Controller Features //
+///////////////////////////////////////
 
 /**
  * Delete configuration

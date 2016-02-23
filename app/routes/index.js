@@ -121,8 +121,8 @@ router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get)
 // Notifications
 router.get('/data/user/notifications', isAuthenticated, Notification.getFromUser);
 
-// Users with
-router.get('/data/loodle/:id/users/configuration', isAuthenticated, Configuration.getUsersWithRole);
+// Get registred users of the loodle
+router.get('/data/loodle/:id/users/configuration', isAuthenticated, Loodle._getRegistredUsers);
 
 // POST ====================================================
 

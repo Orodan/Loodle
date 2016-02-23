@@ -136,7 +136,7 @@ Loodle.getUsers = function (id, callback) {
 
 			async.eachSeries(user_ids, function (user_id, end) {
 
-				var query = 'SELECT id, email, first_name, last_name FROM users WHERE id = ?';
+				var query = 'SELECT id, email, first_name, last_name, status FROM users WHERE id = ?';
 				db.execute(query
 					, [ user_id ]
 					, { prepare : true }
