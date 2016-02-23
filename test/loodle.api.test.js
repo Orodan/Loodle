@@ -1361,4 +1361,172 @@ describe('API Loodle', function () {
         });
 
     });
+
+    // Get loodle data
+    describe('GET /loodle/:id', function () {
+
+        var riri = {
+            email: "ririduck@gmail.com",
+            first_name: "Riri",
+            last_name: "Duck",
+            password: "test"
+        };
+
+        var loodle = {
+            'name': 'Mon super loodle',
+            'description': 'Ma super description'
+        };
+
+        var schedule = {
+            begin_time: '10/02/2016 17:10',
+            end_time: '10/02/2016 17:20',
+            language: 'fr'
+        };
+
+        var token;
+
+        // Create an user, get an access token, create a loodle and add it a schedule
+        before(function (done) {
+
+            async.series({
+
+                // Create user
+                createRiri: function (end) {
+                    User.createUser(riri.email, riri.first_name, riri.last_name, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        riri.id = data.id;
+                        return end();
+                    });
+                },
+
+                // Connect to get the access token
+                connect: function (end) {
+                    User.authenticate(riri.email, riri.password, function (err, data) {
+                        if (err) return end(err);
+
+                        token = data;
+                        return end();
+                    });
+                },
+
+                // Create loodle
+                createLoodle: function (end) {
+                    Loodle.createLoodle(riri.id, loodle.name, loodle.description, function (err, data) {
+                        if (err) return end(err);
+
+                        loodle = data;
+                        return end();
+                    });
+                },
+
+                // Add a schedule
+                addSchedule: function (end) {
+                    Loodle.addSchedule(loodle.id, schedule.begin_time, schedule.end_time, schedule.language, end);
+                }
+
+            }, done);
+
+        });
+
+        // Delete the created loodle and user
+        after(function (done) {
+
+            async.series({
+                deleteLoodle: async.apply(Loodle.delete, loodle.id),
+                deleteRiri: async.apply(User.delete, riri.id)
+            }, done);
+
+        });
+
+        it('should send the loodle data', function (done) {
+
+            request(host)
+                .get('/api/loodle/' + loodle.id)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(200)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+
+                        var data = res.body.data;
+
+                        assert.equal(data.id, loodle.id);
+                        assert.equal(data.name, loodle.name);
+                        assert.equal(data.description, loodle.description);
+                        assert.equal(data.category, 'private');
+                        assert.equal(typeof data.schedules, 'object');
+                        assert.equal(data.schedules.length, 1);
+                        assert.equal(data.schedules[0].begin_time, '2016-02-10T16:10:00.000Z');
+                        assert.equal(data.schedules[0].end_time, '2016-02-10T16:20:00.000Z');
+                        assert.equal(typeof data.votes, 'object');
+                        assert.equal(data.votes.length, 1);
+                        assert.equal(data.votes[0].user_id, riri.id);
+                        assert.equal(data.votes[0].schedule_id, data.schedules[0].id);
+                        assert.equal(data.votes[0].vote, 0);
+                        assert.equal(typeof data.users, 'object');
+                        assert.equal(data.users.length, 1);
+                        assert.equal(data.users[0].id, riri.id);
+                        assert.equal(data.users[0].email, riri.email);
+                        assert.equal(data.users[0].first_name, riri.first_name);
+                        assert.equal(data.users[0].last_name, riri.last_name);
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the loodle id is unknown', function (done) {
+
+            request(host)
+                .get('/api/loodle/' + '00000000-0000-0000-0000-000000000000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        console.log('res.body : ', res.body);
+                        assert.equal(res.body.data, 'Unknown loodle id');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+        it('should send an error if the loodle id is not a valid uuid', function (done) {
+
+            request(host)
+                .get('/api/loodle/' + 'ibjei')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        console.log('res.body : ', res.body);
+                        assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+
+                });
+
+        });
+
+    });
 });

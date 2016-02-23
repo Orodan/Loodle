@@ -89,6 +89,7 @@ LoodleController._deleteSchedule = function (req, res) {
 LoodleController._get = function (req, res) {
 
 	LoodleController.get(req.params.id, function (err, data) {
+		if (err) return reply(res, err.message, data);
 		return reply(res, err, data);
 	});
 
