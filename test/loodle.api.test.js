@@ -1492,7 +1492,6 @@ describe('API Loodle', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        console.log('res.body : ', res.body);
                         assert.equal(res.body.data, 'Unknown loodle id');
                     }
                     catch (e) {
@@ -1515,7 +1514,6 @@ describe('API Loodle', function () {
                 .end(function (err, res) {
                     try {
                         assert.equal(err, null);
-                        console.log('res.body : ', res.body);
                         assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
                     }
                     catch (e) {
