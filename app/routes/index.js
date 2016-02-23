@@ -119,7 +119,7 @@ router.get('/data/participation-request/', isAuthenticated, ParticipationRequest
 router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
 
 // Notifications
-router.get('/data/user/notifications', isAuthenticated, Notification.getFromUser);
+router.get('/data/user/notifications', isAuthenticated, Notification._getFromUser);
 
 // Get registred users of the loodle
 router.get('/data/loodle/:id/users/configuration', isAuthenticated, Loodle._getRegistredUsers);
@@ -184,7 +184,7 @@ router.post('/data/public/loodle', Loodle._createPublicLoodle);
 
 router.put('/loodle/:id/votes', Vote._updateVotes);
 
-router.put('/data/notification/:id', Notification.markAsRead);
+router.put('/data/notification/:id', Notification._markAsRead);
 
 router.put('/data/loodle/:id/configuration', Configuration.update);
 
