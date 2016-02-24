@@ -4,8 +4,14 @@ var cassandra = require('cassandra-driver');
 
 var bcrypt     = require('bcrypt-nodejs');
 
-// User ========================================================================
-
+/**
+ * Create a new user object
+ * 
+ * @param {String}  email       User email
+ * @param {String}  first_name  User first name
+ * @param {String}  last_name   User last name
+ * @param {String}  password    User password
+ */
 function User (email, first_name, last_name, password) {
 
     this.id = cassandra.types.Uuid.random();
@@ -17,12 +23,48 @@ function User (email, first_name, last_name, password) {
     
 }
 
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
+
+User.prototype.save = function (callback) {
+
+    // Save user 
+    // Bind user to email
+
+    var that = this;
+
+    var queries = [
+        {
+            query: 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)',
+            params: [ that.id, that.email, that.first_name, that.last_name, that.password, that.status, Date.now() ]
+        },
+        {
+            query: 'INSERT INTO user_by_email (email, user_id) values (?, ?)',
+            params: [ that.email, that.id ]
+        }
+    ];
+
+    db.batch(queries
+        , { prepare : true }
+        , function (err) {
+            if (err)
+                return callback(err);
+
+            return callback(null, that);
+        });
+    
+};
+
+/////////////////////////
+// User model features //
+/////////////////////////
+
 /**
  * Delete the user
  * 
- * @param  {uuid}       user_id     user identifier
- * @param  {Function}   callback    standard callback function
- * @return {void}                   null or error message
+ * @param  {Uuid}       user_id     User identifier
+ * @param  {Function}   callback    Standard callback function
  */
 User.delete = function (user_id, callback) {
 
@@ -37,8 +79,8 @@ User.delete = function (user_id, callback) {
 /**
  * Delete email reference of the user   
  * 
- * @param  {[type]}   userEmail     Email of the user
- * @param  {Function} callback      Standard callback function
+ * @param  {String}     userEmail     Email of the user
+ * @param  {Function}   callback      Standard callback function
  */
 User.deleteEmailReference = function (userEmail, callback) {
 
@@ -47,44 +89,40 @@ User.deleteEmailReference = function (userEmail, callback) {
 
 };
 
-// Prototypal functions ========================================================
-
-User.prototype.save = function (callback) {
-
-	// Save user 
-	// Bind user to email
-
-    var that = this;
-
-    var queries = [
-    	{
-    		query: 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)',
-    		params: [ that.id, that.email, that.first_name, that.last_name, that.password, that.status, Date.now() ]
-    	},
-    	{
-    		query: 'INSERT INTO user_by_email (email, user_id) values (?, ?)',
-    		params: [ that.email, that.id ]
-    	}
-    ];
-
-    db.batch(queries
-    	, { prepare : true }
-    	, function (err) {
-    		if (err)
-    			return callback(err);
-
-    		return callback(null, that);
-    	});
-};
-
+/**
+ * Check if the given password match the user password
+ * 
+ * @param  {String}     password        Password given by the user trying to log in
+ * @param  {String}     user_password   User password
+ * 
+ * @return {Boolean}                    True if the passwords matched, false otherwise
+ */
 User.validPassword = function (password, user_password) {
+
     return bcrypt.compareSync(password, user_password);
+
 };
 
+/**
+ * Generate a hash from a given text
+ * 
+ * @param  {String} text    Text to hash
+ * 
+ * @return {String}         The hash generated
+ */
 User.generateHash = function (text) {
+
     return bcrypt.hashSync(text, bcrypt.genSaltSync(8), null);
+
 };
 
+/**
+ * Remove an user from the specified loodle
+ * 
+ * @param  {Uuid}       loodle_id   Loodle identifier
+ * @param  {Uuid}       user_id     User identifier
+ * @param  {Function}   callback    Standard callback function
+ */
 User.remove = function (loodle_id, user_id, callback) {
 
 	async.parallel({
@@ -100,6 +138,12 @@ User.remove = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Get user dara from his/her email
+ * 
+ * @param  {String}     user_email      User email
+ * @param  {Function}   callback        Standard callback function
+ */
 User.getByEmail = function (user_email, callback) {
 
     async.waterfall([
@@ -124,9 +168,9 @@ User.getByEmail = function (user_email, callback) {
 
 
 /**
- * Get the user data
- * @param id
- * @param callback
+ * Get user data
+ * @param  {Uuid}       id          User identifier
+ * @param  {Function}   callback    Standard callback function
  */
 User.get = function (id, callback) {
 
@@ -136,12 +180,14 @@ User.get = function (id, callback) {
 		if (result.rows.length === 0) { return callback(null, false); }
 		return callback(null, result.rows[0]);
 	});
+
 };
 
 /**
- * Get the user id by his/her email
- * @param email
- * @param callback
+ * Get user id by his/her email
+ * 
+ * @param  {String}     email       User email
+ * @param  {Function}   callback    Standard callback function
  */
 User.getUserIdByEmail = function (email, callback) {
 
@@ -151,15 +197,15 @@ User.getUserIdByEmail = function (email, callback) {
 		if (result.rows.length === 0) { return callback(null, false); }
         return callback(null, result.rows[0].user_id);
 	});
+
 };
 
 /**
  * Get vote ids of the user in the loodle
  * 
- * @param  {uuid}       user_id     user indentifier
- * @param  {uuid}       loodle_id   loodle identifier
- * @param  {Function}   callback    standard callback function
- * @return {array}                  array of vote ids or error message
+ * @param  {uuid}       user_id     User indentifier
+ * @param  {uuid}       loodle_id   Loodle identifier
+ * @param  {Function}   callback    Standard callback function
  */
 User.getVoteIds = function (user_id, loodle_id, callback) {
 
@@ -181,17 +227,6 @@ User.getVoteIds = function (user_id, loodle_id, callback) {
             return callback(null, results);
         });
 
-};
-
-// To comment
-User.save = function (id, email, first_name, last_name, password, status, callback) {
-
-    var query = 'INSERT INTO Users (id, email, first_name, last_name, password, status, created) values (?, ?, ?, ?, ?, ?, ?)';
-    db.execute(query,
-        [ id, email, first_name, last_name, password, status, Date.now() ],
-        { prepare: true },
-        callback
-    );
 };
 
 /**
@@ -219,37 +254,20 @@ User.getLoodleIds = function (userId, callback) {
 
 /**
  * Save the association between the user and his/her email
- * @param id
- * @param email
- * @param callback
+ * 
+ * @param  {Uuid}       id          User identifier
+ * @param  {String}     email       User email
+ * @param  {Function}   callback    Standard callback function
  */
 User.saveLinkWithEmail = function (id, email, callback) {
 
     var query = 'INSERT INTO user_by_email (email, user_id) values (?, ?)';
     db.execute(query, [ email, id ], { prepare: true }, callback);
-};
-
-User.remove = function (loodle_id, user_id, callback) {
-
-	var queries = [
-		{
-			query: 'DELETE FROM doodle_by_user WHERE user_id = ? AND doodle_id = ?',
-			params: [ user_id, loodle_id ]
-		},
-		{
-			query: 'DELETE FROM user_by_doodle WHERE doodle_id = ? AND user_id = ?',
-			params: [ loodle_id, user_id ]
-		}
-	];
-
-	db.batch(queries
-		, { prepare : true }
-		, callback);
 
 };
 
 /**
- * Delete the user if he is temporary
+ * Delete the user if he/she is temporary
  * 
  * @param  {String}   userId    User identifier
  * @param  {Function} callback  Standard callback function
