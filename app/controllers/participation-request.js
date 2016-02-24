@@ -4,6 +4,7 @@ var ParticipationRequest = require('../models/participation-request.model');
 
 var Configuration        = require('./configuration');
 
+/** @class ParticipationRequestController */
 var ParticipationRequestController = {};
 
 /////////////////

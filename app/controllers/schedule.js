@@ -5,6 +5,7 @@ var Schedule = require('../models/schedule.model');
 var Vote     = require('../controllers/vote');
 var moment   = require('moment');
 
+/** @class ScheduleController */
 var ScheduleController = {};
 
 // Standard call function to send back data in json

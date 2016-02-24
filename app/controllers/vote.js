@@ -7,6 +7,7 @@ var Loodle                 = require('../models/loodle.model');
 
 var Validator 			   = require('../../util/validator');
 
+/** @class VoteController */
 var VoteController = {};
 
 var defaultValue = 0;

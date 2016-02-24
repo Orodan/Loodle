@@ -5,6 +5,7 @@ var NotificationByEmail = require('../models/notification-by-email.model');
 
 var Configuration       = require('./configuration');
 
+/** @class NotificationController */
 var NotificationController = {};
 
 /////////////////

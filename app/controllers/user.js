@@ -16,11 +16,7 @@ var Config     = require('../../Config/config');
 
 var Validator  = require('../../util/Validator');
 
-/**
- * User controller
- * @namespace 
- */
-
+/** @class UserController */
 var UserController = {};
 
 /////////////////
