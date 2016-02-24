@@ -20,7 +20,7 @@ var LoodleController = {};
 /**
  * Route call to add a schedule to the loodle
  * 
- * @param {Object} 	req 	Incomming request
+ * @param {Object} 	req 	Incoming request
  * @param {Object} 	res 	Response to send
  */
 LoodleController._addSchedule = function (req, res) {
@@ -60,7 +60,7 @@ LoodleController._addSchedule = function (req, res) {
 /**
  * Route call to add an user to the loodle
  * 
- * @param {Object} 	req 	Incomming request
+ * @param {Object} 	req 	Incoming request
  * @param {Object} 	res 	Response to send
  */
 LoodleController._addUser = function (req, res) {
@@ -76,7 +76,7 @@ LoodleController._addUser = function (req, res) {
 /**
  * Route call to create a new loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._createLoodle = function (req, res) {
@@ -91,7 +91,7 @@ LoodleController._createLoodle = function (req, res) {
 /** 
  * Route call to delete a schedule from the loodle
  * 
- * @param  {Object}		req 	Incomming request
+ * @param  {Object}		req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._deleteSchedule = function (req, res) {
@@ -106,7 +106,7 @@ LoodleController._deleteSchedule = function (req, res) {
 /** 
  * Route call to get the loodle data
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {[type]} 	res 	Response to send
  */
 LoodleController._get = function (req, res) {
@@ -121,7 +121,7 @@ LoodleController._get = function (req, res) {
 /**
  * Route call to remove an user from the loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._removeUser = function (req, res) {
@@ -136,7 +136,7 @@ LoodleController._removeUser = function (req, res) {
 /**
  * Route call to get registred users
  * 
- * @param  {Object} 	req 	Incomming request	
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getRegistredUsers = function (req, res) {
@@ -151,7 +151,7 @@ LoodleController._getRegistredUsers = function (req, res) {
 /**
  * Route call to get the resume data of the loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getResume = function (req, res) {
@@ -168,7 +168,7 @@ LoodleController._getResume = function (req, res) {
 /**
  * Route call to get loodle's users
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getUsers = function (req, res) {
@@ -185,7 +185,7 @@ LoodleController._getUsers = function (req, res) {
 /**
  * Route call to get loodle's votes
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getVotes = function (req, res) {
@@ -202,7 +202,7 @@ LoodleController._getVotes = function (req, res) {
 /**
  * Route call to get loodle's schedules
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getSchedules = function (req, res) {
@@ -220,7 +220,7 @@ LoodleController._getSchedules = function (req, res) {
 /**
  * Route call to get a resume of the data ov every loodle on the user with his/her configuration for every loodle
  *  
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._getLoodlesOfUser = function (req, res) {
@@ -281,7 +281,7 @@ LoodleController._getLoodlesOfUser = function (req, res) {
 /**
  * Route call to check if the user is accessing an public or private loodle
  * 
- * @param  {Object}   req  		Incomming request
+ * @param  {Object}   req  		Incoming request
  * @param  {Object}   res  		Response to send
  * @param  {Function} next 		Following function
  */
@@ -337,7 +337,7 @@ LoodleController._check = function (req, res, next) {
 /** 
  * Route call to invite an user to participate to the loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._inviteUser = function (req, res) {
@@ -429,7 +429,7 @@ LoodleController._inviteUser = function (req, res) {
 /**
  * Route call to create a public loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
 LoodleController._createPublicLoodle = function (req, res) {
@@ -446,7 +446,7 @@ LoodleController._createPublicLoodle = function (req, res) {
 /**
  * Route call to set the category of the loodle (private or public)
  * 
- * @param {Object} 		req 	Incomming request
+ * @param {Object} 		req 	Incoming request
  * @param {Object} 		res 	Response to send
  */
 LoodleController._setCategory = function (req, res) {
