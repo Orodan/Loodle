@@ -4,7 +4,8 @@ var async     = require('async');
 
 /**
  * Create a new configuration object
- * 
+ *
+ * @class Configuration
  * @param {Uuid} 	user_id               	User identifier
  * @param {Uuid} 	loodle_id             	Loodle identifier
  * @param {String} 	notification          	Notification configuration value

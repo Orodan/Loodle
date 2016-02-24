@@ -6,10 +6,11 @@ var Vote      = require('./vote.model');
 
 /**
  * Create a new participation request object
- * 
+ *
+ * @class ParticipationRequest
  * @param {Uuid} 	loodle_id 	Loodle identifier
  * @param {Uuid} 	from_id   	User identifier who emited the participation request
- * @param {[type]} 	to_id     	User identifier who will received the partcipation request
+ * @param {Uuid} 	to_id     	User identifier who will received the participation request
  */
 function ParticipationRequest (loodle_id, from_id, to_id) {
 
@@ -364,7 +365,7 @@ ParticipationRequest.deleteAssociationsWithLoodle = function (loodleId, callback
  * Delete the assocation between the users and theirs participation requests
  * 
  * @param  {Array}   	participationRequests 		Participation requests array
- * @param  {Function} 	callback              	Standard callback function
+ * @param  {Function} 	callback              		Standard callback function
  */
 ParticipationRequest.deleteAssociationsWithUsers = function (participationRequests, callback) {
 

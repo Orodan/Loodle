@@ -2,6 +2,13 @@ var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 var async     = require('async');
 
+/**
+ * Create a new public user object
+ *
+ * @class  PublicUser
+ * @param {String} first_name 	Public user first name
+ * @param {String} last_name  	Public user last name
+ */
 function PublicUser (first_name, last_name) {
 
 	this.id = cassandra.types.Uuid.random();
@@ -11,6 +18,15 @@ function PublicUser (first_name, last_name) {
 
 }
 
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
+
+/**
+ * Save the public user in db
+ * 
+ * @param  {Function} callback 	Standard callback function
+ */
 PublicUser.prototype.save = function (callback) {
 
 	var query = 'INSERT INTO users (id, first_name, last_name, status) values (?, ?, ?, ?)';
@@ -21,6 +37,17 @@ PublicUser.prototype.save = function (callback) {
 
 };
 
+////////////////////////////////
+// Public user model features //
+////////////////////////////////
+
+/**
+ * Bind the public user to the specified loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 PublicUser.bind = function (user_id, loodle_id, callback) {
 
 	var queries = [

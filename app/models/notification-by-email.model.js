@@ -17,7 +17,8 @@ var NotificationByEmail = {};
 
 /**
  * Send a notification by email
- * 
+ *
+ * @class NotificationByEmail
  * @param  {Uuid}   	from_id   	User identifier who emited the notificaiton
  * @param  {Uuid}   	to_id     	User identifier who will received the notificaiton
  * @param  {Uuid}   	loodle_id 	Loodle identifier

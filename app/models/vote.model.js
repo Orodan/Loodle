@@ -4,7 +4,8 @@ var async     = require('async');
 
 /**
  * Create a new vote object
- * 
+ *
+ * @class  Vote
  * @param {Int} vote Vote value
  */
 function Vote (vote) {

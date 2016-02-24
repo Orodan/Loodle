@@ -4,7 +4,8 @@ var async     = require('async');
 
 /**
  * Create a new schedule object
- * 
+ *
+ * @class  Schedule
  * @param {String} 	begin_time 		Schedule's begin time
  * @param {String} 	end_time   		Schedule's end time
  */

@@ -4,7 +4,8 @@ var async     = require('async');
 
 /** 
  * Create a new notification object
- * 
+ *
+ * @class Notification
  * @param {Uuid} 	from_id   	User identifier who emited the notification
  * @param {Uuid} 	loodle_id 	Loodle identifier
  */

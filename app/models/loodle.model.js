@@ -11,7 +11,8 @@ var Configuration = require('./configuration.model');
 
 /**
  * Create a new loodle object
- * 
+ *
+ * @class Loodle
  * @param {String} name        	Loodle's name
  * @param {String} description 	Loodle's description
  * @param {String} category    	Loodle's category
@@ -518,8 +519,8 @@ Loodle.deleteLoodle = function (loodleId, callback) {
 /**
  * Get the ids of the loodle's schedules
  * 
- * @param  {[type]}   loodle_id 	Loodle identifier
- * @param  {Function} callback  	Standard callback function
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
  */
 Loodle.getScheduleIds = function (loodle_id, callback) {
 

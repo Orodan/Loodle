@@ -185,7 +185,7 @@ ParticipationRequestController.getParticipationRequestsOfLoodle = function (req,
  * 
  * @param  {Uuid}   	loodle_id 	Loodle identifier
  * @param  {Uuid}   	from_id   	User identifier who emited the participation request
- * @param  {[type]}   	to_email  	User identifier who received the participation request
+ * @param  {String}   	to_email  	User identifier who received the participation request
  * @param  {Function} 	callback  	Standard callback function
  */
 ParticipationRequestController.createParticipationRequest = function (loodle_id, from_id, to_email, callback) {

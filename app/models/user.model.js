@@ -6,7 +6,8 @@ var bcrypt     = require('bcrypt-nodejs');
 
 /**
  * Create a new user object
- * 
+ *
+ * @class  User
  * @param {String}  email       User email
  * @param {String}  first_name  User first name
  * @param {String}  last_name   User last name
