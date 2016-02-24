@@ -1,0 +1,11 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+      "include": [
+        "./app/controllers",
+        "./app/models"
+      ]
+    }
+}
