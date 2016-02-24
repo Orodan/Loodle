@@ -11,6 +11,7 @@ var Vote                 = require('./vote');
 
 var Validator = require('../../util/validator');
 
+/** @class LoodleController */
 var LoodleController = {};
 
 /////////////////
@@ -19,7 +20,7 @@ var LoodleController = {};
 
 /**
  * Route call to add a schedule to the loodle
- * 
+ *
  * @param {Object} 	req 	Incoming request
  * @param {Object} 	res 	Response to send
  */
@@ -107,7 +108,7 @@ LoodleController._deleteSchedule = function (req, res) {
  * Route call to get the loodle data
  * 
  * @param  {Object} 	req 	Incoming request
- * @param  {[type]} 	res 	Response to send
+ * @param  {Object} 	res 	Response to send
  */
 LoodleController._get = function (req, res) {
 
