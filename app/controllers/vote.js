@@ -12,11 +12,11 @@ var VoteController = {};
 var defaultValue = 0;
 
 /////////////////
-// Routes call //
+// Route calls //
 /////////////////
 
 /**
- * Route call use to update votes
+ * Route call to update votes
  * 
  * @param  {Object} req 	Incoming request
  * @param  {Object} res 	Response to send
@@ -32,7 +32,7 @@ VoteController._updateVotes = function (req, res) {
 };
 
 /**
- * Route call use to update votes of a public user
+ * Route call to update votes of a public user
  *
  * @param  {Object} req 	Incoming request
  * @param  {Object} res 	Response to send
@@ -48,30 +48,28 @@ VoteController._updatePublicVotes = function (req, res) {
 };
 
 
-/////////////////////////////
-// Vote controller feature //
-/////////////////////////////
+//////////////////////////////
+// Vote controller features //
+//////////////////////////////
 
 /**
  * Delete a vote
  * 
- * @param  {uuid}   	vote_id  		vote identifier
- * @param  {Function} 	callback 		standard callback function
- * 
- * @return {void}            			null or error message
+ * @param  {uuid}   	vote_id  		Vote identifier
+ * @param  {Function} 	callback 		Standard callback function
  */
 VoteController.delete = function (vote_id, callback) {
+
 	Vote.delete(vote_id, callback);
+
 };
 
 /**
  * Remove associations between the user and the votes she/he has on the loodle
  * 
- * @param  {uuid}   	loodle_id 		loodle identifier
- * @param  {uuid}   	user_id   		user identifier
- * @param  {Function} 	callback  		standard callback function
- * 
- * @return {void}             			null or error message
+ * @param  {uuid}   	loodle_id 		Loodle identifier
+ * @param  {uuid}   	user_id   		User identifier
+ * @param  {Function} 	callback  		Standard callback function
  */
 VoteController.removeAssociationsByUser = function (loodle_id, user_id, callback) {
 
@@ -112,11 +110,9 @@ VoteController.removeAssociationsByUser = function (loodle_id, user_id, callback
 /**
  * Remove associations between the schedule and its votes on the loodle
  * 
- * @param  {uuid}   	loodle_id 		loodle identifier
- * @param  {uuid}   	schedule_id 	schedule identifier
- * @param  {Function} 	callback  		standard callback function
- * 
- * @return {void}             			null or error message
+ * @param  {uuid}   	loodle_id 		Loodle identifier
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback  		Standard callback function
  */
 VoteController.removeAssociationsBySchedule = function (loodle_id, schedule_id, callback) {
 
@@ -153,11 +149,9 @@ VoteController.removeAssociationsBySchedule = function (loodle_id, schedule_id, 
 /**
  * Create default votes for the user on all the schedules of the loodle
  * 
- * @param  {uuid}   	loodle_id 		loodle identifier
- * @param  {uuid}   	user_id   		user identifier
- * @param  {Function} 	callback  		standard callback function
- * 
- * @return {void}             			null or error message
+ * @param  {uuid}   	loodle_id 		Loodle identifier
+ * @param  {uuid}   	user_id   		User identifier
+ * @param  {Function} 	callback  		Standard callback function
  */
 VoteController.createDefaultVotesForUser = function (loodle_id, user_id, callback) {
 
@@ -387,14 +381,6 @@ VoteController.deleteVotesFromSchedule = function (loodle_id, schedule_id, callb
  * @param  {Function} callback  	Standard callback function
  */
 VoteController.deleteVotesFromUser = function (loodle_id, user_id, callback) {
-
-	// Get the vote ids of the user in this loodle
-	// Delete the votes
-
-	// Delete the association loodle - user - vote
-
-	// Get the schedule ids of the loodle
-	// For each of them, delete the association loodle - schedule - vote
 
 	async.series([
 
