@@ -2,88 +2,27 @@ var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 var async     = require('async');
 
+/**
+ * Create a new vote object
+ * 
+ * @param {Int} vote Vote value
+ */
 function Vote (vote) {
+
 	this.id = cassandra.types.Uuid.random();
 	this.vote = (vote) ? vote : 0;
+
 }
 
-/**
- * Remove the association between a user and his/her votes on a loodle
- * 
- * @param  {uuid}   	loodle_id 	loodle identifier
- * @param  {uuid}   	user_id   	user identifier
- * @param  {Function} 	callback  	standard callback function
- * 
- * @return {void}             		null or error message
- */
-Vote.removeAssociationsWithUser = function (loodle_id, user_id, callback) {
-
-	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
-	db.execute(query
-		, [ loodle_id, user_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
-Vote.removeAssociationsWithSchedule = function (loodle_id, schedule_id, callback) {
-
-	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
-	db.execute(query
-		, [ loodle_id, schedule_id ]
-		, { prepare : true }
-		, callback);
-
-};
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
 
 /**
- * Remove the association between a vote of a user and a schedule on a loodle
+ * Save the vote in db
  * 
- * @param  {uuid}   	loodle_id   	loodle identifier
- * @param  {uuid}   	schedule_id 	schedule identifier
- * @param  {uuid}   	user_id     	user identifier
- * @param  {Function} 	callback    	standard callback function
- * 
- * @return {void}               		null or error message
+ * @param  {Function} callback 	Standard callback function
  */
-Vote.removeAssociationWithScheduleByUser = function (loodle_id, schedule_id, user_id, callback) {
-
-	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ? AND user_id = ?';
-	db.execute(query
-		, [ loodle_id, schedule_id, user_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
-Vote.removeAssociationWithUserBySchedule = function (loodle_id, user_id, schedule_id, callback) {
-
-	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
-	db.execute(query
-		, [ loodle_id, user_id, schedule_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
-/**
- * Delete a vote
- * 
- * @param  {uuid}   	vote_id  	vote identifier
- * @param  {Function} 	callback 	standard callback function
- * 
- * @return {void}            		null or error message
- */
-Vote.delete = function (vote_id, callback) {
-
-	var query = 'DELETE FROM votes WHERE id = ?';
-	db.execute(query
-		, [ vote_id ]
-		, { prepare : true }
-		, callback);
-
-};
-
 Vote.prototype.save = function (callback) {
 
 	var self = this;
@@ -100,8 +39,16 @@ Vote.prototype.save = function (callback) {
 	    }
 	);
 
-}
+};
 
+/** 
+ * Bind the vote to the specified loodle and loodle's schedule
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	user_id     	User identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 Vote.prototype.bind = function (loodle_id, user_id, schedule_id, callback) {
 
 	var queries = [
@@ -119,8 +66,104 @@ Vote.prototype.bind = function (loodle_id, user_id, schedule_id, callback) {
 		, { prepare : true }
 		, callback);
 
-}
+};
 
+/////////////////////////
+// Vote model features //
+/////////////////////////
+
+/**
+ * Remove the association between a user and his/her votes on a loodle
+ * 
+ * @param  {uuid}   	loodle_id 	Loodle identifier
+ * @param  {uuid}   	user_id   	User identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
+Vote.removeAssociationsWithUser = function (loodle_id, user_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
+	db.execute(query
+		, [ loodle_id, user_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+/**
+ * Remove the associations between the vote and the specified schedule
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
+Vote.removeAssociationsWithSchedule = function (loodle_id, schedule_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
+	db.execute(query
+		, [ loodle_id, schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+/**
+ * Remove the association between a vote and the specified user on the specified schedule
+ * 
+ * @param  {uuid}   	loodle_id   	Loodle identifier
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {uuid}   	user_id     	User identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
+Vote.removeAssociationWithScheduleByUser = function (loodle_id, schedule_id, user_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ? AND user_id = ?';
+	db.execute(query
+		, [ loodle_id, schedule_id, user_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+/**
+ * Remove the assocation between a user vote and the specified schedule
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	user_id     	User identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
+Vote.removeAssociationWithUserBySchedule = function (loodle_id, user_id, schedule_id, callback) {
+
+	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
+	db.execute(query
+		, [ loodle_id, user_id, schedule_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+/**
+ * Delete a vote
+ * 
+ * @param  {uuid}   	vote_id  	Vote identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
+Vote.delete = function (vote_id, callback) {
+
+	var query = 'DELETE FROM votes WHERE id = ?';
+	db.execute(query
+		, [ vote_id ]
+		, { prepare : true }
+		, callback);
+
+};
+
+/**
+ * Get vote data
+ * 
+ * @param  {Uuid}   	id       	Vote identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Vote.get = function (id, callback) {
 
 	var query = 'SELECT * FROM votes WHERE id = ?';
@@ -135,8 +178,14 @@ Vote.get = function (id, callback) {
 		}
 	);
 
-}
+};
 
+/**
+ * Get user ids associated with the loodle
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Vote.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
@@ -159,6 +208,12 @@ Vote.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 };
 
+/**
+ * Get loodle's schedule ids
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Vote.getScheduleIds = function (loodle_id, callback) {
 
 	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
@@ -182,6 +237,13 @@ Vote.getScheduleIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Update the vote with the specified value
+ * 
+ * @param  {Uuid}   	id       	Vote identifier
+ * @param  {Int}   		vote     	New vote value
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Vote.update = function (id, vote, callback) {
 
 	var query = 'UPDATE votes SET vote = ? WHERE id = ?';
@@ -192,6 +254,13 @@ Vote.update = function (id, vote, callback) {
 
 };
 
+/**
+ * Get vote ids associated with the specified schedule
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 Vote.getVoteIdsFromSchedule = function (loodle_id, schedule_id, callback) {
 
 	var query = 'SELECT vote_id FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
@@ -212,6 +281,13 @@ Vote.getVoteIdsFromSchedule = function (loodle_id, schedule_id, callback) {
 
 };
 
+/**
+ * Get vote ids associated with the specified user on the specified loodle
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Uuid}   	user_id   	Schedule identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Vote.getVoteIdsFromUser = function (loodle_id, user_id, callback) {
 
 	var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
@@ -232,6 +308,12 @@ Vote.getVoteIdsFromUser = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Delete the vote
+ * 
+ * @param  {Uuid}   	vote_id  	Vote identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Vote.remove = function (vote_id, callback) {
 
 	var query = 'DELETE FROM votes WHERE id = ?';
@@ -242,6 +324,13 @@ Vote.remove = function (vote_id, callback) {
 
 };
 
+/**
+ * Delete the associations between a schedule and all its votes associated
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 Vote.deleteAssociationScheduleVoteBySchedule = function (loodle_id, schedule_id, callback) {
 
 	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ?';
@@ -252,6 +341,13 @@ Vote.deleteAssociationScheduleVoteBySchedule = function (loodle_id, schedule_id,
 
 };
 
+/**
+ * Delete the associations between a user and all his/her votes on the specified loodle
+ * 
+ * @param  {Uuid}   	loodle_id 		Loodle identifier
+ * @param  {Uuid}   	user_id   		User identifier
+ * @param  {Function} 	callback  		Standard callback function
+ */
 Vote.deleteAssociationUserVoteByUser = function (loodle_id, user_id, callback) {
 	
 	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ?';
@@ -262,6 +358,14 @@ Vote.deleteAssociationUserVoteByUser = function (loodle_id, user_id, callback) {
 
 };
 
+/**
+ * Delete the assocation between a user vote and the specified schedule
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	user_id     	User identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 Vote.deleteAssociationUserVoteBySchedule = function (loodle_id, user_id, schedule_id, callback) {
 
 	var query = 'DELETE FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
@@ -272,6 +376,14 @@ Vote.deleteAssociationUserVoteBySchedule = function (loodle_id, user_id, schedul
 
 };
 
+/**
+ * Delete the association between a vote and the specified user on the specified schedule
+ * 
+ * @param  {uuid}   	loodle_id   	Loodle identifier
+ * @param  {uuid}   	schedule_id 	Schedule identifier
+ * @param  {uuid}   	user_id     	User identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 Vote.deleteAssociationScheduleVoteByUser = function (loodle_id, schedule_id, user_id, callback) {
 
 	var query = 'DELETE FROM vote_by_doodle_and_schedule WHERE doodle_id = ? AND schedule_id = ? AND user_id = ?';
@@ -282,6 +394,12 @@ Vote.deleteAssociationScheduleVoteByUser = function (loodle_id, schedule_id, use
 
 };
 
+/**
+ * Delete associations between a loodle and its votes
+ * 
+ * @param  {Uuid}   	loodleId 	Loodle identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Vote.deleteAssociationsWithLoodle = function (loodleId, callback) {
 
 	var queries = [
