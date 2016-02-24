@@ -66,7 +66,7 @@ router.get('/participation-request/:id/decline', function (req, res) {
 
 });
 
-router.get('/loodle/:id/configuration', Configuration.get);
+router.get('/loodle/:id/configuration', Configuration._get);
 
 router.get('/loodle/:id/notifications', Notification._getFromUser);
 
@@ -112,7 +112,7 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 router.put('/loodle/:id/votes', Vote._updateVotes);
 
-router.put('/loodle/:id/configuration', Configuration.update);
+router.put('/loodle/:id/configuration', Configuration._update);
 
 router.put('/notification/:id', Notification._markAsRead);
 

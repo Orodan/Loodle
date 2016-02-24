@@ -116,7 +116,7 @@ router.get('/data/loodle/:id/participation-request', ParticipationRequest.getPar
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
 
 // Configuration of the user for the specified loodle
-router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
+router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration._get);
 
 // Notifications
 router.get('/data/user/notifications', isAuthenticated, Notification._getFromUser);
@@ -188,11 +188,11 @@ router.put('/loodle/:loodleId/user/:userId/votes', Vote._updatePublicVotes);
 
 router.put('/data/notification/:id', Notification._markAsRead);
 
-router.put('/data/loodle/:id/configuration', Configuration.update);
+router.put('/data/loodle/:id/configuration', Configuration._update);
 
 router.put('/data/loodle/:id/category', isAuthenticated, Loodle._setCategory);
 
-router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration.updateUserRoles);
+router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration._updateUserRoles);
 
 
 // DEL =====================================================

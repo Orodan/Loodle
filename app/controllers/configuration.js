@@ -9,12 +9,12 @@ var ConfigurationController = {};
 /////////////////
 
 /**
- * Get configuration data
+ * Route call to get configuration data
  * 
  * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
-ConfigurationController.get = function (req, res) {
+ConfigurationController._get = function (req, res) {
 
 	Configuration.get(req.user.id, req.params.id, function (err, data) {
 		if (err)
@@ -28,10 +28,10 @@ ConfigurationController.get = function (req, res) {
 /**
  * Update the configuration
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
-ConfigurationController.update = function (req, res) {
+ConfigurationController._update = function (req, res) {
 
 	Configuration.update(req.user.id, req.params.id, req.body.notification, req.body.notification_by_email, function (err, data) {
 		if (err)
@@ -45,10 +45,10 @@ ConfigurationController.update = function (req, res) {
 /**
  * Update the roles of the specified users in the loodle
  * 
- * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	req 	Incoming request
  * @param  {Object} 	res 	Response to send
  */
-ConfigurationController.updateUserRoles = function (req, res) {
+ConfigurationController._updateUserRoles = function (req, res) {
 
 	async.each(req.body.users, function (user, callback) {
 		Configuration.updateUserRole(user.id, req.params.id, user.role, callback);
