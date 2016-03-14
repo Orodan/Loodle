@@ -41,10 +41,12 @@ module.exports = function (passport) {
 				// The user already exists, stop
 				if (user) { return callback(null, false, { message: 'That email is already taken.' }); }
 
-				user = new User(email, req.body.first_name, req.body.last_name, password);
-				user.save(function (err) {
-			    		if (err) { return callback(err); }
-			    		return callback(null, user);
+				User.createUser(email, req.body.first_name, req.body.last_name, password, function (err, user) {
+
+					if (err)
+						return callback(err);
+
+					return callback(null, user);
 				});
 		});
 
@@ -65,17 +67,16 @@ module.exports = function (passport) {
     	User.getByEmail(email, function (err, user) {
 
         	// If an error happened, stop everything and send it back
-        	if (err) { console.log('error : ', err); return callback(null, false, req.flash('loginMessage', err)); }
+        	if (err)
+        		return callback(null, false, req.flash('loginMessage', err));
 
             // No user found
-            if (!user) { console.log('No user found'); return callback(null, false, 'No user found.'); }
-            // if (!user) { return callback(null, false, req.flash('loginMessage', 'No user found')); }
+            if (!user) 
+            	return callback(null, false, 'No user found.');
 
         	// If the user is found but the password is wrong
-        	if (!User.validPassword(password, user.password)) {
-                    console.log('Invalid password');
-            		return callback(null, false, { message: 'Oops ! Wrong password.' });
-        	}
+        	if (!User.validPassword(password, user.password))
+            	return callback(null, false, { message: 'Oops ! Wrong password.' });
 
         	return callback(null, user, { message: 'Welcome !' });
     	});

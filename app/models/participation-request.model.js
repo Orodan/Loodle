@@ -4,6 +4,14 @@ var async     = require('async');
 
 var Vote      = require('./vote.model');
 
+/**
+ * Create a new participation request object
+ *
+ * @class ParticipationRequest
+ * @param {Uuid} 	loodle_id 	Loodle identifier
+ * @param {Uuid} 	from_id   	User identifier who emited the participation request
+ * @param {Uuid} 	to_id     	User identifier who will received the participation request
+ */
 function ParticipationRequest (loodle_id, from_id, to_id) {
 
 	this.id = cassandra.types.Uuid.random();
@@ -13,6 +21,15 @@ function ParticipationRequest (loodle_id, from_id, to_id) {
 
 }
 
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
+
+/**
+ * Save the participation request in db
+ * 
+ * @param  {Function} callback 	Standard callback function
+ */
 ParticipationRequest.prototype.save = function (callback) {
 
 	var self = this;
@@ -30,6 +47,17 @@ ParticipationRequest.prototype.save = function (callback) {
 
 };
 
+//////////////////////////////////////////
+// Participation request model features //
+//////////////////////////////////////////
+
+/**
+ * Bind the participation request to the loodle
+ * 
+ * @param  {Uuid}   	id        	Participation request identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequest.bindToLoodle = function (id, loodle_id, callback) {
 
 	var query = 'INSERT INTO participation_request_by_doodle (doodle_id, participation_request_id) values (?, ?)';
@@ -40,6 +68,13 @@ ParticipationRequest.bindToLoodle = function (id, loodle_id, callback) {
 
 };
 
+/**
+ * Bind the participation request to the user
+ * 
+ * @param  {Uuid}   	id       	Participation request identifier
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 ParticipationRequest.bindToUser = function (id, user_id, callback) {
 
 	var query = 'INSERT INTO participation_request_by_user (user_id, participation_request_id) values (?, ?)';
@@ -50,6 +85,12 @@ ParticipationRequest.bindToUser = function (id, user_id, callback) {
 
 };
 
+/**
+ * Get the participation request data
+ * 
+ * @param  {Uuid}   	id       	Participation request identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 ParticipationRequest.get = function (id, callback) {
 
 	var query = 'SELECT * FROM participation_requests WHERE id = ?';
@@ -65,6 +106,12 @@ ParticipationRequest.get = function (id, callback) {
 
 };
 
+/**
+ * Get user's participation requests identifier
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 ParticipationRequest.getIdsFromUser = function (user_id, callback) {
 
 	var query = 'SELECT participation_request_id FROM participation_request_by_user WHERE user_id = ?';
@@ -86,6 +133,12 @@ ParticipationRequest.getIdsFromUser = function (user_id, callback) {
 
 };
 
+/**
+ * Get loodle's participation requests identifier
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequest.getIdsFromLoodle = function (loodle_id, callback) {
 
 	var query = 'SELECT participation_request_id FROM participation_request_by_doodle WHERE doodle_id = ?';
@@ -107,6 +160,12 @@ ParticipationRequest.getIdsFromLoodle = function (loodle_id, callback) {
 
 };
 
+/**
+ * Get user identifier from his/her email
+ * 
+ * @param  {String}   	email    	Email identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 ParticipationRequest.getUserIdFromEmail = function (email, callback) {
 
 	var query = 'SELECT user_id FROM user_by_email WHERE email = ?';
@@ -125,6 +184,12 @@ ParticipationRequest.getUserIdFromEmail = function (email, callback) {
 
 };
 
+/**
+ * Get user data
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 ParticipationRequest.getUserData = function (user_id, callback) {
 
 	var query = 'SELECT id, email, first_name, last_name FROM users WHERE id = ?';
@@ -140,6 +205,12 @@ ParticipationRequest.getUserData = function (user_id, callback) {
 
 };
 
+/**
+ * Get loodle data
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequest.getLoodleData = function (loodle_id, callback) {
 
 	var query = 'SELECT * FROM doodles WHERE id = ?';
@@ -155,6 +226,13 @@ ParticipationRequest.getLoodleData = function (loodle_id, callback) {
 
 };
 
+/**
+ * Give the user access to the loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequest.giveAcess = function (user_id, loodle_id, callback) {
 
 	var queries = [
@@ -174,6 +252,12 @@ ParticipationRequest.giveAcess = function (user_id, loodle_id, callback) {
 
 };
 
+/**
+ * Get loodle's schedules identifier
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 ParticipationRequest.getScheduleIds = function (loodle_id, callback) {
 
 	var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
@@ -196,6 +280,14 @@ ParticipationRequest.getScheduleIds = function (loodle_id, callback) {
 
 };
 
+/**
+ * Create default vote the user, about the specified schedule on the specified loodle
+ * 
+ * @param  {Uuid}   	loodle_id   	Loodle identifier
+ * @param  {Uuid}   	user_id     	User identifier
+ * @param  {Uuid}   	schedule_id 	Schedule identifier
+ * @param  {Function} 	callback    	Standard callback function
+ */
 ParticipationRequest.createDefaultVote = function (loodle_id, user_id, schedule_id, callback) {
 
 	var defaultVoteValue = 0;
@@ -212,6 +304,14 @@ ParticipationRequest.createDefaultVote = function (loodle_id, user_id, schedule_
 
 };
 
+/**
+ * Remove the participation request
+ * 
+ * @param  {Uuid}   participation_request_id 	Participation request identifier
+ * @param  {Uuid}   loodle_id                	Loodle identifier
+ * @param  {Uuid}   user_id                  	User identifier
+ * @param  {Function} callback                 	Standard callback function
+ */
 ParticipationRequest.remove = function (participation_request_id, loodle_id, user_id, callback) {
 
 	var queries = [
@@ -234,5 +334,60 @@ ParticipationRequest.remove = function (participation_request_id, loodle_id, use
 		, callback)
 
 };
+
+/**
+ * Delete the participation request
+ * 
+ * @param  {String}   prId     	Participation request identifier
+ * @param  {Function} callback 	Standard callbck function
+ */
+ParticipationRequest.delete = function (prId, callback) {
+
+	var query = 'DELETE FROM participation_requests WHERE id = ?';
+	db.execute(query, [ prId ], { prepare : true }, callback);
+
+};
+
+/**
+ * Delete the assocations between the loodle and it's participation requests
+ * 
+ * @param  {String}   loodleId 	Loodle identifier
+ * @param  {Function} callback 	Standard callback function
+ */
+ParticipationRequest.deleteAssociationsWithLoodle = function (loodleId, callback) {
+
+	var query = 'DELETE FROM participation_request_by_doodle WHERE doodle_id = ?';
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
+
+};
+
+/**
+ * Delete the assocation between the users and theirs participation requests
+ * 
+ * @param  {Array}   	participationRequests 		Participation requests array
+ * @param  {Function} 	callback              		Standard callback function
+ */
+ParticipationRequest.deleteAssociationsWithUsers = function (participationRequests, callback) {
+
+	async.each(participationRequests, function (participationRequest, done) {
+		ParticipationRequest.deleteAssociationWithUser(participationRequest.to_id, participationRequest.id, done);
+	}, callback);
+
+};
+
+/**
+ * Delete the assocation between the user and his/her participation request
+ * 
+ * @param  {String}   userId   		User identifier
+ * @param  {String}   prId     		Participation request identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+ParticipationRequest.deleteAssociationWithUser = function (userId, prId, callback) {
+
+	var query = 'DELETE FROM participation_request_by_user WHERE user_id = ? AND participation_request_id = ?';
+	db.execute(query, [ userId, prId ], { prepare : true }, callback);
+
+};
+
 
 module.exports = ParticipationRequest;

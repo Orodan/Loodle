@@ -35,7 +35,7 @@ module.exports = [
 	'CREATE TABLE IF NOT EXISTS user_by_email (' +
 		'email text, ' +
 		'user_id uuid, ' +
-		'primary key (email, user_id)' +
+		'primary key (email)' +
 	')',
 	// Participation requests
 	'CREATE TABLE IF NOT EXISTS participation_requests (' +

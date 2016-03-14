@@ -2,6 +2,13 @@ var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 var async     = require('async');
 
+/** 
+ * Create a new notification object
+ *
+ * @class Notification
+ * @param {Uuid} 	from_id   	User identifier who emited the notification
+ * @param {Uuid} 	loodle_id 	Loodle identifier
+ */
 function Notification (from_id, loodle_id) {
 
 	this.id = cassandra.types.Uuid.random();
@@ -11,51 +18,16 @@ function Notification (from_id, loodle_id) {
 
 }
 
-Notification.get = function (notification_id, callback) {
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
 
-	var query = 'SELECT * FROM notifications WHERE id = ?';
-	db.execute(query
-		, [ notification_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		});
-
-};
-
-Notification.getUser = function (user_id, callback) {
-
-	var query = 'SELECT id, email, first_name, last_name FROM users WHERE id = ?';
-	db.execute(query
-		, [ user_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		})
-
-};
-
-Notification.getLoodle = function (loodle_id, callback) {
-
-	var query = 'SELECT * FROM doodles WHERE id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		})
-
-};
-
+/**
+ * Save the notification in db
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Notification.prototype.save = function (user_id, callback) {
 
 	var queries = [
@@ -79,6 +51,79 @@ Notification.prototype.save = function (user_id, callback) {
 
 };
 
+/////////////////////////////////
+// Notification model featutes //
+/////////////////////////////////
+
+/**
+ * Get notification data
+ * 
+ * @param  {Uuid}   	notification_id 	Notification identifier
+ * @param  {Function} 	callback        	Standard callback function
+ */
+Notification.get = function (notification_id, callback) {
+
+	var query = 'SELECT * FROM notifications WHERE id = ?';
+	db.execute(query
+		, [ notification_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			return callback(null, data.rows[0]);
+		});
+
+};
+
+/**
+ * Get user data
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
+Notification.getUser = function (user_id, callback) {
+
+	var query = 'SELECT id, email, first_name, last_name FROM users WHERE id = ?';
+	db.execute(query
+		, [ user_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			return callback(null, data.rows[0]);
+		})
+
+};
+
+/**
+ * Get loodle data
+ * 
+ * @param  {Uui}   		loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
+Notification.getLoodle = function (loodle_id, callback) {
+
+	var query = 'SELECT * FROM doodles WHERE id = ?';
+	db.execute(query
+		, [ loodle_id ]
+		, { prepare : true }
+		, function (err, data) {
+			if (err)
+				return callback(err);
+
+			return callback(null, data.rows[0]);
+		})
+
+};
+
+/**
+ * Get loodle's user ids
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Notification.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
@@ -99,6 +144,12 @@ Notification.getUserIdsOfLoodle = function (loodle_id, callback) {
 
 };
 
+/**
+ * Get loodle's user ids minus the public ones
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Notification.getUserIdsOfLoodleMinusPublic = function (loodle_id, callback) {
 
 	// Get user ids
@@ -139,8 +190,14 @@ Notification.getUserIdsOfLoodleMinusPublic = function (loodle_id, callback) {
 		}
 	], callback);
 
-}
+};
 
+/**
+ * Get notifications ids from user
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 Notification.getIdsFromUser = function (user_id, callback) {
 
 	var query = 'SELECT notification_id FROM notification_by_user WHERE user_id = ? limit 10';
@@ -161,6 +218,12 @@ Notification.getIdsFromUser = function (user_id, callback) {
 
 };
 
+/**
+ * Mark the notification as read
+ * 
+ * @param  {Uuid}   	notification_id 	Notification identifier
+ * @param  {Function} 	callback        	Standard callback function
+ */
 Notification.markAsRead = function (notification_id, callback) {
 
 	var query = 'UPDATE notifications SET is_read = true WHERE id = ?';
@@ -171,6 +234,12 @@ Notification.markAsRead = function (notification_id, callback) {
 
 };
 
+/**
+ * Get notification ids from loodle
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Notification.getIdsFromLoodle = function (loodle_id, callback) {
 
 	var query = 'SELECT notification_id FROM notification_by_doodle WHERE doodle_id = ?';
@@ -191,6 +260,12 @@ Notification.getIdsFromLoodle = function (loodle_id, callback) {
 
 };
 
+/**
+ * Delete the notification
+ * 
+ * @param  {String}   notification_id 	Notification identifier
+ * @param  {Function} callback        	Standard callback function
+ */
 Notification.delete = function (notification_id, callback) {
 
 	var query = 'DELETE FROM notifications WHERE id = ?';
@@ -201,23 +276,30 @@ Notification.delete = function (notification_id, callback) {
 
 };
 
+/**
+ * Delete the assocation between the user and the notification
+ * 
+ * @param  {String}   user_id         	User identifier
+ * @param  {String}   notification_id 	Notification identifier
+ * @param  {Function} callback        	Standard callback function
+ */
 Notification.deleteAssociationWithUser = function (user_id, notification_id, callback) {
 
 	var query = 'DELETE FROM notification_by_user WHERE user_id = ? AND notification_id = ?';
-	db.execute(query
-		, [ user_id, notification_id ]
-		, { prepare : true }
-		, callback);
+	db.execute(query, [ user_id, notification_id ], { prepare : true }, callback);
 
 };
 
-Notification.deleteAssociationsWithLoodle = function (loodle_id, callback) {
+/**
+ * Delete the assocations between the loodle and its notifications
+ * 
+ * @param  {String}   loodleId 		Loodle identifier
+ * @param  {Function} callback 		Standard callback function
+ */
+Notification.deleteAssociationsWithLoodle = function (loodleId, callback) {
 
 	var query = 'DELETE FROM notification_by_doodle WHERE doodle_id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, callback);
+	db.execute(query, [ loodleId ], { prepare : true }, callback);
 
 };
 

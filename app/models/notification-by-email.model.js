@@ -16,18 +16,15 @@ var transporter = nodemailer.createTransport({
 var NotificationByEmail = {};
 
 /**
- * @param  {[type]}
- * @param  {[type]}
- * @param  {[type]}
- * @param  {Function}
- * @return {[type]}
+ * Send a notification by email
+ *
+ * @class NotificationByEmail
+ * @param  {Uuid}   	from_id   	User identifier who emited the notificaiton
+ * @param  {Uuid}   	to_id     	User identifier who will received the notificaiton
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
  */
 NotificationByEmail.send = function (from_id, to_id, loodle_id, callback) {
-
-	// Get sender data
-	// Get receiver data
-	// Get loodle data
-	// Send mail
 
 	async.parallel({
 		// Get sender data
@@ -60,7 +57,7 @@ NotificationByEmail.send = function (from_id, to_id, loodle_id, callback) {
 			to: results.receiver.email,
 			subject: 'Vote update',
 			html: content
-		}
+		};
 
 		// Send the mail
 		transporter.sendMail(mailOptions);
@@ -70,6 +67,12 @@ NotificationByEmail.send = function (from_id, to_id, loodle_id, callback) {
 
 };
 
+/**
+ * Get user data
+ * 
+ * @param  {Uuid}   	user_id  	User identifier
+ * @param  {Function} 	callback 	Standard callback function
+ */
 NotificationByEmail.getUser = function (user_id, callback) {
 
 	var query = 'SELECT * FROM users WHERE id = ?';
@@ -85,6 +88,12 @@ NotificationByEmail.getUser = function (user_id, callback) {
 
 };
 
+/**
+ * Get loodle data
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 NotificationByEmail.getLoodle = function (loodle_id, callback) {
 
 	var query = 'SELECT * FROM doodles WHERE id = ?';

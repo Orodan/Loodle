@@ -32,6 +32,7 @@
 
 	app.controller('loodleController', ['loodleService', '$timeout', '$http', '$scope', 'userService', 'participationRequestService', '$cookies', function (loodleService, $timeout, $http, $scope, userService, participationRequestService, $cookies) {
 
+		$scope.noSchedules = true;
 		$scope.loodle_id = window.location.pathname.split("/")[2];
 
 		var lang = $cookies.get('mylanguage');
@@ -45,6 +46,9 @@
 
 			if (!$scope.loodle.schedules)
 				return;
+
+			if ($scope.loodle.schedules.length > 0)
+				$scope.noSchedules = false;
 
 			var months = []
 				, days = []
@@ -117,8 +121,8 @@
 				hours.push(moment_begin_time);
 				hours.push(moment_end_time);
 
-				schedule.begin_time = moment(schedule.begin_time);
-				schedule.end_time = moment(schedule.end_time);
+				schedule.begin_time = moment_begin_time;
+				schedule.end_time = moment_end_time;
 			});
 			
 			// Make it available in our scope
@@ -163,8 +167,15 @@
 				});
 			});
 
+			console.log('saveVotes');
+			console.log('loodle : ', $scope.loodle);
+
 			// Server call
-			loodleService.updateVotes($scope.loodle_id, $scope.currentUser.id, data);
+			if ($scope.loodle.category === 'private')
+				loodleService.updateVotes($scope.loodle_id, $scope.currentUser.id, data);
+			else
+				loodleService.updatePublicVotes($scope.loodle_id, $scope.currentUser.id, data);
+
 
 		}
 
@@ -202,7 +213,6 @@
 		loodleService.loadLoodle($scope.loodle_id)
 			.success(function () {
 				$scope.loodle = loodleService.getLoodle();
-				console.log('$scope.loodle : ', $scope.loodle);
 			});
 		
 		// Watch loodle change
@@ -414,7 +424,7 @@
 
 	}]);
 
-	app.controller('publicLoodleController', ['$http', '$scope', '$cookies', 'loodleService', function ($http, $scope, $cookies, loodleService) {
+	app.controller('publicloodleController', ['$http', '$scope', '$cookies', 'loodleService', function ($http, $scope, $cookies, loodleService) {
 
 		var schedules = [];
 
@@ -566,7 +576,7 @@
 
 		loodleService.updateVotes = function (loodle_id, user_id, votes) {
 
-			return $http.put('/loodle/' + loodle_id + '/votes', {votes: votes, user_id: user_id})
+			return $http.put('/loodle/' + loodle_id + '/votes', votes)
 				.success(function (result) {
 					loodleService.loadLoodle(loodle_id);
 				})
@@ -576,9 +586,19 @@
 
 		};
 
-		loodleService.delete = function (loodle_id) {
+		loodleService.updatePublicVotes = function (loodleId, userId, votes) {
 
-			console.log('Call to loodleService.delete');
+			return $http.put('/loodle/' + loodleId + '/user/' + userId + '/votes', votes)
+				.success(function (result) {
+					loodleService.loadLoodle(loodleId);
+				})
+				.error(function (result) {
+					console.log("loodleService.updatePublicVotes error : ", result);
+				})
+
+		};
+
+		loodleService.delete = function (loodle_id) {
 
 			return $http.delete('/loodle/' + loodle_id)
 				.success(function () {

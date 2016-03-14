@@ -81,3 +81,33 @@ npm start
 
 Once launched, the app is available by default on localhost:3000.
 
+### Run tests
+
+To run the tests of the application, you must have mocha installed on your system. If not, use
+
+```
+npm install -g mocha
+```
+
+to install it.
+Then make sure you are in the root directory of the application and write :
+
+```
+mocha
+```
+
+### Generate html documentation
+
+The documentation of every functions have been made so that it could be generated in html files easily. To do so, start by installing jsdoc :
+
+```
+npm install -g jsdoc
+```
+
+Then make sure you are on the root directory of the application and write :
+
+```
+jsdoc -c ./config/conf.json
+```
+
+The generated html documentation will be generated in a folder called "out" in the root directory of the application.

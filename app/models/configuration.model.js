@@ -2,14 +2,35 @@ var db        = require('../../config/database');
 var cassandra = require('cassandra-driver');
 var async     = require('async');
 
+/**
+ * Create a new configuration object
+ *
+ * @class Configuration
+ * @param {Uuid} 	user_id               	User identifier
+ * @param {Uuid} 	loodle_id             	Loodle identifier
+ * @param {String} 	notification          	Notification configuration value
+ * @param {String} 	notification_by_email 	Notification by email configuration value
+ * @param {String} 	role                  	User role configuration value
+ */
 function Configuration (user_id, loodle_id, notification, notification_by_email, role) {
+
 	this.user_id = user_id;
 	this.loodle_id = loodle_id;
 	this.notification = (notification) ? notification : false
 	this.notification_by_email = (notification_by_email) ? notification_by_email : false
 	this.role = (role) ? role : 'user';
+
 }
 
+//////////////////////////
+// Prototypal functions //
+//////////////////////////
+
+/**
+ * Save the configuration in db
+ * 
+ * @param  {Function} callback Standard callback function
+ */
 Configuration.prototype.save = function (callback) {
 
 	var query = 'INSERT INTO configuration_by_user_and_doodle (user_id, doodle_id, notification, notification_by_email, role) values (?, ?, ?, ?, ?)';
@@ -20,6 +41,17 @@ Configuration.prototype.save = function (callback) {
 
 };
 
+//////////////////////////////////
+// Configuration Model Features //
+//////////////////////////////////
+
+/**
+ * Get the configuration of the user on the specified loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Configuration.get = function (user_id, loodle_id, callback) {
 
 	var query = 'SELECT * FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
@@ -35,6 +67,32 @@ Configuration.get = function (user_id, loodle_id, callback) {
 
 };
 
+/**
+ * Delete the configuration
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
+Configuration.delete = function (user_id, loodle_id, callback) {
+
+	var query = 'DELETE FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
+	db.execute(query
+		, [ user_id, loodle_id ]
+		, { prepare : true },
+		callback);
+	
+};
+
+/**
+ * Update the configuration
+ * 
+ * @param  {Uuid}   	user_id               	User identifier
+ * @param  {Uuid}   	loodle_id             	Loodle identifier
+ * @param  {String}   	notification          	Notification configuration value
+ * @param  {String}   	notification_by_email 	Notification by email configuration value
+ * @param  {Function} 	callback              	Standard callback function
+ */
 Configuration.update = function (user_id, loodle_id, notification, notification_by_email, callback) {
 
 	// We are forced to insert notifications config value this way,
@@ -52,21 +110,14 @@ Configuration.update = function (user_id, loodle_id, notification, notification_
 
 };
 
-Configuration.getFromUser = function (user_id, loodle_id, callback) {
-
-	var query = 'SELECT * FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
-	db.execute(query
-		, [ user_id, loodle_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		});
-
-};
-
+/**
+ * Set the user's role on the specified loodle
+ * 
+ * @param {Uuid}   		user_id   	User identifier
+ * @param {Uuid}   		doodle_id 	Loodle identifier
+ * @param {String}   	role      	New user's role
+ * @param {Function} 	callback  	Standard callback function
+ */
 Configuration.setUserRole = function (user_id, doodle_id, role, callback) {
 
 	var query = 'UPDATE configuration_by_user_and_doodle SET role = ? WHERE user_id = ? AND doodle_id = ?';
@@ -77,41 +128,13 @@ Configuration.setUserRole = function (user_id, doodle_id, role, callback) {
 
 };
 
-Configuration.getUserIds = function (loodle_id, callback) {
-
-	var query = 'SELECT user_id FROM user_by_doodle WHERE doodle_id = ?';
-	db.execute(query
-		, [ loodle_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			var results = [];
-			data.rows.forEach(function (element) {
-				results.push(element.user_id);
-			});
-
-			return callback(null, results);
-		});
-
-};
-
-Configuration.getUser = function (user_id, callback) {
-
-	var query = 'SELECT id, email, first_name, last_name, status FROM users WHERE id = ?';
-	db.execute(query
-		, [ user_id ]
-		, { prepare : true }
-		, function (err, data) {
-			if (err)
-				return callback(err);
-
-			return callback(null, data.rows[0]);
-		})
-
-};
-
+/**
+ * Get the user's role on the specified loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 Configuration.getUserRole = function (user_id, loodle_id, callback) {
 
 	var query = 'SELECT role FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
@@ -127,6 +150,14 @@ Configuration.getUserRole = function (user_id, loodle_id, callback) {
 
 };
 
+/**
+ * Update the user's role on the specified loodle
+ * 
+ * @param  {Uuid}   	user_id   	User identifier
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {String}   	role      	New user's role
+ * @param  {Function} callback  	Standard callback function
+ */
 Configuration.updateUserRole = function (user_id, loodle_id, role, callback) {
 
 	var query = 'UPDATE configuration_by_user_and_doodle SET role = ? WHERE user_id = ? AND doodle_id = ?';
@@ -134,16 +165,6 @@ Configuration.updateUserRole = function (user_id, loodle_id, role, callback) {
 		, [ role, user_id, loodle_id ]
 		, { prepare : true }
 		, callback); 
-
-};
-
-Configuration.delete = function (user_id, loodle_id, callback) {
-
-	var query = 'DELETE FROM configuration_by_user_and_doodle WHERE user_id = ? AND doodle_id = ?';
-	db.execute(query
-		, [ user_id, loodle_id ]
-		, { prepare : true }
-		, callback);
 
 };
 

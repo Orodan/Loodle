@@ -5,8 +5,89 @@ var NotificationByEmail = require('../models/notification-by-email.model');
 
 var Configuration       = require('./configuration');
 
+/** @class NotificationController */
 var NotificationController = {};
 
+/////////////////
+// Route calls //
+/////////////////
+
+/**
+ * Get the notifications from the user
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+NotificationController._getFromUser = function (req, res) {
+
+	var notification_ids = [];
+	var notifications = [];
+
+	async.series({
+
+		// Get notification ids from user
+		getNotificationIds: function (done) {
+			Notification.getIdsFromUser(req.user.id, function (err, data) {
+				if (err)
+					return done(err);
+
+				notification_ids = data;
+				return done(err);
+			});
+		},
+
+		// For each ids get notification data
+		getNotificationsData: function (done) {
+
+			async.eachSeries(notification_ids, function (notification_id, end) {
+				NotificationController.get(notification_id, function (err, data) {
+					if (err)
+						return end(err);
+
+					notifications.push(data);
+					return end();
+				});
+			}, done);
+
+		}
+
+	}, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, notifications);
+
+	});
+
+};
+
+/**
+ * Mark the notification as read
+ * 
+ * @param  {Object} 	req 	Incomming request
+ * @param  {Object} 	res 	Response to send
+ */
+NotificationController._markAsRead = function (req, res) {
+
+	Notification.markAsRead(req.params.id, function (err) {
+		if (err)
+			return error(res, err);
+
+		return success(res, 'notification mark as read');
+	});
+
+};
+
+//////////////////////////////////////
+// Notification controller features //
+//////////////////////////////////////
+
+/**
+ * Get the notification
+ * 
+ * @param  {Uuid}   	notification_id 	Notification identifier
+ * @param  {Function} 	callback        	Standard callback function
+ */
 NotificationController.get = function (notification_id, callback) {
 
 	// Get full data of the notification
@@ -57,12 +138,14 @@ NotificationController.get = function (notification_id, callback) {
 
 };
 
+/**
+ * Send a notification to the user about the loodle
+ * 
+ * @param  {Uuid}   	loodle_id       	Loodle identifier
+ * @param  {Uuid}   	current_user_id 	Current user identifier
+ * @param  {Function} 	callback        	Standard callback function
+ */
 NotificationController.notify = function (loodle_id, current_user_id, callback) {
-
-	// Get the user ids of the loodle minus the current user
-	// For each of them get notification and notification_by_email
-	// If notification --> create notification 
-	// If notification_by_email --> create notification by email
 
 	var users = [];
 
@@ -92,7 +175,7 @@ NotificationController.notify = function (loodle_id, current_user_id, callback) 
 		getConfiguration: function (done) {
 
 			async.each(users, function (user, end) {
-				Configuration.getFromUser(user.id, loodle_id, function (err, configuration) {
+				Configuration.getUserConfiguration(user.id, loodle_id, function (err, configuration) {
 					if (err)
 						return end(err);
 
@@ -147,80 +230,25 @@ NotificationController.notify = function (loodle_id, current_user_id, callback) 
 
 };
 
-NotificationController.getFromUser = function (req, res) {
-
-	// Get notification ids from user
-	// For each ids
-	// Get notifications data
-	// For each of them
-	// Get user data
-	// Get resume doodle data
-
-	var notification_ids = [];
-	var notifications = [];
-
-	async.series({
-
-		// Get notification ids from user
-		getNotificationIds: function (done) {
-			Notification.getIdsFromUser(req.user.id, function (err, data) {
-				if (err)
-					return done(err);
-
-				notification_ids = data;
-				return done(err);
-			});
-		},
-
-		// For each ids get notification data
-		getNotificationsData: function (done) {
-
-			async.eachSeries(notification_ids, function (notification_id, end) {
-				NotificationController.get(notification_id, function (err, data) {
-					if (err)
-						return end(err);
-
-					notifications.push(data);
-					return end();
-				});
-			}, done);
-
-		}
-
-	}, function (err) {
-		if (err)
-			return error(res, err);
-
-		return success(res, notifications);
-
-	});
-
-};
-
-NotificationController.markAsRead = function (req, res) {
-
-	Notification.markAsRead(req.params.id, function (err) {
-		if (err)
-			return error(res, err);
-
-		return success(res, 'notification mark as read');
-	});
-
-};
-
+/**
+ * Get loodle's notification ids
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 NotificationController.getIdsFromLoodle = function (loodle_id, callback) {
+
 	Notification.getIdsFromLoodle(loodle_id, callback);
+
 };
 
-// Delete all the notifications coming from the loodle
+/**
+ * Delete all the notifications coming from the loodle
+ * 
+ * @param  {Uuid}   	loodle_id 	Loodle identifier
+ * @param  {Function} 	callback  	Standard callback function
+ */
 NotificationController.deleteFromLoodle = function (loodle_id, callback) {
-
-	// Get notification ids
-	// Get user ids
-
-	// For each notification ids, delete the notification
-	// For each user ids, delete the notification association
-	// Delete the loodle association
 
 	var notification_ids 	= [],
 		user_ids 			= [];
@@ -289,9 +317,6 @@ NotificationController.deleteFromLoodle = function (loodle_id, callback) {
 		}
 
 	}, callback);
-};
-
-NotificationController.delete = function () {
 
 };
 

@@ -53,7 +53,7 @@ router.get('/new-doodle', isAuthenticated, function (req, res) {
 // Loodle page
 router.get('/loodle/:id'
 	// Authentication
-	, Loodle.check
+	, Loodle._check
 	, function (req, res) {
 		res.render('loodle', {
 			message: req.flash()
@@ -101,33 +101,13 @@ router.get('/participation-request/:id/accept', isAuthenticated, function (req, 
 // DATA ======================
 
 // Get user data
-router.get('/data/user', function (req, res) {
-
-	// Authenticated
-	if (!req.user)
-		return res.json({
-			type: true,
-			data: false
-		})
-
-	User.get(req.user.id, function (err, user) {
-		
-		if (err)
-			throw new Error(err);
-
-		return res.json({
-			type: true,
-			data: user
-		});
-	})
-});
+router.get('/data/user', User._get);
 
 // Get loodle data
-router.get('/data/loodle/:id'
-	, Loodle.get);
+router.get('/data/loodle/:id', Loodle._get);
 
 // Loodles list data
-router.get('/data/loodle/', isAuthenticated, Loodle.getLoodlesOfUser);
+router.get('/data/loodle/', isAuthenticated, Loodle._getLoodlesOfUser);
 
 // Participation requests data of loodle
 router.get('/data/loodle/:id/participation-request', ParticipationRequest.getParticipationRequestsOfLoodle);
@@ -136,13 +116,13 @@ router.get('/data/loodle/:id/participation-request', ParticipationRequest.getPar
 router.get('/data/participation-request/', isAuthenticated, ParticipationRequest.getParticipationRequestsOfUser);
 
 // Configuration of the user for the specified loodle
-router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration.get);
+router.get('/data/loodle/:id/configuration', isAuthenticated, Configuration._get);
 
 // Notifications
-router.get('/data/user/notifications', isAuthenticated, Notification.getFromUser);
+router.get('/data/user/notifications', isAuthenticated, Notification._getFromUser);
 
-// Users with
-router.get('/data/loodle/:id/users/configuration', isAuthenticated, Configuration.getUsersWithRole);
+// Get registred users of the loodle
+router.get('/data/loodle/:id/users/configuration', isAuthenticated, Loodle._getRegistredUsers);
 
 // POST ====================================================
 
@@ -170,14 +150,15 @@ router.post('/new-doodle', isAuthenticated, function (req, res) {
 			throw err;
 
 		res.redirect('/loodle/' + data.id);
-	})
+	});
+	
 });
 
 // Process add schedule
-router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle.addSchedule);
+router.post('/loodle/:id/schedule/add', isAuthenticated, Loodle._addSchedule);
 
 // Process add user
-router.post('/loodle/:id/user/add', isAuthenticated, Loodle.inviteUser)
+router.post('/loodle/:id/user/add', isAuthenticated, Loodle._inviteUser)
 
 // Process delete schedule
 router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) {
@@ -193,42 +174,32 @@ router.post('/loodle/:id/schedule/delete', isAuthenticated, function (req, res) 
 });
 
 // Process delete user
-router.post('/loodle/:id/user/delete', isAuthenticated, function (req, res) {
+router.post('/loodle/:id/user/delete', isAuthenticated, User._remove);
 
-	User.remove(req.params.id, req.body.user_id, function (err) {
+router.post('/data/loodle/:id/user/public', User._createPublicUser);
 
-		if (err)
-			throw new Error(err);
-
-		req.flash('success', 'User deleted');
-		res.redirect('/loodle/' + req.params.id);
-
-	});
-
-});
-
-router.post('/data/loodle/:id/user/public', User.createPublicUser);
-
-router.post('/data/public/loodle', Loodle.createPublicLoodle);
+router.post('/data/public/loodle', Loodle._createPublicLoodle);
 
 // PUT =====================================================
 
-router.put('/loodle/:id/votes', Vote.updateVotes);
+router.put('/loodle/:id/votes', Vote._updateVotes);
 
-router.put('/data/notification/:id', Notification.markAsRead);
+router.put('/loodle/:loodleId/user/:userId/votes', Vote._updatePublicVotes);
 
-router.put('/data/loodle/:id/configuration', Configuration.update);
+router.put('/data/notification/:id', Notification._markAsRead);
 
-router.put('/data/loodle/:id/category', isAuthenticated, Loodle.setCategory);
+router.put('/data/loodle/:id/configuration', Configuration._update);
 
-router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration.updateUserRoles);
+router.put('/data/loodle/:id/category', isAuthenticated, Loodle._setCategory);
+
+router.put('/data/loodle/:id/users/roles', isAuthenticated, Configuration._updateUserRoles);
 
 
 // DEL =====================================================
 
 router.delete('/loodle/:id', function (req, res) {
 
-	Loodle.remove(req.params.id, function (err) {
+	Loodle.delete(req.params.id, function (err) {
 		if (err)
 			throw new Error(err);
 
