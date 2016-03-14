@@ -13,7 +13,7 @@ var Vote                 = require('../controllers/vote');
 
 var Config               = require('../../config/config.js');
 
-// All the api routes need an acces token, except the route to get the token
+// All the api routes need an access token, except the route to get the token
 router.use(jwt({ secret: Config.jwt_secret }).unless({path: ['/api/authenticate', {url: '/api/user', methods: 'POST'}]}));
 router.use(function (err, req, res, next) {
 
