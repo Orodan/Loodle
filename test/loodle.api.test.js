@@ -541,6 +541,34 @@ describe('API Loodle', function () {
 
         });
 
+        it('should send an error if a schedule with the same begin and end time is already on the loodle', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'There is already a similar schedule in this loodle');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
     });
 
     // Update the vote of an user in a loodle

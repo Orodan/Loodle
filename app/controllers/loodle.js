@@ -41,16 +41,13 @@ LoodleController._addSchedule = function (req, res) {
 		return reply(res, 'Attribute "end_time" required', 400);
 
 	LoodleController.addSchedule(req.params.id, req.body.begin_time, req.body.end_time, language, function (err, data) {
-
 		if (req.baseUrl === '/api') {
 			if (err) return reply(res, err.message, data);
 			else return reply(res, err, 'Schedule added');
 		}
 		else {
-			if (err)
-				req.flash('error', err);
-			else
-				req.flash('success', 'Schedule added');
+			if (err) req.flash('error', err);
+			else req.flash('success', 'Schedule added');
 
 			res.redirect('/loodle/' + req.params.id);
 		}
