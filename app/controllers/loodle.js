@@ -941,18 +941,24 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 		if (!result)
 			return callback(new ReferenceError('Unknown loodle id'));
 
-		async.series({
-			// Create the new schedule 
-			createSchedule: function (done) {
-				Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
-			}
-
-		}, function (err) {
+		Validator.loodle.alreadyHaveSimilarSchedule(loodle_id, begin_time, end_time, language, function (err, haveAlreadySimilarSchedule) {
 			if (err) return callback(err);
 
-			return callback(null, 'Schedule added');
+			if (haveAlreadySimilarSchedule) return callback(new Error('There is already a similar schedule in this loodle'));
+
+			async.series({
+				// Create the new schedule
+				createSchedule: function (done) {
+					Schedule.createSchedule(loodle_id, begin_time, end_time, language, done);
+				}
+
+			}, function (err) {
+				if (err) return callback(err);
+
+				return callback(null, 'Schedule added');
+			});
 		});
-	})
+	});
 
 };
 
