@@ -184,34 +184,27 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
     var user = new PublicUser(first_name, last_name);
 
     Loodle.get(loodle_id, function (err, data) {
-
-        if (err)
-            return callback(err);
+        if (err) return callback(err);
 
         async.parallel({
             // Save the user
             save: function (done) {
                 user.save(done);
             },
-
             // Bind user - loodle
             bind: function (done) {
                 PublicUser.bind(user.id, loodle_id, done);
             },
-
             // Create default votes
             defaultVotes: function (done) {
                 Vote.createDefaultVotesForLoodle(loodle_id, user.id, done);
             }
-        }, function (err, result) {
-
-            if (err)
-                return callback(err);
-
+        }, function (err) {
+            if (err) return callback(err);
             return callback(null, user);
         });
 
-    })
+    });
 
 };
 

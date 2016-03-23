@@ -92,6 +92,24 @@ Validator.user.knownId = function (userId, callback) {
 Validator.loodle = {};
 
 /**
+ * Check if a loodle is public
+ *
+ * @param loodleId
+ * @param callback
+ */
+Validator.loodle.isPublic = function (loodleId, callback) {
+
+    var query = 'SELECT category FROM doodles WHERE id = ?';
+    db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        var isPublic = (data.rows[0].category === 'public') ? true : false ;
+        return callback(null, isPublic);
+    });
+
+};
+
+/**
  * Check if all the informations required to create a loodle were given
  * 
  * @param  {String}     name        Loodle name
@@ -144,12 +162,9 @@ Validator.loodle.mustHaveAtLeastOneSchedule = function (schedules) {
 
 Validator.loodle.alreadyHaveSimilarSchedule = function (loodleId, begin_time, end_time, lang, callback) {
 
-    // Get the loodle schedules
-    // Check for each of them if it contains the same begin time and end time
-    // If that's the case -> true else -> false
-
     var alreadyHaveSimilarSchedule = false;
 
+    // Get the loodle schedules
     var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
     db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
         if (err) return callback(err);
@@ -162,8 +177,8 @@ Validator.loodle.alreadyHaveSimilarSchedule = function (loodleId, begin_time, en
             db.execute(query, [ scheduleId.schedule_id ], { prepare : true }, function (err, data) {
                 if (err) return done(err);
 
-                var begin_time = moment(data.rows[0].begin_time);
-                var end_time = moment(data.rows[0].end_time);
+                var begin_time_to_test = moment(data.rows[0].begin_time);
+                var end_time_to_test = moment(data.rows[0].end_time);
 
                 if (lang == 'en') {
                     begin_time_to_add = moment(begin_time, 'MM-DD-YYYY LT');
@@ -174,7 +189,8 @@ Validator.loodle.alreadyHaveSimilarSchedule = function (loodleId, begin_time, en
                     end_time_to_add = moment(end_time, 'DD-MM-YYYY HH:mm');
                 }
 
-                if (begin_time.isSame(begin_time_to_add, 'minute') && end_time.isSame(end_time_to_add, 'minute')) {
+                // Check for each of them if it contains the same begin time and end time
+                if (begin_time_to_test.isSame(begin_time_to_add, 'minute') && end_time_to_test.isSame(end_time_to_add, 'minute')) {
                     alreadyHaveSimilarSchedule = true;
                 }
 
@@ -183,7 +199,7 @@ Validator.loodle.alreadyHaveSimilarSchedule = function (loodleId, begin_time, en
 
         }, function (err) {
             if (err) return callback(err);
-            return callback(null, alreadyHaveSimilarSchedule);
+            callback(null, alreadyHaveSimilarSchedule);
         });
     });
 

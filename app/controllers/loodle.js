@@ -56,6 +56,29 @@ LoodleController._addSchedule = function (req, res) {
 };
 
 /**
+ * Route call to add a public user to a loodle with votes
+ *
+ * @param req
+ * @param res
+ * @private
+ */
+LoodleController._addPublicUserWithVotes = function (req, res) {
+
+	// Create the public user
+	User.createPublicUser(req.params.id, req.body.firstName, req.body.lastName, function (err, user) {
+		if (err) return reply(res, err.message);
+
+		// Update user votes
+		Vote.updateVotesFromSchedules(req.params.id, user.id, req.body.votes, function (err) {
+			if (err) return reply(res, err.message);
+
+			reply(res, null, user);
+		});
+	});
+
+};
+
+/**
  * Route call to add an user to the loodle
  * 
  * @param {Object} 	req 	Incoming request
@@ -79,10 +102,24 @@ LoodleController._addUser = function (req, res) {
  */
 LoodleController._createLoodle = function (req, res) {
 
-	LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
-		if (err) return reply(res, err.message, data);
-		return reply(res, err, data);
-	});
+	if (!Validator.isDefined(req.body.category))
+		return reply(res, 'Missing one parameter');
+
+	if (req.body.category === 'private') {
+		LoodleController.createLoodle(req.user.id, req.body.name, req.body.description, function (err, data) {
+			if (err) return reply(res, err.message, data);
+			return reply(res, err, data);
+		});
+	}
+	else if (req.body.category === 'public') {
+		LoodleController.createPublicLoodleConnected(req.user.id, req.body.name, req.body.description, function (err, data) {
+			if (err) return reply(res, err.message, data);
+			return reply(res, err, data);
+		});
+	}
+	else {
+		return reply(res, 'Invalid category');
+	}
 
 };
 
@@ -112,6 +149,42 @@ LoodleController._get = function (req, res) {
 	LoodleController.get(req.params.id, function (err, data) {
 		if (err) return reply(res, err.message, data);
 		return reply(res, err, data);
+	});
+
+};
+
+/**
+ * Route call to get public loodle data
+ *
+ * @param  {Object} 	req 	Incoming request
+ * @param  {Object} 	res 	Response to send
+ */
+LoodleController._getPublicLoodleData = function (req, res) {
+
+	async.series({
+		checkId: function (done) {
+			Validator.loodle.knownId(req.params.id, function (err, knownId) {
+				if (err) return done(err);
+				if (!knownId) return done(new ReferenceError('Unknown loodle id'));
+				done();
+			});
+		},
+		isPublic: function (done) {
+			Validator.loodle.isPublic(req.params.id, function (err, isPublic) {
+				if (err) return done(err);
+				if (!isPublic) return done(new ReferenceError('This loodle is not public'));
+				done();
+			});
+		},
+		getData: function (done) {
+			LoodleController.get(req.params.id, function (err, data) {
+				if (err) return done(err);
+				done(null, data);
+			});
+		}
+	}, function (err, results) {
+		if (err) return reply(res, err.message, results);
+		reply(res, err, results.getData);
 	});
 
 };
@@ -605,9 +678,7 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 
 	Validator.user.knownId(user_id, function (err, result) {
 		if (err) return callback(err);
-
-		if (!result)
-			return callback(new ReferenceError('Unknown user id'));
+		if (!result) return callback(new ReferenceError('Unknown user id'));
 
 		async.parallel({
 			// Save the loodle
@@ -620,7 +691,6 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 			},
 			// Create default configuration for the user and set the user role as manager
 			config: function (done) {
-
 				async.series([
 					function (end) {
 						Configuration.createDefaultConfiguration(user_id, loodle.id, end);
@@ -632,12 +702,8 @@ LoodleController.createLoodle = function (user_id, name, description, callback) 
 				], done);
 			}
 		}, function (err, results) {
-
-			if (err)
-				return callback(err)
-
+			if (err) return callback(err)
 			return callback(null, results.save);
-
 		});
 
 	});
@@ -960,6 +1026,49 @@ LoodleController.addSchedule = function (loodle_id, begin_time, end_time, langua
 };
 
 /**
+ * Create a public loodle from a connected user
+ *
+ * @param userId
+ * @param name
+ * @param description
+ * @param callback
+ */
+LoodleController.createPublicLoodleConnected = function (userId, name, description, callback) {
+
+	if (!Validator.loodle.hasAllInformations(name))
+		return callback(new Error('Missing one parameter'));
+
+	var loodle = new Loodle(name, description, 'public');
+
+	async.parallel({
+		// Save the loodle
+		save: function (done) {
+			loodle.save(done);
+		},
+		// Associate the loodle and the user
+		bind: function (done) {
+			Loodle.bindUser(userId, loodle.id, done)
+		},
+		// Create default configuration for the user and set the user role as manager
+		config: function (done) {
+			async.series([
+				function (end) {
+					Configuration.createDefaultConfiguration(userId, loodle.id, end);
+				},
+
+				function (end) {
+					Configuration.setUserRole(userId, loodle.id, 'manager', end);
+				}
+			], done);
+		}
+	}, function (err, results) {
+		if (err) return callback(err)
+		return callback(null, results.save);
+	});
+
+};
+
+/**
  * Create a public loodle
  * 
  * @param  {String}   	name        	Loodle's name
@@ -978,6 +1087,7 @@ LoodleController.createPublicLoodle = function (name, description, schedules, lo
 
 	if (!Validator.loodle.mustHaveAtLeastOneSchedule(schedules))
 		return callback(new Error('At least one schedule is required'));
+
 
 	async.series({
 

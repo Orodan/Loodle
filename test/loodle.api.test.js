@@ -59,7 +59,8 @@ describe('API Loodle', function () {
 
             var loodle = {
                 name: 'Mon super doodle',
-                description: 'test'
+                description: 'test',
+                category: 'private'
             };
 
             request(host)
@@ -84,7 +85,7 @@ describe('API Loodle', function () {
 
         });
 
-        it('should send an error if the name is missing', function (done) {
+        it('should send an error if one parameter is missing', function (done) {
 
             var loodle = {
                 description: 'test'
@@ -107,6 +108,34 @@ describe('API Loodle', function () {
 
                     return done();
                 });
+
+        });
+
+        it('should send an error if the category is invalid', function (done) {
+
+            var loodle = {
+                name: 'Mon super doodle',
+                description: 'test',
+                category: 'toto'
+            };
+
+            request(host)
+                .post('/api/loodle')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                try {
+                    assert.equal(err, null);
+                    assert.equal(res.body.data, 'Invalid category');
+                }
+                catch (e) {
+                    return done(e);
+                }
+
+                return done();
+            });
 
         });
 

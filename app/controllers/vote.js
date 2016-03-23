@@ -33,6 +33,23 @@ VoteController._updateVotes = function (req, res) {
 };
 
 /**
+ * Route call to update the votes of a public user
+ *
+ * @param req
+ * @param res
+ * @private
+ */
+VoteController._updatePublicVotesWithoutUserId = function (req, res) {
+
+    VoteController.updatePublicVotes(req.params.id, req.body, function (err, result) {
+        if (err) return error(res, err.message);
+
+        success(res, 'OK');
+    });
+
+};
+
+/**
  * Route call to update votes of a public user
  *
  * @param  {Object} req 	Incoming request
@@ -232,6 +249,22 @@ VoteController.createDefaultVotesForSchedule = function (loodle_id, schedule_id,
 };
 
 /**
+ * Update the loodle's votes of a user from schedule ids
+ *
+ * @param loodleId
+ * @param userId
+ * @param votes
+ * @param callback
+ */
+VoteController.updateVotesFromSchedules = function (loodleId, userId, votes, callback) {
+
+    async.forEachOf(votes, function (value, key, done) {
+        Vote.updateVoteFromScheduleId(loodleId, userId, key, value, done);
+    }, callback);
+
+};
+
+/**
  * Update the loodle's votes of the user
  * 
  * @param  {String}   	loodleId 		Loodle identifier
@@ -241,7 +274,6 @@ VoteController.createDefaultVotesForSchedule = function (loodle_id, schedule_id,
  */
 VoteController.updateVotes = function (loodleId, userId, votes, callback) {
 
-	// Check if the vote value are all 0 or 1
 	async.series({
 
 		// Validate the loodle id is known
@@ -322,6 +354,46 @@ VoteController.updateVotes = function (loodleId, userId, votes, callback) {
 
 		return callback(null, 'Vote(s) updated');
 	});
+
+};
+
+/**
+ * Update the votes of a public user
+ */
+VoteController.updatePublicVotes = function (loodleId, votes, callback) {
+
+    async.series({
+        checkLoodleId: function (done) {
+            Validator.loodle.knownId(loodleId, function (err, result) {
+                if (err) return done(err);
+                if (!result) return done(new ReferenceError('Unknown loodle id'));
+
+                done();
+            });
+        },
+        checkVoteIds: function (done) {
+            async.forEachOf(votes, function (vote, id, end) {
+                Validator.vote.knownId(id, function (err, result) {
+                    if (err) return end(err);
+                    if (!result) return end(new ReferenceError('Unknown vote id'));
+
+                    end();
+                });
+            }, done);
+        },
+        checkVoteValues: function (done) {
+            async.forEachOf(votes, function (vote, id, end) {
+                if (!Validator.vote.isInRange(vote)) return end(new RangeError('Vote value should be 0 or 1'));
+
+                end();
+            }, done);
+        },
+        updateVotes: function (done) {
+            async.forEachOf(votes, function (vote, id, end) {
+                Vote.update(id, vote, end);
+            }, done);
+        }
+    }, callback);
 
 };
 
