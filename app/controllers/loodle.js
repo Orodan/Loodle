@@ -530,8 +530,6 @@ LoodleController._setCategory = function (req, res) {
 
 	Loodle.setCategory(req.params.id, req.body.category, function (err) {
 		if (err) return error(res, err);
-        
-        console.log('loodle ' + req.params.id + ' set to ' + req.body.category);
 
 		return success(res, 'Loodle category updated');
 	});
