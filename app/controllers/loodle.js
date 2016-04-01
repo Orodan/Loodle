@@ -521,10 +521,17 @@ LoodleController._createPublicLoodle = function (req, res) {
  * @param {Object} 		res 	Response to send
  */
 LoodleController._setCategory = function (req, res) {
+    
+    // Check if the category is defined and has a valid value
+    if (!Validator.isDefined(req.body.category))
+        return reply(res, 'Attribute "category" required', 400);
+    if (!Validator.loodle.isAValidCategory(req.body.category))
+        return reply(res, 'Invalid category', 400);
 
 	Loodle.setCategory(req.params.id, req.body.category, function (err) {
-		if (err)
-			return error(res, err);
+		if (err) return error(res, err);
+        
+        console.log('loodle ' + req.params.id + ' set to ' + req.body.category);
 
 		return success(res, 'Loodle category updated');
 	});

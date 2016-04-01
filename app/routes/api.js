@@ -128,6 +128,8 @@ router.put('/loodle/:id/configuration', Configuration._update);
 
 router.put('/notification/:id', Notification._markAsRead);
 
+router.put('/loodle/:id/category', Loodle._setCategory);
+
 // DELETE ==========================================
 
 // Remove an user from a loodle

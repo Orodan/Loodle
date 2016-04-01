@@ -92,6 +92,15 @@ Validator.user.knownId = function (userId, callback) {
 Validator.loodle = {};
 
 /**
+ * Check if a category has a valid value
+ * 
+ * @param category
+ */
+Validator.loodle.isAValidCategory = function (category, callback) {
+    return (category == 'public' || category == 'private');
+};
+
+/**
  * Check if a loodle is public
  *
  * @param loodleId
