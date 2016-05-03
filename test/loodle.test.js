@@ -1005,7 +1005,7 @@ describe('Loodle', function () {
 			'description': 'Ma super description'
 		};
 
-		// We need a loodle to play with
+		// Create a loodle to play with
 		before(function (done) {
 
 			async.series({

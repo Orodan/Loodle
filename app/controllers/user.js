@@ -37,7 +37,7 @@ UserController._authenticate = function (req, res) {
     if (!Validator.isDefined(req.body.email))
         return reply(res, 'Email required', 400);
 
-    if (!Validator.isDefined(req.body.email))
+    if (!Validator.isDefined(req.body.password))
         return reply(res, 'Password required', 400);
 
     UserController.authenticate(req.body.email, req.body.password, function (err, data) {
@@ -112,12 +112,11 @@ UserController._createUser = function (req, res) {
     if (!Validator.isDefined(req.body.password))
         return reply(res, 'Password required', 400);
 
-    UserController.createUser(req.body.email, req.body.first_name, req.body.last_name, req.body.password
-        , function (err, data) {
-            if (err) return reply(res, err.message, data);
+    UserController.createUser(req.body.email, req.body.first_name, req.body.last_name, req.body.password, function (err, data) {
+        if (err) return reply(res, err.message, data);
 
-            return reply(res, null, data);
-        });
+        return reply(res, null, data);
+    });
 
 };
 

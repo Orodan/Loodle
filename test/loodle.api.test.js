@@ -51,6 +51,7 @@ describe('API Loodle', function () {
 
         });
 
+        // Delete the created user
         after(function (done) {
            User.delete(result.id, done);
         });
