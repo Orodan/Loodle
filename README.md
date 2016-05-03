@@ -38,6 +38,29 @@ notification-by-email.model.js
 
 and edit the transporter.
 
+#### Config Cassandra cluster
+```
+cd config/
+```
+Edit the file
+```
+database.js
+```
+add config cluster
+```
+var system_client = new cassandra.Client({
+	keyspace: 'system',
+	contactPoints: ['db1','db2','db3']
+});
+
+// Client connecting to the keyspace used by the application
+var client = new cassandra.Client ({
+	keyspace: keyspace,
+	contactPoints: ['db1','db2','db3']
+	});
+```
+Warning : without port 
+
 
 ### Starting the app
 
