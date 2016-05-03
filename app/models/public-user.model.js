@@ -29,9 +29,9 @@ function PublicUser (first_name, last_name) {
  */
 PublicUser.prototype.save = function (callback) {
 
-	var query = 'INSERT INTO users (id, first_name, last_name, status) values (?, ?, ?, ?)';
+	var query = 'INSERT INTO Users (id, first_name, last_name, status, created) values (?, ?, ?, ?, ?)';
 	db.execute(query
-		, [ this.id, this.first_name, this.last_name, this.status ]
+		, [ this.id, this.first_name, this.last_name, this.status, Date.now() ]
 		, { prepare : true }
 		, callback);
 

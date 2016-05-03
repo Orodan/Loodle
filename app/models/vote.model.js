@@ -9,10 +9,8 @@ var async     = require('async');
  * @param {Int} vote Vote value
  */
 function Vote (vote) {
-
 	this.id = cassandra.types.Uuid.random();
 	this.vote = (vote) ? vote : 0;
-
 }
 
 //////////////////////////
@@ -72,6 +70,26 @@ Vote.prototype.bind = function (loodle_id, user_id, schedule_id, callback) {
 /////////////////////////
 // Vote model features //
 /////////////////////////
+
+/**
+ * Update the vote which match the loodle, the user and the schedule with the specified value
+ *
+ * @param loodleId
+ * @param userId
+ * @param scheduleId
+ * @param value
+ * @param callback
+ */
+Vote.updateVoteFromScheduleId = function (loodleId, userId, scheduleId, value, callback) {
+
+	var query = 'SELECT vote_id FROM vote_by_doodle_and_user WHERE doodle_id = ? AND user_id = ? AND schedule_id = ?';
+	db.execute(query, [ loodleId, userId, scheduleId ], { prepare : true }, function (err, data) {
+		if (err) return callback(err);
+
+		Vote.update(data.rows[0].vote_id, value, callback);
+	});
+
+};
 
 /**
  * Remove the association between a user and his/her votes on a loodle

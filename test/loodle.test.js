@@ -268,6 +268,25 @@ describe('Loodle', function () {
 
 		});
 
+		it('should send an error if a schedule with the same begin and end time is already on the loodle', function (done) {
+
+			Loodle.addSchedule(result.id, '10/02/2016 17:10', '10/02/2016 17:12', 'fr', function (err, data) {
+
+				try {
+					assert.equal(err.name, 'Error');
+					assert.equal(err.message, 'There is already a similar schedule in this loodle');
+					assert.equal(data, null);
+				}
+				catch (e) {
+					return done(e);
+				}
+
+				return done();
+
+			})
+
+		});
+
 	});
 
 	describe('deleteSchedule', function (done) {
@@ -986,7 +1005,7 @@ describe('Loodle', function () {
 			'description': 'Ma super description'
 		};
 
-		// We need a loodle to play with
+		// Create a loodle to play with
 		before(function (done) {
 
 			async.series({

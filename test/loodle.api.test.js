@@ -51,6 +51,7 @@ describe('API Loodle', function () {
 
         });
 
+        // Delete the created user
         after(function (done) {
            User.delete(result.id, done);
         });
@@ -59,7 +60,8 @@ describe('API Loodle', function () {
 
             var loodle = {
                 name: 'Mon super doodle',
-                description: 'test'
+                description: 'test',
+                category: 'private'
             };
 
             request(host)
@@ -84,7 +86,7 @@ describe('API Loodle', function () {
 
         });
 
-        it('should send an error if the name is missing', function (done) {
+        it('should send an error if one parameter is missing', function (done) {
 
             var loodle = {
                 description: 'test'
@@ -107,6 +109,34 @@ describe('API Loodle', function () {
 
                     return done();
                 });
+
+        });
+
+        it('should send an error if the category is invalid', function (done) {
+
+            var loodle = {
+                name: 'Mon super doodle',
+                description: 'test',
+                category: 'toto'
+            };
+
+            request(host)
+                .post('/api/loodle')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(loodle)
+                .expect(500)
+                .end(function (err, res) {
+                try {
+                    assert.equal(err, null);
+                    assert.equal(res.body.data, 'Invalid category');
+                }
+                catch (e) {
+                    return done(e);
+                }
+
+                return done();
+            });
 
         });
 
@@ -531,6 +561,34 @@ describe('API Loodle', function () {
                     try {
                         assert.equal(err, null);
                         assert.equal(res.body.data, 'Invalid string representation of Uuid, it should be in the 00000000-0000-0000-0000-000000000000');
+                    }
+                    catch (e) {
+                        return done(e);
+                    }
+
+                    return done();
+                });
+
+        });
+
+        it('should send an error if a schedule with the same begin and end time is already on the loodle', function (done) {
+
+            var schedule = {
+                begin_time: '10/02/2016 17:10',
+                end_time: '10/02/2016 17:20',
+                language: 'fr'
+            };
+
+            request(host)
+                .post('/api/loodle/' + loodle.id + '/schedule')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + token)
+                .send(schedule)
+                .expect(500)
+                .end(function (err, res) {
+                    try {
+                        assert.equal(err, null);
+                        assert.equal(res.body.data, 'There is already a similar schedule in this loodle');
                     }
                     catch (e) {
                         return done(e);

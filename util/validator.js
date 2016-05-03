@@ -1,5 +1,6 @@
 var db = require('../config/database');
 var moment = require('moment');
+var async = require('async');
 
 var Validator = {};
 
@@ -91,6 +92,33 @@ Validator.user.knownId = function (userId, callback) {
 Validator.loodle = {};
 
 /**
+ * Check if a category has a valid value
+ * 
+ * @param category
+ */
+Validator.loodle.isAValidCategory = function (category, callback) {
+    return (category == 'public' || category == 'private');
+};
+
+/**
+ * Check if a loodle is public
+ *
+ * @param loodleId
+ * @param callback
+ */
+Validator.loodle.isPublic = function (loodleId, callback) {
+
+    var query = 'SELECT category FROM doodles WHERE id = ?';
+    db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        var isPublic = (data.rows[0].category === 'public') ? true : false ;
+        return callback(null, isPublic);
+    });
+
+};
+
+/**
  * Check if all the informations required to create a loodle were given
  * 
  * @param  {String}     name        Loodle name
@@ -138,6 +166,51 @@ Validator.loodle.knownId = function (loodleId, callback) {
 Validator.loodle.mustHaveAtLeastOneSchedule = function (schedules) {
 
     return (schedules.length > 0);
+
+};
+
+Validator.loodle.alreadyHaveSimilarSchedule = function (loodleId, begin_time, end_time, lang, callback) {
+
+    var alreadyHaveSimilarSchedule = false;
+
+    // Get the loodle schedules
+    var query = 'SELECT schedule_id FROM schedule_by_doodle WHERE doodle_id = ?';
+    db.execute(query, [ loodleId ], { prepare : true }, function (err, data) {
+        if (err) return callback(err);
+
+        var scheduleIds = data.rows;
+
+        async.each(scheduleIds, function (scheduleId, done) {
+
+            query = 'SELECT begin_time, end_time FROM schedules WHERE id = ?';
+            db.execute(query, [ scheduleId.schedule_id ], { prepare : true }, function (err, data) {
+                if (err) return done(err);
+
+                var begin_time_to_test = moment(data.rows[0].begin_time);
+                var end_time_to_test = moment(data.rows[0].end_time);
+
+                if (lang == 'en') {
+                    begin_time_to_add = moment(begin_time, 'MM-DD-YYYY LT');
+                    end_time_to_add = moment(end_time, 'MM-DD-YYYY LT');
+                }
+                else if (lang == 'fr') {
+                    begin_time_to_add = moment(begin_time, 'DD-MM-YYYY HH:mm');
+                    end_time_to_add = moment(end_time, 'DD-MM-YYYY HH:mm');
+                }
+
+                // Check for each of them if it contains the same begin time and end time
+                if (begin_time_to_test.isSame(begin_time_to_add, 'minute') && end_time_to_test.isSame(end_time_to_add, 'minute')) {
+                    alreadyHaveSimilarSchedule = true;
+                }
+
+                return done();
+            });
+
+        }, function (err) {
+            if (err) return callback(err);
+            callback(null, alreadyHaveSimilarSchedule);
+        });
+    });
 
 };
 

@@ -13,18 +13,25 @@ var Vote                 = require('../controllers/vote');
 
 var Config               = require('../../config/config.js');
 
-// All the api routes need an access token, except the route to get the token
-router.use(jwt({ secret: Config.jwt_secret }).unless({path: ['/api/authenticate', {url: '/api/user', methods: 'POST'}]}));
+// All the api routes need an access token, minus some exceptions
+router.use(jwt({ secret: Config.jwt_secret }).unless({path: [
+	'/api/authenticate',
+	{url: '/api/user', methods: 'POST'},
+	{url: /\/api\/public\/loodle\/.*/, methods: 'GET'},
+	{url: /\/api\/loodle\/.*\/public\/user/, methods: 'POST'}, // /loodle/:id/public/votes
+	{url: /\/api\/loodle\/.*\/public\/votes/, methods: 'PUT'}
+]}));
+
 router.use(function (err, req, res, next) {
-
-  if (err.name === 'UnauthorizedError') {
-    res.status(401);
-    return res.json('Unauthorized');
-  }
-
+	if (err.name === 'UnauthorizedError') {
+		res.status(401);
+		return res.json('Unauthorized');
+	}
 });
 
 // GET ==========================================================================================
+
+router.get('/public/loodle/:id', Loodle._getPublicLoodleData);
 
 router.get('/user', User._get);
 
@@ -91,6 +98,9 @@ router.post('/user', User._createUser);
 // Create a new loodle =================================
 router.post('/loodle', Loodle._createLoodle);
 
+// Add public user with votes to a loodle
+router.post('/loodle/:id/public/user', Loodle._addPublicUserWithVotes);
+
 // Add user ============================================
 router.post('/loodle/:loodleId/user/:userId', Loodle._addUser);
 
@@ -112,9 +122,13 @@ router.post('/loodle/:id/participation-request', function (req, res) {
 
 router.put('/loodle/:id/votes', Vote._updateVotes);
 
+router.put('/loodle/:id/public/votes', Vote._updatePublicVotesWithoutUserId);
+
 router.put('/loodle/:id/configuration', Configuration._update);
 
 router.put('/notification/:id', Notification._markAsRead);
+
+router.put('/loodle/:id/category', Loodle._setCategory);
 
 // DELETE ==========================================
 

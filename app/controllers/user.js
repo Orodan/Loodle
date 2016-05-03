@@ -37,7 +37,7 @@ UserController._authenticate = function (req, res) {
     if (!Validator.isDefined(req.body.email))
         return reply(res, 'Email required', 400);
 
-    if (!Validator.isDefined(req.body.email))
+    if (!Validator.isDefined(req.body.password))
         return reply(res, 'Password required', 400);
 
     UserController.authenticate(req.body.email, req.body.password, function (err, data) {
@@ -112,12 +112,11 @@ UserController._createUser = function (req, res) {
     if (!Validator.isDefined(req.body.password))
         return reply(res, 'Password required', 400);
 
-    UserController.createUser(req.body.email, req.body.first_name, req.body.last_name, req.body.password
-        , function (err, data) {
-            if (err) return reply(res, err.message, data);
+    UserController.createUser(req.body.email, req.body.first_name, req.body.last_name, req.body.password, function (err, data) {
+        if (err) return reply(res, err.message, data);
 
-            return reply(res, null, data);
-        });
+        return reply(res, null, data);
+    });
 
 };
 
@@ -184,34 +183,27 @@ UserController.createPublicUser = function (loodle_id, first_name, last_name, ca
     var user = new PublicUser(first_name, last_name);
 
     Loodle.get(loodle_id, function (err, data) {
-
-        if (err)
-            return callback(err);
+        if (err) return callback(err);
 
         async.parallel({
             // Save the user
             save: function (done) {
                 user.save(done);
             },
-
             // Bind user - loodle
             bind: function (done) {
                 PublicUser.bind(user.id, loodle_id, done);
             },
-
             // Create default votes
             defaultVotes: function (done) {
                 Vote.createDefaultVotesForLoodle(loodle_id, user.id, done);
             }
-        }, function (err, result) {
-
-            if (err)
-                return callback(err);
-
+        }, function (err) {
+            if (err) return callback(err);
             return callback(null, user);
         });
 
-    })
+    });
 
 };
 

@@ -196,6 +196,15 @@ Loodle.getUsers = function (id, callback) {
 
 		}
 	], function (err) {
+        results.sort(function (a, b) {
+            var lowerA = a.first_name.toLowerCase(),
+                lowerB = b.first_name.toLowerCase();
+
+            if (lowerA < lowerB) return -1;
+            if (lowerA > lowerB) return 1;
+            return 0;
+        });
+
 		return callback(err, results);
 	});
 
